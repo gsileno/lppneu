@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?><pnml>
+  <net type="http://www.yasper.org/specs/epnml-1.1" id="di0">
+    <transition id="tr0">
+      <graphics>
+        <position x="99" y="33"/>
+        <dimension x="32" y="32"/>
+      </graphics>
+    </transition>
+    <transition id="tr1">
+      <graphics>
+        <position x="99" y="99"/>
+        <dimension x="32" y="32"/>
+      </graphics>
+    </transition>
+    <place id="pl0">
+      <name>
+        <text>OR(NEG(p), NOT(r))</text>
+      </name>
+      <graphics>
+        <position x="165" y="33"/>
+        <dimension x="20" y="20"/>
+      </graphics>
+    </place>
+    <place id="pl1">
+      <name>
+        <text>NEG(p)</text>
+      </name>
+      <graphics>
+        <position x="33" y="33"/>
+        <dimension x="20" y="20"/>
+      </graphics>
+    </place>
+    <place id="pl2">
+      <name>
+        <text>NOT(r)</text>
+      </name>
+      <graphics>
+        <position x="33" y="99"/>
+        <dimension x="20" y="20"/>
+      </graphics>
+    </place>
+    <arc id="a0" source="tr0" target="pl1"/>
+    <arc id="a1" source="pl1" target="tr0"/>
+    <arc id="a2" source="tr0" target="pl0"/>
+    <arc id="a3" source="tr0" target="pl0">
+      <type>
+        <text>inhibitor</text>
+      </type>
+    </arc>
+    <arc id="a4" source="tr1" target="pl2"/>
+    <arc id="a5" source="pl2" target="tr1"/>
+    <arc id="a6" source="tr1" target="pl0"/>
+    <arc id="a7" source="tr1" target="pl0">
+      <type>
+        <text>inhibitor</text>
+      </type>
+    </arc>
+  </net>
+</pnml>
+

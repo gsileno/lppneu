@@ -1,0 +1,9 @@
+digraph G {
+  rankdir="LR";
+  subgraph place {
+    graph [shape=circle,color=gray];
+    node [shape=circle,fixedsize=true,width=.5];
+    pl0 [label="p"];
+  } 
+}
+

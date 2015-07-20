@@ -1,0 +1,24 @@
+digraph G {
+  rankdir="LR";
+  subgraph place {
+    graph [shape=circle,color=gray];
+    node [shape=circle,fixedsize=true,width=.5];
+    pl0 [label="OR(NEG(p), NOT(r))"];
+    pl1 [label="NEG(p)"];
+    pl2 [label="NOT(r)"];
+  } 
+  subgraph transitions {
+    node [shape=rect,height=.5,width=.5];
+    tr0 [label="null"];
+    tr1 [label="null"];
+  } 
+  tr0 -> pl1 [] ;
+  pl1 -> tr0 [] ;
+  tr0 -> pl0 [] ;
+  pl0 -> tr0 [arrowhead=dot] ;
+  tr1 -> pl2 [] ;
+  pl2 -> tr1 [] ;
+  tr1 -> pl0 [] ;
+  pl0 -> tr1 [arrowhead=dot] ;
+}
+
