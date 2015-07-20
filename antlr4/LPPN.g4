@@ -7,36 +7,40 @@ grammar LPPN;
 *----------------*/
 
 /** The overall program consists of directives, facts and rules. */
-program : (directive | aspfact | asprule)* EOF ;
+program : (situationfact | eventfact | logicrule | causalrule )* EOF ;
 
-/** We consider the directives '#domain', 'hide' and 'show' */
-directive
-: DOMAIN list_literals DOT
-| ( 'hide' | 'show' ) (list_literals)? DOT ;
+/** A fact is the head followed by a dot. */
+situationfact : head DOT ;
 
-/** A rule can be a normal rule or a constraint. */
-asprule : normrule | constraint ;
+/** An event is a DO prefix with a head followed by a dot. */
+eventfact : CAUSES operation ;
 
-/** A fact is the head followed by a dot, or a range. */
-aspfact : ( head | range ) DOT ;
-
-/** Ranges relate interger values to an identifier */
-range : identifier LPAR min=INTEGER RANGE max=INTEGER RPAR;
+/** A logic rule can be a normal rule or a constraint. */
+logicrule : normrule | constraint ;
 
 /** A normal rule has a head and body. */
-normrule : head ENTAILS body DOT ;
+normrule : head IF body DOT ;
 
 /** A constraint has NO head, only a body. */
-constraint : ENTAILS body DOT ;
+constraint : IF body DOT ;
 
-/** A choice operator has curly brackets . */
-choice : ( min=INTEGER )? LACC list_literals RACC ( max=INTEGER )? ;
+/** A causal rule can be a Condition-Action, an Event-Condition-Action rule or a dependency. */
+causalrule : carule | ecarule | dependency ;
 
-/** The head consists of a literal or a choice. */
-head : literal | choice ;
+/** A condition action rule is a situation that generates an operation */
+carule : situation CAUSES operation ;
 
-/** The body consists of a list of literals or expressions separated or a choice construct. */
-body : list_ext_literals_expressions | choice ;
+/** An event condition action rule is an event, that in a certain situation generates an operation */
+ecarule : event WHEN situation CAUSES operation ;
+
+/** A dependency is an ECA without condition */
+dependency : event CAUSES operation ;
+
+/** The head consists of a literal. */
+head : literal ;
+
+/** The body consists of a list of literals or expressions separated. */
+body : list_ext_literals_expressions ;
 
 /** A list of literals is separated by comma */
 list_literals : literal ( COMMA list_literals )? ;
@@ -67,14 +71,14 @@ identifier : IDENTIFIER ;
 constant : INTEGER ;
 variable : VARIABLE ;
 
-
 /*----------------
 * LEXER RULES
 *----------------*/
 
 WS : (' ' | '\t' | '\n' | '\r' | '\f')+ -> skip ;
 
-ENTAILS : ':-' ;
+IF : ':-' ;
+WHEN : ':' ;
 
 DOT : '.' ;
 COMMA : ',' ;
@@ -90,6 +94,8 @@ GT : '>' ;
 LT : '<' ;
 GE : '>=' ;
 LE : '<=' ;
+
+CAUSES : '>>' ;
 
 NOT : 'not' ; // default negation
 PLUS : '+' ;

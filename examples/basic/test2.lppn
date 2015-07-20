@@ -1,0 +1,2 @@
+p -> q.         // when p occurs, then q occurs after
+q and r -> s.   // if (q and r) occurs, then s occurs after.
