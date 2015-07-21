@@ -1,0 +1,6 @@
+shoot: loaded -> -loaded par dead.
+load -> loaded.
+dead :- -alive.
+alive :- -dead.
+
+-> load seq shoot seq sneeze seq shoot.

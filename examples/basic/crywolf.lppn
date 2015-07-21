@@ -1,46 +1,6 @@
-#domain wolf(W), human(H), human(H1), human(H2).
-#domain agent(A), agent(A1), agent(A2).
+crywolf -> help.
+wolf -> crywolf.
+// crywolf seq (~help in time) -> crywolf.
+crywolf and ~joker -> help.
+(help seq help) and ~wolf -> joker.
 
-agent(X) :- animal(X).
-animal(X) :- wolf(X).
-animal(X) :- human(X).
-
-action(cryWolf(X)) :- human(X).
-action(assume(joker(X))) :- human(X).
-action(see(X, Y)) :- agent(X), agent(Y).
-action(help(X, Y)) :- agent(X), agent(Y).
-action(attack(X, Y)) :- agent(X), agent(Y).
-
-// Action effects / mechanisms
-
-help(Agent1, Agent2) -> -attacked(Agent2).
-assume(joker(Agent)) -> joker(Agent).
-
-attack(Agent1, Agent2) -> see(Agent2, Agent1).
-see(H, W) -> cryWolf(H).
-
-( cryWolf(H) SEQ duration(time) ) PAR not helped(H) -> cryWolf(H).
-cryWolf(H2), not joker(H2) -> help(H1, H2).
-
-helped(H) :-
-
-(helped(H) AND -wol
-
-happens(assume(joker(H2)), T2)
-  :- happens(help(H1, H2), T2), not holdsAt(attacked(H2), T2 - 1),
-     happens(help(H1, H2), T1), not holdsAt(attacked(H2), T1),
-     T1 < T2 - 1.
-
-// Narrative of actions
-
-human(shepherd).
-human(villager).
-wolf(wolf).
-happens(cryWolf(shepherd), 0).
-happens(cryWolf(shepherd), 5).
-happens(attack(wolf, shepherd), 10).
-
-// Computation range
-time(0..20).
-
-hide initiates(_, _, _), terminates(_, _, _), action(_), time(_), helped(_, _), clipped(_, _, _), agent(_), animal(_), human(_), fluent(_).

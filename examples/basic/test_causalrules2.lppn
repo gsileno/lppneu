@@ -1,0 +1,8 @@
+p -> q.  // when p occurs, then q occurs after
+q -> r.  // when q occurs, then r occurs after
+
+p & p -> t1.   // when p occurs than t1 occurs
+p seq p -> t2. // when p occurs twice, then t2
+s -> -q.
+q and s -> -q.
+
