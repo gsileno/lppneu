@@ -25,13 +25,13 @@ normrule : head IS_IMPLIED_BY body DOT ;
 constraint : IS_IMPLIED_BY body DOT ;
 
 /** A causal rule can be a Condition-Action, an Event-Condition-Action rule or a dependency. */
-causalrule : ec_expression CAUSES operation DOT ;
+causalrule : eventcondition_expression CAUSES operation DOT ;
 
-ec_expression : body_situation |
+eventcondition_expression : body_situation |
 | event WHEN body_expression
-| LPAR ec_expression RPAR
-| ec_expression SEQ ec_expression
-| ec_expression (PAR | ALT) ec_expression
+| LPAR eventcondition_expression RPAR
+| eventcondition_expression SEQ eventcondition_expression
+| eventcondition_expression (PAR | ALT) eventcondition_expression
 | body_expression AND body_expression
 | body_expression (OR | XOR) body_expression
 ;
@@ -86,7 +86,7 @@ num_expression : (variable | INTEGER) (PLUS | MINUS) (variable | INTEGER) ;
 ext_literal : ( NOT | TILDE )? literal ;
 
 /** A literal can be positive or negative. */
-literal : ( MINUS )? pos_literal ;
+literal : ( NEG | MINUS )? pos_literal ;
 
 /** A positive literal consists of symbols (no predicates) or symbols and terms (predicate literal). */
 pos_literal : predicate ( LPAR list_parameters RPAR )? ;

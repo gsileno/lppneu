@@ -45,7 +45,7 @@ class Operation {
         )
     }
 
-    // for special cases: NOT (THIS | INSTANCE), NEG (THIS | INSTANCE)
+    // for special cases: NULL (THIS | INSTANCE), NEG (THIS | INSTANCE)
     static Operation build(Operator op) {
         new Operation(
                 formula: PROTOTYPE.build(op)

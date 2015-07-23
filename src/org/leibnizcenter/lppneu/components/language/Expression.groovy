@@ -80,7 +80,7 @@ class Expression {
     Polarity polarity() {
         if (formula.operator == Operator.NEG)
             return Polarity.NEG
-        else if (formula.operator == Operator.NOT)
+        else if (formula.operator == Operator.NULL)
             return Polarity.NOT
         else
             return Polarity.POS
@@ -91,7 +91,7 @@ class Expression {
     }
 
     Expression nullify() {
-        return build(this, Operator.NOT)
+        return build(this, Operator.NULL)
     }
 
     // to obtain the positive content we can take the internal part of the proposition

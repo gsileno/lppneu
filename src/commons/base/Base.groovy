@@ -31,7 +31,6 @@ class Base<T> {
     Integer findIndexOf(T elem) {
         Integer pos = base.findIndexOf { it == elem }
         if (pos == -1) return null
-
         pos
     }
 

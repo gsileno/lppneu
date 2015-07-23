@@ -8,10 +8,18 @@ class Program {
     List<LogicRule> logicRules = []
     List<CausalRule> causalRules = []
 
-    Program() {
-    }
+    Program() {}
 
     void print() {
+
+        for (rule in logicRules) {
+            println rule
+        }
+
+        for (rule in causalRules) {
+            println rule
+        }
+
     }
 
 }

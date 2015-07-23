@@ -72,6 +72,8 @@ public class LPPNLoader {
         walker.walk(loader, tree); // walk parse tree
 
         program.setParsingErrors(errorListener.errors); // record the parsing errors
+        program.setCausalRules(loader.getProgram().getCausalRules());
+        program.setLogicRules(loader.getProgram().getLogicRules());
 
         return program;
     }

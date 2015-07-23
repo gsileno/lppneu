@@ -1,4 +1,4 @@
-// Generated from /home/giovanni/dev/lppneu/antlr4/LPPN.g4 by ANTLR 4.5.1
+// Generated from /home/giovanni/dev/lppneu/antlr4/LPPN.g4 by ANTLR 4.5
 package org.leibnizcenter.lppneu.parser;
 import org.antlr.v4.runtime.Lexer;
 import org.antlr.v4.runtime.CharStream;
@@ -11,7 +11,7 @@ import org.antlr.v4.runtime.misc.*;
 
 @SuppressWarnings({"all", "warnings", "unchecked", "unused", "cast"})
 public class LPPNLexer extends Lexer {
-	static { RuntimeMetaData.checkVersion("4.5.1", RuntimeMetaData.VERSION); }
+	static { RuntimeMetaData.checkVersion("4.5", RuntimeMetaData.VERSION); }
 
 	protected static final DFA[] _decisionToDFA;
 	protected static final PredictionContextCache _sharedContextCache =
@@ -29,7 +29,7 @@ public class LPPNLexer extends Lexer {
 	public static final String[] ruleNames = {
 		"WS", "IS_IMPLIED_BY", "WHEN", "DOT", "COMMA", "LPAR", "RPAR", "LACC", 
 		"RACC", "EQ", "NEQ", "GT", "LT", "GE", "LE", "AND", "OR", "XOR", "SEQ", 
-		"PAR", "ALT", "CAUSES", "NOT", "NEG", "PLUS", "MINUS", "TILDE", "DOMAIN", 
+		"PAR", "ALT", "CAUSES", "NULL", "NEG", "PLUS", "MINUS", "TILDE", "DOMAIN",
 		"RANGE", "INTEGER", "IDENTIFIER", "VARIABLE", "SINGLE_LINE_COMMENT", "MULTILINE_COMMENT"
 	};
 
@@ -41,7 +41,7 @@ public class LPPNLexer extends Lexer {
 	private static final String[] _SYMBOLIC_NAMES = {
 		null, "WS", "IS_IMPLIED_BY", "WHEN", "DOT", "COMMA", "LPAR", "RPAR", "LACC", 
 		"RACC", "EQ", "NEQ", "GT", "LT", "GE", "LE", "AND", "OR", "XOR", "SEQ", 
-		"PAR", "ALT", "CAUSES", "NOT", "NEG", "PLUS", "MINUS", "TILDE", "DOMAIN", 
+		"PAR", "ALT", "CAUSES", "NULL", "NEG", "PLUS", "MINUS", "TILDE", "DOMAIN",
 		"RANGE", "INTEGER", "IDENTIFIER", "VARIABLE", "SINGLE_LINE_COMMENT", "MULTILINE_COMMENT"
 	};
 	public static final Vocabulary VOCABULARY = new VocabularyImpl(_LITERAL_NAMES, _SYMBOLIC_NAMES);
@@ -72,7 +72,7 @@ public class LPPNLexer extends Lexer {
 	}
 
 	@Override
-
+	@NotNull
 	public Vocabulary getVocabulary() {
 		return VOCABULARY;
 	}

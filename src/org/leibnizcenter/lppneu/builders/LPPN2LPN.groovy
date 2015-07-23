@@ -242,7 +242,7 @@ class LPPN2LPN {
             if (formula.inputFormulas.size() > 0) { // there are subformulas
                 if (formula.operator == Operator.POS) {
                     return buildExpressionNet(formula.inputFormulas[0], z - 1)
-                } else if (formula.operator == Operator.NEG || formula.operator == Operator.NOT) {
+                } else if (formula.operator == Operator.NEG || formula.operator == Operator.NULL) {
                     return buildNegNotExpressionNet(formula, z - 1)
                 } else {
                     log.warn("You should not be here."); return null
@@ -252,7 +252,7 @@ class LPPN2LPN {
                     return buildSituationNet(formula.inputPorts[0], z)
                 } else if (formula.operator == Operator.NEG) {
                     return buildSituationNet(formula.inputPorts[0].negate(), z)
-                } else if (formula.operator == Operator.NOT) {
+                } else if (formula.operator == Operator.NULL) {
                     return buildSituationNet(formula.inputPorts[0].nullify(), z)
                 } else {
                     log.warn("You should not be here."); return null
@@ -392,7 +392,7 @@ class LPPN2LPN {
                     return buildEventNet(formula.inputPorts[0], z)
                 } else if (formula.operator == Operator.NEG) {
                     return buildEventNet(formula.inputPorts[0].negate(), z)
-                } else if (formula.operator == Operator.NOT) {
+                } else if (formula.operator == Operator.NULL) {
                     return buildEventNet(formula.inputPorts[0].nullify(), z)
                 } else {
                     log.warn("You should not be here."); return null

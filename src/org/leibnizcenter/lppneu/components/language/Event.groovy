@@ -49,7 +49,7 @@ class Event {
 
     Event nullify() {
         return new Event(
-                operator: operator.NOT,
+                operator: operator.NULL,
                 positionRef: positionRef,
                 rootLiteral: rootLiteral,
                 position: position

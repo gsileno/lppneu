@@ -31,4 +31,18 @@ class EventCondition {
         )
     }
 
+    String toString() {
+        String output = ""
+
+        if (event) {
+            output = event.toString()
+            if (condition) {
+                output += " in "+condition.toString()
+            }
+        } else {
+            output += condition.toString()
+        }
+
+        output
+    }
 }

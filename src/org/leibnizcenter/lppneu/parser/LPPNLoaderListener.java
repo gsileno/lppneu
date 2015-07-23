@@ -11,7 +11,9 @@ import java.util.List;
 
 public class LPPNLoaderListener extends LPPNBaseListener {
 
-    public Program program;
+    private Program program;
+
+    public Program getProgram() { return program; }
 
     private final static Logger log = Logger.getLogger("LoaderListener");
 
@@ -26,6 +28,7 @@ public class LPPNLoaderListener extends LPPNBaseListener {
     private ParseTreeProperty<PositionRef> positionRefNodes = new ParseTreeProperty<PositionRef>();
     private ParseTreeProperty<Situation> situationNodes = new ParseTreeProperty<Situation>();
     private ParseTreeProperty<Expression> expressionNodes = new ParseTreeProperty<Expression>();
+    private ParseTreeProperty<EventConditionExpression> eventConditionExpressionNodes = new ParseTreeProperty<EventConditionExpression>();
     private ParseTreeProperty<Event> eventNodes = new ParseTreeProperty<Event>();
     private ParseTreeProperty<Operation> operationNodes = new ParseTreeProperty<Operation>();
     private ParseTreeProperty<LogicRule> logicRuleNodes = new ParseTreeProperty<LogicRule>();
@@ -113,7 +116,7 @@ public class LPPNLoaderListener extends LPPNBaseListener {
     public void exitLiteral(LPPNParser.LiteralContext ctx) {
         ExtLiteral extLiteral = ExtLiteral.build(literalNodes.get(ctx.pos_literal()));
 
-        if (ctx.MINUS() != null)
+        if (ctx.MINUS() != null || ctx.NEG() != null)
             extLiteral.negate();
 
         extLiteralNodes.put(ctx, extLiteral);
@@ -122,7 +125,7 @@ public class LPPNLoaderListener extends LPPNBaseListener {
     public void exitExt_literal(LPPNParser.Ext_literalContext ctx) {
         ExtLiteral extLiteral;
 
-        if (ctx.NOT() != null)
+        if (ctx.NOT() != null || ctx.TILDE() != null)
             extLiteral = ExtLiteral.buildNull(extLiteralNodes.get(ctx.literal()));
         else
             extLiteral = extLiteralNodes.get(ctx.literal());
@@ -209,10 +212,58 @@ public class LPPNLoaderListener extends LPPNBaseListener {
         expressionNodes.put(ctx, expressionNodes.get(ctx.body_expression()));
     }
 
+    public void exitEventcondition_expression(LPPNParser.Eventcondition_expressionContext ctx) {
+        EventConditionExpression expression;
+
+        if (ctx.body_situation() != null) {
+            expression = EventConditionExpression.build(Expression.build(situationNodes.get(ctx.body_situation())));
+        } else if (ctx.WHEN() != null) {
+            expression = EventConditionExpression.build(eventNodes.get(ctx.event()), expressionNodes.get(ctx.body_expression(0)));
+        } else if (ctx.LPAR() != null) {
+            expression = eventConditionExpressionNodes.get(ctx.eventcondition_expression(0));
+        } else {
+            Operator op;
+            if (ctx.AND() != null) op = Operator.AND;
+            else if (ctx.OR() != null) op = Operator.OR;
+            else if (ctx.XOR() != null) op = Operator.XOR;
+            else if (ctx.SEQ() != null) op = Operator.SEQ;
+            else if (ctx.PAR() != null) op = Operator.PAR;
+            else if (ctx.ALT() != null) op = Operator.ALT;
+            else {
+                log.warn("Unknown operator in expression.");
+                return;
+            }
+
+            if (op.binaryProcessOperator()) {
+                expression = EventConditionExpression.build(
+                        eventConditionExpressionNodes.get(ctx.eventcondition_expression(0)),
+                        eventConditionExpressionNodes.get(ctx.eventcondition_expression(1)),
+                        op
+                );
+            } else {
+                expression = EventConditionExpression.build(
+                        EventConditionExpression.build(expressionNodes.get(ctx.body_expression(0))),
+                        EventConditionExpression.build(expressionNodes.get(ctx.body_expression(1))),
+                        op
+                );
+            }
+        }
+
+        eventConditionExpressionNodes.put(ctx, expression);
+    }
+
     public void exitEvent(LPPNParser.EventContext ctx) {
         Event event = Event.build(extLiteralNodes.get(ctx.literal()));
         eventNodes.put(ctx, event);
     }
+
+    public void exitCausalrule(LPPNParser.CausalruleContext ctx) {
+        CausalRule rule = new CausalRule();
+        rule.setTrigger(eventConditionExpressionNodes.get(ctx.eventcondition_expression()));
+        rule.setAction(operationNodes.get(ctx.operation()));
+        causalRuleNodes.put(ctx, rule);
+    }
+
 
     public void exitOperation(LPPNParser.OperationContext ctx) {
 

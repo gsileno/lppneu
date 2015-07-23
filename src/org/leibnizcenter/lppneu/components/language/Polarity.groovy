@@ -4,7 +4,7 @@ import groovy.util.logging.Log4j
 
 // POS: positive polarity (+)
 // NEG: negative polarity (-), correspondent to strong negation
-// NOT: null polarity (0), equivalent to default negation (NAF), unknown, undecidable, etc.
+// NULL: null polarity (0), equivalent to default negation (NAF), unknown, undecidable, etc.
 
 @Log4j
 enum Polarity {
@@ -13,7 +13,7 @@ enum Polarity {
     Operator toOperator() {
         if (this == POS) return Operator.POS
         else if (this == NEG) return Operator.NEG
-        else if (this == NOT) return Operator.NOT
+        else if (this == NOT) return Operator.NULL
         else { log.warn("You should not be here."); return null }
     }
 

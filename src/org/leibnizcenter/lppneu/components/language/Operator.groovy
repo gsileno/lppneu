@@ -6,13 +6,15 @@ import groovy.util.logging.Log4j
 
 // POS: positive polarity (+)
 // NEG: negative polarity (-), correspondent to strong negation
-// NOT: null polarity (0), equivalent to default negation (NAF), unknown, undecidable, etc.
+// NULL: null polarity (0), equivalent to default negation (NAF), unknown, undecidable, etc.
 
 // unary operators for events
 
 // POS: charge positively (+)
 // NEG: charge negatively (-)
-// NOT: remove polarity (0)
+// NULL: remove polarity (0)
+
+// NOT: it is a
 
 // binary operators for events
 
@@ -22,7 +24,7 @@ import groovy.util.logging.Log4j
 
 @Log4j
 enum Operator {
-    POS, NEG, NOT,          // unary operators  (situations and events)
+    POS, NEG, NULL, NOT,    // unary operators  (situations and events)
     AND, OR, XOR,           // binary operators (situations)
     SEQ, PAR, ALT,          // binary operators (events)
 
@@ -33,18 +35,30 @@ enum Operator {
     Operator negate() {
         if (this == POS) return NEG
         else if (this == NEG) return POS
-        else if (this == NOT) return NOT
+        else if (this == NULL) return NULL
         else  { log.warn("You should not be here."); return null }
     }
 
     Boolean unary() {
-        (this == POS || this == NEG || this == NOT)
+        this == POS || this == NEG || this == NULL
+    }
+
+    Boolean binaryProcessOperator() {
+        this == SEQ || this == PAR || this == ALT
+    }
+
+    Boolean binaryLogicOperator() {
+        this == AND || this == OR || this == XOR
+    }
+
+    Boolean binary() {
+        binaryLogicOperator() || binaryProcessOperator()
     }
 
     Polarity toPolarity() {
         if (this == POS) return Polarity.POS
         else if (this == NEG) return Polarity.NEG
-        else if (this == NOT) return Polarity.NOT
+        else if (this == NULL) return Polarity.NOT
         else  { log.warn("You should not be here."); return null }
     }
 

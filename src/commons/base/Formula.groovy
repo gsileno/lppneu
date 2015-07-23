@@ -56,7 +56,7 @@ class Formula<T> {
         } else { // with only one input, the formula becomes identity, unless it is negation
             if (op == Operator.NEG)
                 formula = build(terms[0].negate())
-            else if (op == Operator.NOT)
+            else if (op == Operator.NULL)
                 formula = build(terms[0].nullify())
             else
                 formula = build(terms[0])

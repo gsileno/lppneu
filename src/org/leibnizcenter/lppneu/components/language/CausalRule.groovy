@@ -9,6 +9,14 @@ package org.leibnizcenter.lppneu.components.language
  **/
 
 class CausalRule {
-    CausalFormula trigger
+    EventConditionExpression trigger
     Operation action
+
+    String toString() {
+        String output = ""
+
+        output = trigger.toString() + " => " + action.toString()
+
+        output
+    }
 }

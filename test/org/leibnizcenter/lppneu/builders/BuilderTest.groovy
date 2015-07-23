@@ -279,7 +279,7 @@ class BuilderTest extends GroovyTestCase {
 //        assert (p.position.x == 33)
 //        assert (p.position.y == 33)
 //
-//        p = pnml.placeList.find() { it.name == "NOT(r)" }
+//        p = pnml.placeList.find() { it.name == "NULL(r)" }
 //        assert (p.position.x == 33)
 //        assert (p.position.y == 99)
     }
