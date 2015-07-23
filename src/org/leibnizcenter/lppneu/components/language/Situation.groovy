@@ -24,16 +24,16 @@ class Situation {
     }
 
     static Situation build(Expression expression) {
-        if (!expression.formula.operator.unary()) {
+        if (!expression.operator.unary()) {
             return new Situation(
                     polarity: Polarity.POS,
                     rootExpression: expression
             )
         } else {
             Expression content = expression.positive()
-            Polarity polarity = expression.formula.operator.toPolarity()
+            Polarity polarity = expression.operator.toPolarity()
 
-            if (content.formula.inputFormulas.size() > 0) {
+            if (content.inputFormulas.size() > 0) {
                 return new Situation(
                         polarity: polarity,
                         rootExpression: content
@@ -41,7 +41,7 @@ class Situation {
             } else {
                 return new Situation(
                         polarity: polarity,
-                        rootLiteral: content.formula.inputPorts[0]
+                        rootLiteral: content.inputPorts[0]
                 )
             }
         }

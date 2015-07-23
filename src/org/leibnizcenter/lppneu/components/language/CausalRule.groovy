@@ -9,7 +9,6 @@ package org.leibnizcenter.lppneu.components.language
  **/
 
 class CausalRule {
-    Event event
-    Expression condition
+    CausalFormula trigger
     Operation action
 }

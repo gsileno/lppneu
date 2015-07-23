@@ -25,13 +25,16 @@ normrule : head IS_IMPLIED_BY body DOT ;
 constraint : IS_IMPLIED_BY body DOT ;
 
 /** A causal rule can be a Condition-Action, an Event-Condition-Action rule or a dependency. */
-causalrule : carule | ecarule ;
+causalrule : ec_expression CAUSES operation DOT ;
 
-/** A condition action rule is a situation that generates an operation */
-carule : body_expression CAUSES operation DOT ;
-
-/** An event condition action rule is an event, that in a certain situation generates an operation */
-ecarule : event WHEN body_expression CAUSES operation DOT ;
+ec_expression : body_situation |
+| event WHEN body_expression
+| LPAR ec_expression RPAR
+| ec_expression SEQ ec_expression
+| ec_expression (PAR | ALT) ec_expression
+| body_expression AND body_expression
+| body_expression (OR | XOR) body_expression
+;
 
 /** The head consists of a literal. */
 head : head_expression ;
@@ -106,7 +109,7 @@ variable : VARIABLE ;
 WS : (' ' | '\t' | '\n' | '\r' | '\f')+ -> skip ;
 
 IS_IMPLIED_BY : ':-' ;
-WHEN : ':' ;
+WHEN : ':' | 'in' ;
 
 DOT : '.' ;
 COMMA : ',' ;

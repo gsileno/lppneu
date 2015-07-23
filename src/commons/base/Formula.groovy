@@ -1,7 +1,8 @@
-package org.leibnizcenter.lppneu.components.language
+package commons.base
 
 import groovy.transform.EqualsAndHashCode
 import groovy.util.logging.Log4j
+import org.leibnizcenter.lppneu.components.language.Operator
 
 @Log4j @EqualsAndHashCode
 class Formula<T> {

@@ -1,8 +1,7 @@
-// Generated from /home/giovanni/dev/lppneu/antlr4/LPPN.g4 by ANTLR 4.5
+// Generated from /home/giovanni/dev/lppneu/antlr4/LPPN.g4 by ANTLR 4.5.1
 package org.leibnizcenter.lppneu.parser;
 
 import org.antlr.v4.runtime.ParserRuleContext;
-import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.tree.ErrorNode;
 import org.antlr.v4.runtime.tree.TerminalNode;
 
@@ -17,372 +16,360 @@ public class LPPNBaseListener implements LPPNListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterProgram(@NotNull LPPNParser.ProgramContext ctx) { }
+	@Override public void enterProgram(LPPNParser.ProgramContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitProgram(@NotNull LPPNParser.ProgramContext ctx) { }
+	@Override public void exitProgram(LPPNParser.ProgramContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterSituationfact(@NotNull LPPNParser.SituationfactContext ctx) { }
+	@Override public void enterSituationfact(LPPNParser.SituationfactContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitSituationfact(@NotNull LPPNParser.SituationfactContext ctx) { }
+	@Override public void exitSituationfact(LPPNParser.SituationfactContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterEventfact(@NotNull LPPNParser.EventfactContext ctx) { }
+	@Override public void enterEventfact(LPPNParser.EventfactContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitEventfact(@NotNull LPPNParser.EventfactContext ctx) { }
+	@Override public void exitEventfact(LPPNParser.EventfactContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterLogicrule(@NotNull LPPNParser.LogicruleContext ctx) { }
+	@Override public void enterLogicrule(LPPNParser.LogicruleContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitLogicrule(@NotNull LPPNParser.LogicruleContext ctx) { }
+	@Override public void exitLogicrule(LPPNParser.LogicruleContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterNormrule(@NotNull LPPNParser.NormruleContext ctx) { }
+	@Override public void enterNormrule(LPPNParser.NormruleContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitNormrule(@NotNull LPPNParser.NormruleContext ctx) { }
+	@Override public void exitNormrule(LPPNParser.NormruleContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterConstraint(@NotNull LPPNParser.ConstraintContext ctx) { }
+	@Override public void enterConstraint(LPPNParser.ConstraintContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitConstraint(@NotNull LPPNParser.ConstraintContext ctx) { }
+	@Override public void exitConstraint(LPPNParser.ConstraintContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterCausalrule(@NotNull LPPNParser.CausalruleContext ctx) { }
+	@Override public void enterCausalrule(LPPNParser.CausalruleContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitCausalrule(@NotNull LPPNParser.CausalruleContext ctx) { }
+	@Override public void exitCausalrule(LPPNParser.CausalruleContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterCarule(@NotNull LPPNParser.CaruleContext ctx) { }
+	@Override public void enterEc_expression(LPPNParser.Ec_expressionContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitCarule(@NotNull LPPNParser.CaruleContext ctx) { }
+	@Override public void exitEc_expression(LPPNParser.Ec_expressionContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterEcarule(@NotNull LPPNParser.EcaruleContext ctx) { }
+	@Override public void enterHead(LPPNParser.HeadContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitEcarule(@NotNull LPPNParser.EcaruleContext ctx) { }
+	@Override public void exitHead(LPPNParser.HeadContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterHead(@NotNull LPPNParser.HeadContext ctx) { }
+	@Override public void enterBody(LPPNParser.BodyContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitHead(@NotNull LPPNParser.HeadContext ctx) { }
+	@Override public void exitBody(LPPNParser.BodyContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterBody(@NotNull LPPNParser.BodyContext ctx) { }
+	@Override public void enterList_literals(LPPNParser.List_literalsContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitBody(@NotNull LPPNParser.BodyContext ctx) { }
+	@Override public void exitList_literals(LPPNParser.List_literalsContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterList_literals(@NotNull LPPNParser.List_literalsContext ctx) { }
+	@Override public void enterHead_situation(LPPNParser.Head_situationContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitList_literals(@NotNull LPPNParser.List_literalsContext ctx) { }
+	@Override public void exitHead_situation(LPPNParser.Head_situationContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterHead_situation(@NotNull LPPNParser.Head_situationContext ctx) { }
+	@Override public void enterHead_expression(LPPNParser.Head_expressionContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitHead_situation(@NotNull LPPNParser.Head_situationContext ctx) { }
+	@Override public void exitHead_expression(LPPNParser.Head_expressionContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterHead_expression(@NotNull LPPNParser.Head_expressionContext ctx) { }
+	@Override public void enterEvent(LPPNParser.EventContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitHead_expression(@NotNull LPPNParser.Head_expressionContext ctx) { }
+	@Override public void exitEvent(LPPNParser.EventContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterEvent(@NotNull LPPNParser.EventContext ctx) { }
+	@Override public void enterOperation(LPPNParser.OperationContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitEvent(@NotNull LPPNParser.EventContext ctx) { }
+	@Override public void exitOperation(LPPNParser.OperationContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterOperation(@NotNull LPPNParser.OperationContext ctx) { }
+	@Override public void enterBody_situation(LPPNParser.Body_situationContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitOperation(@NotNull LPPNParser.OperationContext ctx) { }
+	@Override public void exitBody_situation(LPPNParser.Body_situationContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterBody_situation(@NotNull LPPNParser.Body_situationContext ctx) { }
+	@Override public void enterBody_expression(LPPNParser.Body_expressionContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitBody_situation(@NotNull LPPNParser.Body_situationContext ctx) { }
+	@Override public void exitBody_expression(LPPNParser.Body_expressionContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterBody_expression(@NotNull LPPNParser.Body_expressionContext ctx) { }
+	@Override public void enterBody_constraint(LPPNParser.Body_constraintContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitBody_expression(@NotNull LPPNParser.Body_expressionContext ctx) { }
+	@Override public void exitBody_constraint(LPPNParser.Body_constraintContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterBody_constraint(@NotNull LPPNParser.Body_constraintContext ctx) { }
+	@Override public void enterNum_expression(LPPNParser.Num_expressionContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitBody_constraint(@NotNull LPPNParser.Body_constraintContext ctx) { }
+	@Override public void exitNum_expression(LPPNParser.Num_expressionContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterNum_expression(@NotNull LPPNParser.Num_expressionContext ctx) { }
+	@Override public void enterExt_literal(LPPNParser.Ext_literalContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitNum_expression(@NotNull LPPNParser.Num_expressionContext ctx) { }
+	@Override public void exitExt_literal(LPPNParser.Ext_literalContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterExt_literal(@NotNull LPPNParser.Ext_literalContext ctx) { }
+	@Override public void enterLiteral(LPPNParser.LiteralContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitExt_literal(@NotNull LPPNParser.Ext_literalContext ctx) { }
+	@Override public void exitLiteral(LPPNParser.LiteralContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterLiteral(@NotNull LPPNParser.LiteralContext ctx) { }
+	@Override public void enterPos_literal(LPPNParser.Pos_literalContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitLiteral(@NotNull LPPNParser.LiteralContext ctx) { }
+	@Override public void exitPos_literal(LPPNParser.Pos_literalContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterPos_literal(@NotNull LPPNParser.Pos_literalContext ctx) { }
+	@Override public void enterList_parameters(LPPNParser.List_parametersContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitPos_literal(@NotNull LPPNParser.Pos_literalContext ctx) { }
+	@Override public void exitList_parameters(LPPNParser.List_parametersContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterList_parameters(@NotNull LPPNParser.List_parametersContext ctx) { }
+	@Override public void enterParameter(LPPNParser.ParameterContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitList_parameters(@NotNull LPPNParser.List_parametersContext ctx) { }
+	@Override public void exitParameter(LPPNParser.ParameterContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterParameter(@NotNull LPPNParser.ParameterContext ctx) { }
+	@Override public void enterPredicate(LPPNParser.PredicateContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitParameter(@NotNull LPPNParser.ParameterContext ctx) { }
+	@Override public void exitPredicate(LPPNParser.PredicateContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterPredicate(@NotNull LPPNParser.PredicateContext ctx) { }
+	@Override public void enterIdentifier(LPPNParser.IdentifierContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitPredicate(@NotNull LPPNParser.PredicateContext ctx) { }
+	@Override public void exitIdentifier(LPPNParser.IdentifierContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterIdentifier(@NotNull LPPNParser.IdentifierContext ctx) { }
+	@Override public void enterConstant(LPPNParser.ConstantContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitIdentifier(@NotNull LPPNParser.IdentifierContext ctx) { }
+	@Override public void exitConstant(LPPNParser.ConstantContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterConstant(@NotNull LPPNParser.ConstantContext ctx) { }
+	@Override public void enterVariable(LPPNParser.VariableContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitConstant(@NotNull LPPNParser.ConstantContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void enterVariable(@NotNull LPPNParser.VariableContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void exitVariable(@NotNull LPPNParser.VariableContext ctx) { }
+	@Override public void exitVariable(LPPNParser.VariableContext ctx) { }
 
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterEveryRule(@NotNull ParserRuleContext ctx) { }
+	@Override public void enterEveryRule(ParserRuleContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitEveryRule(@NotNull ParserRuleContext ctx) { }
+	@Override public void exitEveryRule(ParserRuleContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void visitTerminal(@NotNull TerminalNode node) { }
+	@Override public void visitTerminal(TerminalNode node) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void visitErrorNode(@NotNull ErrorNode node) { }
+	@Override public void visitErrorNode(ErrorNode node) { }
 }

@@ -201,6 +201,13 @@ public class LPPNLoaderListener extends LPPNBaseListener {
         expressionNodes.put(ctx, expression);
     }
 
+    public void exitHead(LPPNParser.HeadContext ctx) {
+        expressionNodes.put(ctx, expressionNodes.get(ctx.head_expression()));
+    }
+
+    public void exitBody(LPPNParser.BodyContext ctx) {
+        expressionNodes.put(ctx, expressionNodes.get(ctx.body_expression()));
+    }
 
     public void exitEvent(LPPNParser.EventContext ctx) {
         Event event = Event.build(extLiteralNodes.get(ctx.literal()));
@@ -254,21 +261,6 @@ public class LPPNLoaderListener extends LPPNBaseListener {
 
     public void exitEventfact(LPPNParser.EventfactContext ctx) {
         CausalRule rule = new CausalRule();
-        rule.setAction(operationNodes.get(ctx.operation()));
-        causalRuleNodes.put(ctx, rule);
-    }
-
-    public void exitCarule(LPPNParser.CaruleContext ctx) {
-        CausalRule rule = new CausalRule();
-        rule.setCondition(expressionNodes.get(ctx.body_expression()));
-        rule.setAction(operationNodes.get(ctx.operation()));
-        causalRuleNodes.put(ctx, rule);
-    }
-
-    public void exitEcarule(LPPNParser.EcaruleContext ctx) {
-        CausalRule rule = new CausalRule();
-        rule.setEvent(eventNodes.get(ctx.event()));
-        rule.setCondition(expressionNodes.get(ctx.body_expression()));
         rule.setAction(operationNodes.get(ctx.operation()));
         causalRuleNodes.put(ctx, rule);
     }

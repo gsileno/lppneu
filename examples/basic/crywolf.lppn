@@ -1,6 +1,5 @@
 crywolf -> help.
 wolf -> crywolf.
-// crywolf seq (~help in time) -> crywolf.
+crywolf seq timeout in ~help -> crywolf.
 crywolf and ~joker -> help.
-(help seq help) and ~wolf -> joker.
-
+(help seq neg wolf) seq (help seq neg wolf) -> joker.

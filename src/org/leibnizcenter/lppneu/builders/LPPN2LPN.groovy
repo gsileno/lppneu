@@ -3,7 +3,7 @@ package org.leibnizcenter.lppneu.builders
 import groovy.util.logging.Log4j
 import org.leibnizcenter.lppneu.components.language.Event
 import org.leibnizcenter.lppneu.components.language.Expression
-import org.leibnizcenter.lppneu.components.language.Formula
+import commons.base.Formula
 import org.leibnizcenter.lppneu.components.language.Operation
 import org.leibnizcenter.lppneu.components.language.Operator
 import org.leibnizcenter.lppneu.components.language.Situation
