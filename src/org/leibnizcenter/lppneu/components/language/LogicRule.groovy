@@ -11,4 +11,15 @@ package org.leibnizcenter.lppneu.components.language
 class LogicRule {
     Expression head
     Expression body
+
+    String toString() {
+        String output = ""
+
+        if (head != null)
+            output += head.toString()
+        if (body != null)
+            output += " :- " + body.toString()
+
+        output
+    }
 }

@@ -15,7 +15,9 @@ class CausalRule {
     String toString() {
         String output = ""
 
-        output = trigger.toString() + " => " + action.toString()
+        if (trigger != null)
+           output += trigger.toString() + " "
+        output += "=> " + action.toString()
 
         output
     }

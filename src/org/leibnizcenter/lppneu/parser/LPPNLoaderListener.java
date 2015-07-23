@@ -277,8 +277,8 @@ public class LPPNLoaderListener extends LPPNBaseListener {
             else if (ctx.PAR() != null) op = Operator.PAR;
             else if (ctx.ALT() != null) op = Operator.ALT;
             else {
-                log.warn("unknown operator in operation. using default SEQ.");
-                op = Operator.SEQ; // default
+                log.warn("Unknown operator in operation.");
+                return;
             }
 
             operation = Operation.build(
@@ -314,6 +314,16 @@ public class LPPNLoaderListener extends LPPNBaseListener {
         CausalRule rule = new CausalRule();
         rule.setAction(operationNodes.get(ctx.operation()));
         causalRuleNodes.put(ctx, rule);
+    }
+
+    public void exitLogicrule(LPPNParser.LogicruleContext ctx) {
+
+        if (ctx.constraint() != null) {
+            logicRuleNodes.put(ctx, logicRuleNodes.get(ctx.constraint()));
+        } else if (ctx.normrule() != null) {
+            logicRuleNodes.put(ctx, logicRuleNodes.get(ctx.normrule()));
+        }
+
     }
 
     public void exitProgram(LPPNParser.ProgramContext ctx) {

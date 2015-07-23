@@ -65,6 +65,7 @@ class Operation {
     }
 
     static Operation build(Operation left, Operation right, Operator op) {
+
         new Operation(
                 formula: PROTOTYPE.build(left.formula, right.formula, op)
         )

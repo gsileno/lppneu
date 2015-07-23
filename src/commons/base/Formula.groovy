@@ -107,16 +107,16 @@ class Formula<T> {
     // Views
     //////////////////
 
-    String toString() {
+    String toString(Operator superOperator = null) {
         String output = ""
 
-        Boolean printOp = (operator != Operator.POS)
+        Boolean printOp = (operator != Operator.POS && (superOperator == null || operator != superOperator))
 
         if (printOp) output += operator.toString()+"("
 
         if (inputFormulas.size() > 0) {
             for (formula in inputFormulas)
-                output += formula.toString() + ", "
+                output += formula.toString(operator) + ", "
             output = output[0..-3]
         } else {
             for (T term in inputPorts) {
