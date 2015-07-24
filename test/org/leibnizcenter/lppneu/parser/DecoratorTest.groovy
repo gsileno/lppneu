@@ -16,6 +16,8 @@ class DecoratorTest extends GroovyTestCase {
 
         Program program = LPPNLoader.parseFile("examples/basic/yaleshooting.lppn")
 
+        program.print()
+
     }
 
 //    void testDecorationLogicRules() {
