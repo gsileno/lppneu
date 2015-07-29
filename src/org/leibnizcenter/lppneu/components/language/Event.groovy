@@ -73,7 +73,15 @@ class Event {
                 position: position
         )
     }
-    
+
+    Situation toSituation() {
+        return new Situation(
+                polarity: operator.toPolarity(),
+                positionRef: positionRef,
+                rootLiteral: rootLiteral
+        )
+    }
+
     String toString() {
         String output = ""
 

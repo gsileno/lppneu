@@ -80,7 +80,7 @@ class EventConditionExpression {
 
     // to obtain the positive content we can take the internal part of the proposition
     EventConditionExpression positive() {
-        if (!this.formula.operator.unary()) {
+        if (!this.formula.operator.isUnary()) {
             log.warn("You should not be here."); return null
         }
 

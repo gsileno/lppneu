@@ -24,7 +24,7 @@ class Situation {
     }
 
     static Situation build(Expression expression) {
-        if (!expression.formula.operator.unary()) {
+        if (!expression.formula.operator.isUnary()) {
             return new Situation(
                     polarity: Polarity.POS,
             )

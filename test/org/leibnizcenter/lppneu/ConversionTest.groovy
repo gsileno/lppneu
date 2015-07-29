@@ -3,7 +3,7 @@ package org.leibnizcenter.lppneu
 import org.leibnizcenter.lppneu.components.language.*
 import org.leibnizcenter.lppneu.parser.LPPNLoader
 
-class ReductionTest extends GroovyTestCase {
+class ConversionTest extends GroovyTestCase {
 
     Literal literalP = Literal.build(Atom.build("p"))
     Literal literalQ = Literal.build(Atom.build("q"))
@@ -64,57 +64,15 @@ class ReductionTest extends GroovyTestCase {
 
     Operation operationPSEQNEGPSEQQ = Operation.buildFromOperations([operationP, operationNEGP, operationQ], Operator.SEQ)
 
-//    void testReduceComplexExpression() {
-//        Program program = new Program()
-//        program.reduceExpression(complexExpression.formula)
-//        assert program.reducedExpressionMap.size() == 6
-//    }
-//
-//    void testReduceLogicRule() {
-//        Program program = new Program()
-//        program.logicRules << new LogicRule(head: expressionPANDQ, body: expressionPANDQXORQ)
-//
-//        assert program.logicRules.size() == 1
-//        Program reducedProgram = program.reduce()
-//        assert reducedProgram.logicRules.size() == 5
-//    }
-//
-//    void testReduceYaleShooting() {
-//        Program program = LPPNLoader.parseFile("examples/basic/yaleshooting.lppn")
-//
-//        assert program.logicRules.size() == 2
-//        assert program.causalRules.size() == 3
-//
-//        Program reducedProgram = program.reduce()
-//
-//        assert reducedProgram.logicRules.size() == 4
-//        assert reducedProgram.causalRules.size() == 3
-//
-//    }
+    void testConversion() {
 
-//    void testReduceLogicRule2() {
-//        Program program = LPPNLoader.parseString("(a and b) seq ((a and b) and (a or b)) :- a.")
-//        program.print()
-//        assert program.logicRules.size() == 1
-//
-//        Program reducedProgram = program.reduce()
-//        reducedProgram.print()
-//        assert reducedProgram.logicRules.size() == 9
-//    }
+        assert operationP.toExpression() == expressionP
+        assert expressionP.toOperation() == operationP
 
-    void testReduceCausalRule() {
-        Program program = LPPNLoader.parseString("(a and b) seq ((a and b) and (a or b)) -> a.")
-        program.print()
+        assert operationPPARQ.toExpression() == expressionPPARQ
+        assert expressionPPARQ.toOperation() == operationPPARQ
 
-        Program reducedProgram = program.reduce()
-        reducedProgram.print()
+        assert expressionPANDQ.toOperation() == operationPANDQ
+
     }
-
-//    void testReduceCausalRule() {
-//        Program program = LPPNLoader.parseString("(a in b) seq (a and b) and (a or b) -> p.")
-//        program.print()
-//
-//        Program reducedProgram = program.reduce()
-//        reducedProgram.print()
-//    }
 }

@@ -102,18 +102,22 @@ class Program {
     EventConditionExpression reduceEventConditionExpression(Formula<EventCondition> formula) {
 
         List<EventConditionExpression> inputReducedExpressions = []
-        EventConditionExpression expression
+
+        log.trace("reduce event condition expression: "+formula.toString())
 
         if (formula.isCompound()) {
+            log.trace("formula is compound (${formula.dump()})")
             for (input in formula.inputFormulas) {
                 inputReducedExpressions << reduceEventConditionExpression(input)
             }
         } else {
+            log.trace("formula is simple (${formula.dump()})")
             for (input in formula.inputPorts) {
                 inputReducedExpressions << EventConditionExpression.build(input.event, reduceExpression(input.condition.formula))
             }
         }
 
+        log.trace("reduced event condition expressions: "+inputReducedExpressions+" (for ${formula.toString()})")
         return EventConditionExpression.buildFromExpressions(inputReducedExpressions, formula.operator)
     }
 

@@ -67,7 +67,7 @@ class Formula<T> {
 
 
 
-    // unary formula
+    // isUnary formula
     Formula<T> build(Formula<T> input, Operator op) {
 
         // if reduction has to be applied
@@ -89,6 +89,11 @@ class Formula<T> {
 
     // n-ary formula
     Formula<T> buildFromFormulas(List<Formula<T>> inputs, Operator op) {
+
+        // if there is only 1 element then simplify
+        if (inputs.size() == 1 && op != Operator.NEG && op != Operator.NULL) {
+            return inputs[0]
+        }
 
         // aggregate all terms of the inputs
         List<T> terms = []

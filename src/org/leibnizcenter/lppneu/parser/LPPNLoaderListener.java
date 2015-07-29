@@ -234,7 +234,7 @@ public class LPPNLoaderListener extends LPPNBaseListener {
                 return;
             }
 
-            if (op.binaryProcessOperator()) {
+            if (op.isBinaryProcessOperator()) {
                 expression = EventConditionExpression.build(
                         eventConditionExpressionNodes.get(ctx.eventcondition_expression(0)),
                         eventConditionExpressionNodes.get(ctx.eventcondition_expression(1)),

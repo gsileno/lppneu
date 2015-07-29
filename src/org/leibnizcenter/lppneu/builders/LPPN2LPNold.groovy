@@ -6,8 +6,6 @@ import org.leibnizcenter.lppneu.components.language.Event
 import org.leibnizcenter.lppneu.components.language.EventConditionExpression
 import org.leibnizcenter.lppneu.components.language.Expression
 import commons.base.Formula
-import org.leibnizcenter.lppneu.components.language.ExtLiteral
-import org.leibnizcenter.lppneu.components.language.LogicRule
 import org.leibnizcenter.lppneu.components.language.Operation
 import org.leibnizcenter.lppneu.components.language.Operator
 import org.leibnizcenter.lppneu.components.language.Program
@@ -251,7 +249,7 @@ class LPPN2LPNold {
     }
 
     static Net buildExpressionNet(Formula<Situation> formula, Integer z = 0) {
-        if (formula.operator.unary()) {
+        if (formula.operator.isUnary()) {
             if (formula.inputFormulas.size() > 0) { // there are subformulas
                 if (formula.operator == Operator.POS) {
                     return buildExpressionNet(formula.inputFormulas[0], z - 1)
@@ -398,7 +396,7 @@ class LPPN2LPNold {
 
     static Net buildOperationNet(Formula<Event> formula, Integer z = 0) {
 
-        if (formula.operator.unary()) {
+        if (formula.operator.isUnary()) {
             if (formula.inputFormulas.size() > 0) {
                 return buildOperationNet(formula.inputFormulas[0], z - 1)
             } else {

@@ -2,13 +2,13 @@ package org.leibnizcenter.lppneu.components.language
 
 import groovy.util.logging.Log4j
 
-// unary operators for situations
+// isUnary operators for situations
 
 // POS: positive polarity (+)
 // NEG: negative polarity (-), correspondent to strong negation
 // NULL: null polarity (0), equivalent to default negation (NAF), unknown, undecidable, etc.
 
-// unary operators for events
+// isUnary operators for events
 
 // POS: charge positively (+)
 // NEG: charge negatively (-)
@@ -26,7 +26,7 @@ import groovy.util.logging.Log4j
 enum Operator {
     POS, NEG, NULL,           // unary operators  (situations and events)
     AND, OR, XOR,             // binary operators (situations)
-    SEQ, PAR, ALT,            // binary operators (events and situations)
+    SEQ, PAR, OPT, ALT, IN,   // binary operators (events and situations)
 
     IMPLIES, INHIBITS,        // only for logical dependencies on situations
 
@@ -41,16 +41,20 @@ enum Operator {
         else  { log.warn("You should not be here."); return null }
     }
 
-    Boolean unary() {
+    Boolean isUnary() {
         this == POS || this == NEG || this == NULL
     }
 
-    Boolean binaryProcessOperator() {
-        this == SEQ || this == PAR || this == ALT
+    Boolean isBinaryProcessOperator() {
+        this == SEQ || this == PAR || this == OPT || this == ALT
     }
 
-    Boolean binaryLogicOperator() {
+    Boolean isBinaryLogicOperator() {
         this == AND || this == OR || this == XOR
+    }
+
+    Boolean isLogicOperator() {
+        isUnary() || isBinaryLogicOperator()
     }
 
     Polarity toPolarity() {

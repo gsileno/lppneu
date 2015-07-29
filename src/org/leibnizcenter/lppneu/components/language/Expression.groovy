@@ -96,7 +96,7 @@ class Expression {
 
     // to obtain the positive content we can take the internal part of the proposition
     Expression positive() {
-        if (!this.formula.operator.unary()) {
+        if (!this.formula.operator.isUnary()) {
             log.warn("You should not be here."); return null
         }
 
@@ -112,4 +112,21 @@ class Expression {
         formula.toString()
     }
 
+    Operation toOperation() {
+
+        List<Operation> inputOperations = []
+
+        if (formula.isCompound()) {
+            for (input in formula.inputFormulas) {
+                inputOperations += build(input).toOperation()
+            }
+        } else {
+            for (input in formula.inputPorts) {
+                inputOperations += Operation.build(input.toEvent())
+            }
+        }
+
+        Operation.buildFromOperations(inputOperations, formula.operator)
+
+    }
 }

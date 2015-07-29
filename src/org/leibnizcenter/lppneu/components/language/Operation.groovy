@@ -91,8 +91,58 @@ class Operation {
         )
     }
 
-    String toString() {
+    Expression toExpression() {
+
+        List<Expression> inputExpressions = []
+
+        if (formula.isCompound()) {
+            for (input in formula.inputFormulas) {
+                inputExpressions += build(input).toExpression()
+            }
+        } else {
+            for (input in formula.inputPorts) {
+                inputExpressions += Expression.build(input.toSituation())
+            }
+        }
+
+        Expression.buildFromExpressions(inputExpressions, formula.operator)
+
+    }
+
+    String toString(Operator superOperator = null) {
         formula.toString()
+//        String output = ""
+//
+//        Boolean printOp = (superOperator == null || formula.operator != superOperator)
+//
+//        if (printOp) {
+//            if (formula.operator == Operator.POS)
+//                output += "+"
+//            else if (formula.operator == Operator.NEG)
+//                output += "-"
+//            else if (formula.operator == Operator.NULL)
+//                output += "0"
+//            else
+//                output += formula.operator.toString()+"("
+//        }
+//
+//        if (formula.isCompound()) {
+//            for (formula in formula.inputFormulas)
+//                output += formula.toString(formula.operator) + ", "
+//            output = output[0..-3]
+//        } else {
+//            for (Event term in formula.inputPorts) {
+//                output += term.toString() + ", "
+//            }
+//            output = output[0..-3]
+//        }
+//
+//        if (printOp && formula.operator != Operator.POS &&
+//                formula.operator != Operator.NEG &&
+//                formula.operator != Operator.NULL)
+//            output += ")"
+//
+//        output
     }
 
 }
