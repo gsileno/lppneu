@@ -1,0 +1,51 @@
+digraph G {
+  rankdir="LR";
+  subgraph place {
+    graph [shape=circle,color=gray];
+    node [shape=circle,fixedsize=true,width=.5];
+    _p0 [label="NEG(alive)"];
+    _p1 [label="dead"];
+    _p0 [label="NEG(alive)"];
+    _p1 [label="dead"];
+    _p4 [label="NEG(dead)"];
+    _p5 [label="alive"];
+    _p4 [label="NEG(dead)"];
+    _p5 [label="alive"];
+    _p8 [label="AND(loaded, alive)"];
+    _p9 [label="_e0"];
+    _p8 [label="AND(loaded, alive)"];
+    _p11 [label="loaded"];
+    _p12 [label="alive"];
+    _p9 [label="_e0"];
+    _p14 [label="_e0"];
+    _p15 [label="AND(loaded, alive)"];
+    _p14 [label="_e0"];
+    _p15 [label="AND(loaded, alive)"];
+    _p18 [label="loaded"];
+    _p19 [label="alive"];
+  } 
+  subgraph transitions {
+    node [shape=rect,height=.5,width=.5];
+    _t0 [label="IMPLIES"];
+    _t1 [label="IMPLIES"];
+    _t2 [label="IMPLIES"];
+    _t3 [label="AND"];
+    _t4 [label="IMPLIES"];
+    _t5 [label="AND"];
+  } 
+  _p0 -> _t0 [] ;
+  _t0 -> _p1 [] ;
+  _p4 -> _t1 [] ;
+  _t1 -> _p5 [] ;
+  _p8 -> _t2 [] ;
+  _t2 -> _p9 [] ;
+  _t3 -> _p8 [] ;
+  _p11 -> _t3 [] ;
+  _p12 -> _t3 [] ;
+  _p14 -> _t4 [] ;
+  _t4 -> _p15 [] ;
+  _t5 -> _p15 [] ;
+  _p18 -> _t5 [] ;
+  _p19 -> _t5 [] ;
+}
+

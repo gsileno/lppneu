@@ -21,10 +21,15 @@ class Base<T> {
         pos
     }
 
+    T build(T elem) {
+        Integer pos = add(T)
+        if (pos == null) return null
+        base[pos]
+    }
+
     T find(T elem) {
         Integer pos = findIndexOf(elem)
         if (pos == null) return null
-
         base[pos]
     }
 

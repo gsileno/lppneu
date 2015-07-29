@@ -12,6 +12,18 @@ class EventCondition {
     Event event
     Expression condition
 
+    Boolean isMereEvent() {
+        (condition == null)
+    }
+
+    Boolean isMereCondition() {
+        (event == null)
+    }
+
+    Boolean isEventCondition() {
+        !isMereEvent() && !isMereCondition()
+    }
+    
     static EventCondition build(Event event) {
         new EventCondition(
                 event: event

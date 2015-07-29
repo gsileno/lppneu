@@ -28,7 +28,7 @@ class ExtLiteral {
 
     ExtLiteral nullify() {
         if (polarity == Polarity.POS | polarity == Polarity.NEG)
-            polarity = Polarity.NOT
+            polarity = Polarity.NULL
         else
             log.warn("Nullification of a null polarity is a null polarity ($input)")
         this

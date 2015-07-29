@@ -8,19 +8,19 @@ import groovy.util.logging.Log4j
 
 @Log4j
 enum Polarity {
-    POS, NEG, NOT
+    POS, NEG, NULL
 
     Operator toOperator() {
         if (this == POS) return Operator.POS
         else if (this == NEG) return Operator.NEG
-        else if (this == NOT) return Operator.NULL
+        else if (this == NULL) return Operator.NULL
         else { log.warn("You should not be here."); return null }
     }
 
     Polarity negate() {
         if (this == POS) return NEG
         else if (this == NEG) return POS
-        else if (this == NOT) return NOT
+        else if (this == NULL) return NULL
         else { log.warn("You should not be here."); return null }
     }
 

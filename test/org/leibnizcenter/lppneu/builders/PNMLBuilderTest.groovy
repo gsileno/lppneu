@@ -16,7 +16,7 @@ import org.leibnizcenter.pneu.components.petrinet.Transition
 import org.leibnizcenter.pneu.builders.PN2dot
 import org.leibnizcenter.pneu.parsers.PNML2PN
 
-class BuilderTest extends GroovyTestCase {
+class PNMLBuilderTest extends GroovyTestCase {
 
     Literal literalP = Literal.build(Atom.build("p"))
     Literal literalQ = Literal.build(Atom.build("q"))
@@ -98,7 +98,7 @@ class BuilderTest extends GroovyTestCase {
 //    }
 
     void testEvent() {
-        LPPN2LPN conversion = new LPPN2LPN()
+        LPPN2LPNold conversion = new LPPN2LPNold()
         Net net = conversion.buildEventNet(eventP)
         batchExport(net, "operation.p")
 
@@ -111,7 +111,7 @@ class BuilderTest extends GroovyTestCase {
     }
 
     void testOperationSEQ() {
-        LPPN2LPN conversion = new LPPN2LPN()
+        LPPN2LPNold conversion = new LPPN2LPNold()
         Net net = conversion.buildOperationNet(operationPSEQQ)
         batchExport(net, "operation.pSEQq")
 
@@ -135,7 +135,7 @@ class BuilderTest extends GroovyTestCase {
     }
 
     void testOperationSEQ2() {
-        LPPN2LPN conversion = new LPPN2LPN()
+        LPPN2LPNold conversion = new LPPN2LPNold()
         Net net = conversion.buildOperationNet(operationPSEQNEGPSEQQ)
         batchExport(net, "operation.pSEQNEGpSEQq")
 
@@ -147,7 +147,7 @@ class BuilderTest extends GroovyTestCase {
     }
 
     void testOperationPAR() {
-        LPPN2LPN conversion = new LPPN2LPN()
+        LPPN2LPNold conversion = new LPPN2LPNold()
         Net net = conversion.buildOperationNet(operationPPARQ)
         batchExport(net, "operation.pPARq")
 
@@ -171,7 +171,7 @@ class BuilderTest extends GroovyTestCase {
     }
 
     void testOperationALT() {
-        LPPN2LPN conversion = new LPPN2LPN()
+        LPPN2LPNold conversion = new LPPN2LPNold()
         Net net = conversion.buildOperationNet(operationQALTNEGP)
         batchExport(net, "operation.qALTNEGp")
 
@@ -194,7 +194,7 @@ class BuilderTest extends GroovyTestCase {
     }
 
     void testSituation() {
-        LPPN2LPN conversion = new LPPN2LPN()
+        LPPN2LPNold conversion = new LPPN2LPNold()
         Net net = conversion.buildSituationNet(situationP)
         batchExport(net, "situation.p")
 
@@ -208,7 +208,7 @@ class BuilderTest extends GroovyTestCase {
     }
 
     void testExpressionNEG() {
-        LPPN2LPN conversion = new LPPN2LPN()
+        LPPN2LPNold conversion = new LPPN2LPNold()
         Net net = conversion.buildExpressionNet(expressionNEGP)
         batchExport(net, "expression.NEGp")
 
@@ -222,7 +222,7 @@ class BuilderTest extends GroovyTestCase {
     }
 
     void testExpressionNEGNEG() {
-        LPPN2LPN conversion = new LPPN2LPN()
+        LPPN2LPNold conversion = new LPPN2LPNold()
 
         Net net = conversion.buildExpressionNet(expressionNEGNEGP)
 
@@ -238,7 +238,7 @@ class BuilderTest extends GroovyTestCase {
     }
 
     void testExpressionAND() {
-        LPPN2LPN conversion = new LPPN2LPN()
+        LPPN2LPNold conversion = new LPPN2LPNold()
 
         Net net = conversion.buildExpressionNet(expressionPANDQ)
 
@@ -261,7 +261,7 @@ class BuilderTest extends GroovyTestCase {
     }
 
     void testExpressionOR() {
-        LPPN2LPN conversion = new LPPN2LPN()
+        LPPN2LPNold conversion = new LPPN2LPNold()
 
         Net net = conversion.buildExpressionNet(expressionNEGPORNOTR)
 
@@ -285,7 +285,7 @@ class BuilderTest extends GroovyTestCase {
     }
 
     void testExpressionXOR() {
-        LPPN2LPN conversion = new LPPN2LPN()
+        LPPN2LPNold conversion = new LPPN2LPNold()
 
         Net net = conversion.buildExpressionNet(expressionPANDQXORQ)
 
@@ -309,7 +309,7 @@ class BuilderTest extends GroovyTestCase {
     }
 
     void testExpressionSEQ() {
-        LPPN2LPN conversion = new LPPN2LPN()
+        LPPN2LPNold conversion = new LPPN2LPNold()
 
         Net net = conversion.buildExpressionNet(expressionPSEQQ)
 
@@ -333,7 +333,7 @@ class BuilderTest extends GroovyTestCase {
     }
 
     void testExpressionSEQ2() {
-        LPPN2LPN conversion = new LPPN2LPN()
+        LPPN2LPNold conversion = new LPPN2LPNold()
 
         Net net = conversion.buildExpressionNet(expressionQSEQPANDQ)
 
@@ -357,7 +357,7 @@ class BuilderTest extends GroovyTestCase {
     }
 
     void testExpressionSEQ2b() {
-        LPPN2LPN conversion = new LPPN2LPN()
+        LPPN2LPNold conversion = new LPPN2LPNold()
 
         Net net = conversion.buildExpressionNet(expressionQSEQPPARQ)
 
@@ -372,7 +372,7 @@ class BuilderTest extends GroovyTestCase {
     }
 
     void testExpressionSEQ3() {
-        LPPN2LPN conversion = new LPPN2LPN()
+        LPPN2LPNold conversion = new LPPN2LPNold()
 
         Net net = conversion.buildExpressionNet(expressionPSEQNEGPSEQQ)
 
@@ -394,7 +394,7 @@ class BuilderTest extends GroovyTestCase {
 
 
     void testExpressionSEQ4() {
-        LPPN2LPN conversion = new LPPN2LPN()
+        LPPN2LPNold conversion = new LPPN2LPNold()
 
         Net net = conversion.buildExpressionNet(expressionPANDQSEQQANDR)
 
@@ -408,7 +408,7 @@ class BuilderTest extends GroovyTestCase {
     }
 
     void testExpressionPAR() {
-        LPPN2LPN conversion = new LPPN2LPN()
+        LPPN2LPNold conversion = new LPPN2LPNold()
 
         Net net = conversion.buildExpressionNet(expressionPPARQ)
 
@@ -433,7 +433,7 @@ class BuilderTest extends GroovyTestCase {
     }
 
     void testExpressionALT() {
-        LPPN2LPN conversion = new LPPN2LPN()
+        LPPN2LPNold conversion = new LPPN2LPNold()
 
         Net net = conversion.buildExpressionNet(expressionQALTNEGP)
 
@@ -461,7 +461,7 @@ class BuilderTest extends GroovyTestCase {
     }
 
     void testExpressionALT2() {
-        LPPN2LPN conversion = new LPPN2LPN()
+        LPPN2LPNold conversion = new LPPN2LPNold()
 
         Net net = conversion.buildExpressionNet(expressionQALTNEGPSEQQ)
 

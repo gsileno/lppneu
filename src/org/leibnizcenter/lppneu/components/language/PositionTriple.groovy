@@ -26,7 +26,7 @@ class PositionTriple {
             triple.positive = position.negate()
             triple.negative = position
             triple.nullified = position.nullify()
-        } else if (expression.polarity() == Polarity.NOT) {
+        } else if (expression.polarity() == Polarity.NULL) {
             triple.positive = position.negative()
             triple.negative = position.positive()
             triple.nullified = position

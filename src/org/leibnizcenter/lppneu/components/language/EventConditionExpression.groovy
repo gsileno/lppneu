@@ -65,7 +65,7 @@ class EventConditionExpression {
         if (formula.operator == Operator.NEG)
             return Polarity.NEG
         else if (formula.operator == Operator.NULL)
-            return Polarity.NOT
+            return Polarity.NULL
         else
             return Polarity.POS
     }

@@ -24,9 +24,11 @@ import groovy.util.logging.Log4j
 
 @Log4j
 enum Operator {
-    POS, NEG, NULL, NOT,    // unary operators  (situations and events)
-    AND, OR, XOR,           // binary operators (situations)
-    SEQ, PAR, ALT,          // binary operators (events)
+    POS, NEG, NULL,           // unary operators  (situations and events)
+    AND, OR, XOR,             // binary operators (situations)
+    SEQ, PAR, ALT,            // binary operators (events and situations)
+
+    IMPLIES, INHIBITS,        // only for logical dependencies on situations
 
     // TOCHECK not formally correct:
     POS_INSTANCE, NEG_INSTANCE, NOT_INSTANCE,  // specific operators
@@ -51,14 +53,10 @@ enum Operator {
         this == AND || this == OR || this == XOR
     }
 
-    Boolean binary() {
-        binaryLogicOperator() || binaryProcessOperator()
-    }
-
     Polarity toPolarity() {
         if (this == POS) return Polarity.POS
         else if (this == NEG) return Polarity.NEG
-        else if (this == NULL) return Polarity.NOT
+        else if (this == NULL) return Polarity.NULL
         else  { log.warn("You should not be here."); return null }
     }
 

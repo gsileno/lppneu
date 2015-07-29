@@ -1,4 +1,4 @@
-shoot: loaded -> -loaded par dead.
+shoot: loaded and alive -> -loaded seq dead.
 load -> loaded.
 dead :- -alive.
 alive :- -dead.

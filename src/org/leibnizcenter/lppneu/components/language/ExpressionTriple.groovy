@@ -25,7 +25,7 @@ class ExpressionTriple {
             triple.positive = expression.negate()
             triple.negative = expression
             triple.nullified = expression.nullify()
-        } else if (expression.polarity() == Polarity.NOT) {
+        } else if (expression.polarity() == Polarity.NULL) {
             triple.positive = expression.negative()
             triple.negative = expression.positive()
             triple.nullified = expression

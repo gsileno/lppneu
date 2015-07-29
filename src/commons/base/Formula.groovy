@@ -65,6 +65,8 @@ class Formula<T> {
         formula
     }
 
+
+
     // unary formula
     Formula<T> build(Formula<T> input, Operator op) {
 
@@ -81,12 +83,12 @@ class Formula<T> {
     }
 
     // binary formula
-    Formula<T> build(Formula leftInput, Formula rightInput, Operator op) {
+    Formula<T> build(Formula<T> leftInput, Formula<T> rightInput, Operator op) {
         buildFromFormulas([leftInput, rightInput], op)
     }
 
     // n-ary formula
-    Formula<T> buildFromFormulas(List<Formula> inputs, Operator op) {
+    Formula<T> buildFromFormulas(List<Formula<T>> inputs, Operator op) {
 
         // aggregate all terms of the inputs
         List<T> terms = []
@@ -103,6 +105,10 @@ class Formula<T> {
         formula
     }
 
+    Boolean isCompound() {
+        (inputFormulas.size() > 0)
+    }
+
     //////////////////
     // Views
     //////////////////
@@ -114,7 +120,7 @@ class Formula<T> {
 
         if (printOp) output += operator.toString()+"("
 
-        if (inputFormulas.size() > 0) {
+        if (isCompound()) {
             for (formula in inputFormulas)
                 output += formula.toString(operator) + ", "
             output = output[0..-3]

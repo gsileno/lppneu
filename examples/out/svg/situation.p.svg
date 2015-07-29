@@ -9,10 +9,10 @@
 <g id="graph1" class="graph" transform="scale(1 1) rotate(0) translate(4 40)">
 <title>G</title>
 <polygon fill="white" stroke="white" points="-4,5 -4,-40 41,-40 41,5 -4,5"/>
-<!-- pl0 -->
-<g id="node2" class="node"><title>pl0</title>
+<!-- null -->
+<g id="node2" class="node"><title>null</title>
 <ellipse fill="none" stroke="black" cx="18" cy="-18" rx="18" ry="18"/>
-<text text-anchor="middle" x="18" y="-13.9" font-family="Times Roman,serif" font-size="14.00">POS(p)</text>
+<text text-anchor="middle" x="18" y="-13.9" font-family="Times Roman,serif" font-size="14.00">p</text>
 </g>
 </g>
 </svg>

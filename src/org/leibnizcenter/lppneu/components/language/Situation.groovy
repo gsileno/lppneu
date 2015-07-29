@@ -1,13 +1,13 @@
 package org.leibnizcenter.lppneu.components.language
 
+import groovy.transform.EqualsAndHashCode
 import groovy.util.logging.Log4j
 
-@Log4j
+@Log4j @EqualsAndHashCode
 class Situation {
     Polarity polarity
     PositionRef positionRef
     Literal rootLiteral
-    Expression rootExpression
 
     static Situation build(Literal literal, Polarity polarity = Polarity.POS) {
         new Situation(
@@ -24,24 +24,22 @@ class Situation {
     }
 
     static Situation build(Expression expression) {
-        if (!expression.operator.unary()) {
+        if (!expression.formula.operator.unary()) {
             return new Situation(
                     polarity: Polarity.POS,
-                    rootExpression: expression
             )
         } else {
             Expression content = expression.positive()
-            Polarity polarity = expression.operator.toPolarity()
+            Polarity polarity = expression.formula.operator.toPolarity()
 
-            if (content.inputFormulas.size() > 0) {
+            if (content.formula.inputFormulas.size() > 0) {
                 return new Situation(
                         polarity: polarity,
-                        rootExpression: content
                 )
             } else {
                 return new Situation(
                         polarity: polarity,
-                        rootLiteral: content.inputPorts[0]
+                        rootLiteral: content.formula.inputPorts[0].rootLiteral
                 )
             }
         }
@@ -55,10 +53,7 @@ class Situation {
     }
 
     Situation negate() {
-        if (rootExpression) {
-            return Situation.build(rootExpression.negate())
-        } else
-            return new Situation(
+            new Situation(
                     polarity: polarity.negate(),
                     positionRef: positionRef,
                     rootLiteral: rootLiteral
@@ -66,39 +61,32 @@ class Situation {
     }
 
     Situation nullify() {
-        if (rootExpression) {
-            return Situation.build(rootExpression.nullify())
-        } else {
             new Situation(
-                    polarity: polarity.NOT,
+                    polarity: polarity.NULL,
                     positionRef: positionRef,
                     rootLiteral: rootLiteral
             )
-        }
     }
 
     Situation positive() {
-        if (rootExpression) {
-            return Situation.build(rootExpression.positive())
-        } else {
-            return new Situation(
+            new Situation(
                     polarity: polarity.POS,
                     positionRef: positionRef,
                     rootLiteral: rootLiteral
             )
-        }
     }
 
     Situation negative() {
-        if (rootExpression) {
-            return Situation.build(rootExpression.negative())
-        } else {
+
             return new Situation(
                     polarity: polarity.NEG,
                     positionRef: positionRef,
                     rootLiteral: rootLiteral
             )
-        }
+    }
+
+    List<Parameter> getParameters() {
+        if (rootLiteral) rootLiteral.getParameters()
     }
 
     String toString() {
