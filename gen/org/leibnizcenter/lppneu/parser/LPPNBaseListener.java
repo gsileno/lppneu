@@ -101,18 +101,6 @@ public class LPPNBaseListener implements LPPNListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterEventcondition_expression(@NotNull LPPNParser.Eventcondition_expressionContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void exitEventcondition_expression(@NotNull LPPNParser.Eventcondition_expressionContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
 	@Override public void enterHead(@NotNull LPPNParser.HeadContext ctx) { }
 	/**
 	 * {@inheritDoc}

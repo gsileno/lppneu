@@ -3,7 +3,7 @@ package org.leibnizcenter.lppneu.builders
 import commons.base.Base
 import groovy.util.logging.Log4j
 import org.leibnizcenter.lppneu.components.language.Event
-import org.leibnizcenter.lppneu.components.language.EventConditionExpression
+
 import org.leibnizcenter.lppneu.components.language.Expression
 import commons.base.Formula
 import org.leibnizcenter.lppneu.components.language.Operation
@@ -23,7 +23,6 @@ class LPPN2LPNold {
     Map<Event, Transition> eventTransitionMap = [:]
     Map<Expression, Place> expressionPlaceMap = [:]
     Map<Operation, Net> operationNetMap = [:]
-    Map<EventConditionExpression, Net> eventConditionExpressionNetMap = [:]
 
     Base<Situation> situationBase = new Base<Situation>()
 

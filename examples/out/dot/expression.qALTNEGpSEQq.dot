@@ -1,0 +1,40 @@
+digraph G {
+  rankdir="LR";
+  subgraph place {
+    graph [shape=circle,color=gray];
+    node [shape=circle,fixedsize=true,width=.5];
+    _p0 [label="ALT(q, NEG(p))"];
+    _p1 [label="q"];
+    _p2 [label="SEQ(ALT(q, NEG(p)), q)"];
+    _p3 [label="AND(SEQ(ALT(q, NEG(p)), q), q)"];
+    _p4 [label="OR(NEG(q, NEG(p)), NULL(q, NEG(p)))"];
+    _p5 [label="q"];
+    _p6 [label="NEG(p)"];
+    _p7 [label="OR(NEG(q), NULL(q))"];
+    _p8 [label="NEG(q)"];
+    _p9 [label="NULL(q)"];
+  } 
+  subgraph transitions {
+    node [shape=rect,height=.5,width=.5];
+    _t0 [label="ALT(q, NEG(p))"];
+    _t1 [label="q"];
+    _t2 [label="AND"];
+    _t3 [label="OR"];
+    _t4 [label="OR"];
+  } 
+  _p4 -> _t0 [] ;
+  _t0 -> _p0 [] ;
+  _p0 -> _t1 [] ;
+  _p7 -> _t1 [] ;
+  _t1 -> _p2 [] ;
+  _p2 -> _t2 [] ;
+  _p1 -> _t2 [] ;
+  _t2 -> _p3 [] ;
+  _t3 -> _p4 [] ;
+  _p5 -> _t3 [] ;
+  _p6 -> _t3 [] ;
+  _t4 -> _p7 [] ;
+  _p8 -> _t4 [] ;
+  _p9 -> _t4 [] ;
+}
+

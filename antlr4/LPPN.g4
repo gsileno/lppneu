@@ -25,16 +25,7 @@ normrule : head IS_IMPLIED_BY body DOT ;
 constraint : IS_IMPLIED_BY body DOT ;
 
 /** A causal rule can be a Condition-Action, an Event-Condition-Action rule or a dependency. */
-causalrule : eventcondition_expression CAUSES operation DOT ;
-
-eventcondition_expression : body_situation |
-| event WHEN body_expression
-| LPAR eventcondition_expression RPAR
-| eventcondition_expression SEQ eventcondition_expression
-| eventcondition_expression (PAR | ALT) eventcondition_expression
-| body_expression AND body_expression
-| body_expression (OR | XOR) body_expression
-;
+causalrule : body_expression CAUSES operation DOT ;
 
 /** The head consists of a literal. */
 head : head_expression ;
@@ -50,6 +41,7 @@ list_literals : literal ( COMMA list_literals )? ;
 head_situation : literal ;
 
 head_expression : head_situation
+| operation WHEN head_expression
 | LPAR head_expression RPAR
 | head_expression SEQ head_expression
 | head_expression (PAR | ALT) head_expression
@@ -69,6 +61,7 @@ operation : event
 body_situation : ext_literal ;
 
 body_expression : body_situation | body_constraint
+| operation WHEN body_expression
 | LPAR body_expression RPAR
 | body_expression SEQ body_expression
 | body_expression (PAR | ALT) body_expression
@@ -122,7 +115,6 @@ NEG : 'neg' | 'NEG' ; // strong negation
 
 CAUSES : '->' |  '=>';
 IS_IMPLIED_BY : ':-' ;
-
 
 WHEN : ':' | 'in' ;
 PLUS : '+' ;

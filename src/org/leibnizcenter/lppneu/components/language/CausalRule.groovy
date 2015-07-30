@@ -12,18 +12,22 @@ import groovy.transform.AutoClone
 
 @AutoClone
 class CausalRule {
-    EventConditionExpression trigger
+    Expression condition
     Operation action
 
     Boolean isMechanism() {
-        (trigger != null && action != null)
+        (condition != null && action != null)
+    }
+
+    Boolean isEventSeries() {
+        (condition == null && action != null)
     }
 
     String toString() {
         String output = ""
 
-        if (trigger != null)
-           output += trigger.toString() + " "
+        if (condition != null)
+           output += condition.toString() + " "
         output += "=> " + action.toString()
 
         output

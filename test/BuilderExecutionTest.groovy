@@ -1,3 +1,4 @@
+import org.leibnizcenter.lppneu.builders.LPPN2LPN
 import org.leibnizcenter.lppneu.builders.LPPN2LPNold
 import org.leibnizcenter.lppneu.components.language.*
 import org.leibnizcenter.pneu.builders.PN2dot
@@ -439,7 +440,7 @@ class BuilderExecutionTest extends GroovyTestCase {
 //    }
 
     void testExpressionALT2() {
-        LPPN2LPNold conversion = new LPPN2LPNold()
+        LPPN2LPN conversion = new LPPN2LPN()
 
         Net net = conversion.buildExpressionNet(expressionQALTNEGPSEQQ)
 

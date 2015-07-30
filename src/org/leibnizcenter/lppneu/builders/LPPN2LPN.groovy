@@ -16,23 +16,19 @@ class LPPN2LPN {
     static Net convert(Program program) {
         Program reducedProgram = program.reduce()
 
-        Map<LPlace, List<Net>> placeNetMap = [:]
-        Map<LTransition, List<Net>> transitionNetMap = [:]
-
         Net net = new Net()
 
         for (logicRule in reducedProgram.logicRules) {
             Net subNet
 
             if (logicRule.isRule()) {
-                subNet = buildImplicationExpressionNet(logicRule.body.formula, logicRule.head.formula)
+                subNet = buildImplicationNet(logicRule.body.formula, logicRule.head.formula)
             } else if (logicRule.isConstraint()) {
-                subNet = buildInhibitedExpressionNet(logicRule.body.formula)
+                subNet = buildConstraintNet(logicRule.body.formula)
             } else if (logicRule.isFact()) {
-                subNet = buildFactExpressionNet(logicRule.head.formula)
+                subNet = buildFactNet(logicRule.head.formula)
             } else {
-                log.error("You should not be here")
-                return
+                throw new RuntimeException()
             }
 
 //            // anchor subnet to general index of places
@@ -55,10 +51,9 @@ class LPPN2LPN {
             Net subNet
 
             if (causalRule.isMechanism()) {
-                subNet = buildMechanismNet(causalRule.trigger.formula, causalRule.action)
+                subNet = buildMechanismNet(causalRule.condition, causalRule.action)
             } else {
-                log.error("You should not be here")
-                return
+                throw new RuntimeException() 
             }
 
             net.include(subNet)
@@ -67,18 +62,18 @@ class LPPN2LPN {
         net
     }
 
-    static Net buildInhibitedExpressionNet(Formula<Situation> constraint) {
+    static Net buildConstraintNet(Formula<Situation> constraint) {
         Net net = new Net()
         // TODO
         return net
     }
 
-    static Net buildFactExpressionNet(Formula<Situation> fact) {
+    static Net buildFactNet(Formula<Situation> fact) {
         Net net = buildExpressionNet(fact)
         return net
     }
 
-    static Net buildImplicationExpressionNet(Formula<Situation> body, Formula<Situation> head) {
+    static Net buildImplicationNet(Formula<Situation> body, Formula<Situation> head) {
 
         Net net = new Net()
 
@@ -97,7 +92,7 @@ class LPPN2LPN {
         return net
     }
 
-    static Net buildSeqExpressionNet(Formula<Situation> formula) {
+    static Net buildSeqNet(Formula<Situation> formula) {
 
         Net net = new Net()
 
@@ -145,17 +140,17 @@ class LPPN2LPN {
 
         }
 
-        if (pOut == null) { log.error("You should not be here."); return }
+        if (pOut == null) { throw new RuntimeException()  }
 
         net.outputs += [pOut]
         return net
 
     }
 
-    static Net buildProcessExpressionNet(Formula<Situation> formula) {
+    static Net buildProcessNet(Formula<Situation> formula) {
 
         if (formula.operator == Operator.SEQ) {
-            return buildSeqExpressionNet(formula)
+            return buildSeqNet(formula)
         }
 
         Net net = new Net()
@@ -170,7 +165,7 @@ class LPPN2LPN {
         } else if (formula.operator == Operator.OPT) {
             tOut = new LTransition(operator: Operator.OR)
         } else {
-            log.error("You should not be here."); return
+            throw new RuntimeException() 
         }
 
         net.placeList << pOut
@@ -200,6 +195,10 @@ class LPPN2LPN {
         return net
     }
 
+    static Net buildExpressionNet(Expression expression) {
+        buildExpressionNet(expression.formula)
+    }
+
     static Net buildExpressionNet(Formula<Situation> formula) {
         Net net = new Net()
 
@@ -221,10 +220,12 @@ class LPPN2LPN {
                     net.inputs += [pIn]
                 }
             // Process expressions are transformed into actual Petri Nets
+            } else if (formula.operator == Operator.IN) {
+                return buildEventConditionNet(formula)
             } else if (formula.operator.isBinaryProcessOperator()) {
-                return buildProcessExpressionNet(formula)
+                return buildProcessNet(formula)
             } else {
-                log.error("Your should not be here"); return
+                throw new RuntimeException() 
             }
         } else {
             net.inputs += [pOut]
@@ -233,73 +234,74 @@ class LPPN2LPN {
         net
     }
 
-    static Net buildEventConditionNet(EventCondition eventCondition) {
+    static Net buildEventConditionNet(Formula<Situation> formula) {
         Net net = new Net()
+
+        Expression eventExpression = Expression.build(formula.inputPorts[0])
 
         LPlace pOut
         LTransition tOut
-        if (eventCondition.isMereCondition()) {
-            Expression targetExpression = eventCondition.condition
-            pOut = new LPlace(expression: targetExpression)
-            tOut = new LTransition(operation: targetExpression.toOperation())
-            net.placeList += [pOut]
-            net.transitionList += [tOut]
-            net.arcList += Arc.buildArc((Transition) tOut, (Place) pOut)
+        pOut = new LPlace(expression: Expression.build(formula))
+        tOut = new LTransition(operation: eventExpression.toOperation())
 
-            Net subNet = buildExpressionNet(Expression.buildFromExpressions(
-                    [Expression.build(targetExpression.formula, Operator.NEG),
-                     Expression.build(targetExpression.formula, Operator.NULL)],
-                    Operator.OR
-            ).formula)
-            net.include(subNet)
-            net.arcList += Arc.buildArc((Place) subNet.outputs[0], (Transition) tOut)
-        } else if (eventCondition.isMereEvent()) {
-            Expression targetExpression = Expression.build(eventCondition.event.toSituation())
-            pOut = new LPlace(expression: targetExpression)
-            tOut = new LTransition(operation: Operation.build(eventCondition.event))
-            net.placeList += [pOut]
-            net.transitionList += [tOut]
-            net.arcList += Arc.buildArc((Transition) tOut, (Place) pOut)
+        net.placeList += [pOut]
+        net.transitionList += [tOut]
+        net.arcList += Arc.buildArc((Transition) tOut, (Place) pOut)
 
-            Net subNet = buildExpressionNet(Expression.buildFromExpressions(
-                    [Expression.build(targetExpression.formula, Operator.NEG),
-                     Expression.build(targetExpression.formula, Operator.NULL)],
-                    Operator.OR
-            ).formula)
-            net.include(subNet)
-            net.arcList += Arc.buildArc((Place) subNet.outputs[0], (Transition) tOut)
-        } else if (eventCondition.isEventCondition()) {
-            Expression targetExpression = Expression.build(eventCondition.event.toSituation())
-            Expression contextExpression = eventCondition.condition
-
-            pOut = new LPlace(expression: Expression.buildFromExpressions([targetExpression, contextExpression], Operator.IN))
-            tOut = new LTransition(operation: Operation.build(eventCondition.event))
-            LPlace pCatalyst = new LPlace(expression: contextExpression)
-
-            net.placeList += [pOut, pCatalyst]
-            net.transitionList += [tOut]
-            net.arcList += Arc.buildArc((Transition) tOut, (Place) pOut)
+        // if a catalyst context is specified about the occurrence
+        if (formula.inputPorts[1] != null) {
+            Expression conditionExpression = Expression.build(formula.inputPorts[1])
+            LPlace pCatalyst = new LPlace(expression: conditionExpression)
             net.arcList += Arc.buildArc((Place) pCatalyst, (Transition) tOut)
-
-            Net subNet = buildExpressionNet(Expression.buildFromExpressions(
-                    [Expression.build(targetExpression.formula, Operator.NEG),
-                     Expression.build(targetExpression.formula, Operator.NULL)],
-                    Operator.OR
-            ).formula)
-            net.include(subNet)
-            net.arcList += Arc.buildArc((Place) subNet.outputs[0], (Transition) tOut)
-        } else {
-            log.error("You should not be here"); return
+            net.placeList += [pCatalyst]
         }
 
+        Net subNet = buildExpressionNet(Expression.buildFromExpressions(
+                [Expression.build(eventExpression.formula, Operator.NEG),
+                 Expression.build(eventExpression.formula, Operator.NULL)],
+                Operator.OR
+        ).formula)
+        net.include(subNet)
+        net.arcList += Arc.buildArc((Place) subNet.outputs[0], (Transition) tOut)
+
+        // I/O
+        net.inputs += subNet.inputs
+        net.outputs += [pOut]
+
         net
-    }
 
-    static Net buildEventConditionExpressionNet(Formula<EventCondition> formula) {
-        Net net = new Net()
+//        if (formula.isMereCondition()) {
+//            Expression targetExpression = formula.condition
+//            pOut = new LPlace(expression: targetExpression)
+//            tOut = new LTransition(operation: targetExpression.toOperation())
+//            net.placeList += [pOut]
+//            net.transitionList += [tOut]
+//            net.arcList += Arc.buildArc((Transition) tOut, (Place) pOut)
+//
+//            Net subNet = buildExpressionNet(Expression.buildFromExpressions(
+//                    [Expression.build(targetExpression.formula, Operator.NEG),
+//                     Expression.build(targetExpression.formula, Operator.NULL)],
+//                    Operator.OR
+//            ).formula)
+//            net.include(subNet)
+//            net.arcList += Arc.buildArc((Place) subNet.outputs[0], (Transition) tOut)
+//        } else if (eventCondition.isMereEvent()) {
+//            Expression targetExpression = Expression.build(eventCondition.event.toSituation())
+//            pOut = new LPlace(expression: targetExpression)
+//            tOut = new LTransition(operation: Operation.build(eventCondition.event))
+//            net.placeList += [pOut]
+//            net.transitionList += [tOut]
+//            net.arcList += Arc.buildArc((Transition) tOut, (Place) pOut)
+//
+//            Net subNet = buildExpressionNet(Expression.buildFromExpressions(
+//                    [Expression.build(targetExpression.formula, Operator.NEG),
+//                     Expression.build(targetExpression.formula, Operator.NULL)],
+//                    Operator.OR
+//            ).formula)
+//            net.include(subNet)
+//            net.arcList += Arc.buildArc((Place) subNet.outputs[0], (Transition) tOut)
+//        } else if (formula.isEventCondition()) {
 
-
-        net
     }
 
     static Net buildEventNet(Event event) {
@@ -414,7 +416,7 @@ class LPPN2LPN {
                 } else if (formula.operator == Operator.NULL) {
                     return buildEventNet(formula.inputPorts[0].nullify())
                 } else {
-                    log.warn("You should not be here."); return null
+                    throw new RuntimeException() 
                 }
             }
         } else {
@@ -428,18 +430,29 @@ class LPPN2LPN {
                 } else if (formula.operator == Operator.ALT) {
                     return buildAltOperationNet(formula)
                 } else {
-                    log.warn("You should not be here."); return null
+                    throw new RuntimeException() 
                 }
             }
         }
     }
 
+    static Net buildMechanismNet(Expression condition, Operation action) {
 
-    static Net buildMechanismNet(Formula<EventCondition> trigger, Operation action) {
+        Expression actualCondition
+
         Net net = new Net()
 
+        // transform condition action rule in event condition action
+        // i.e. when the given condition is not described by an event IN a context
+        // consider the "creation" of such condition as the event.
+        if (condition.formula.operator != Operator.IN) {
+            actualCondition = Expression.build(condition, Operator.IN)
+        } else {
+            actualCondition = condition
+        }
+
         // create antecedent
-        Net triggerNet = buildEventConditionExpressionNet(trigger)
+        Net triggerNet = buildExpressionNet(actualCondition)
         net.include(triggerNet)
 
         LPlace pIn = (LPlace) triggerNet.outputs[0]
@@ -557,7 +570,7 @@ class LPPN2LPN {
 //                } else if (formula.operator == Operator.NEG || formula.operator == Operator.NULL) {
 //                    return buildNegNotExpressionNet(formula, z - 1)
 //                } else {
-//                    log.warn("You should not be here."); return null
+//                    throw new RuntimeException() 
 //                }
 //            } else { // there are no subformulas, refer to literals
 //                if (formula.operator == Operator.POS) {
@@ -567,20 +580,20 @@ class LPPN2LPN {
 //                } else if (formula.operator == Operator.NULL) {
 //                    return buildSituationNet(formula.inputPorts[0].nullify(), z)
 //                } else {
-//                    log.warn("You should not be here."); return null
+//                    throw new RuntimeException() 
 //                }
 //            }
 //        } else {
 //            if (formula.operator == Operator.AND || formula.operator == Operator.OR || formula.operator == Operator.XOR) {
 //              return buildLogicExpressionNet(formula, z)
 ////            } else if (formula.operator == Operator.SEQ) {
-////                return buildSeqExpressionNet(formula, z)
+////                return buildSeqNet(formula, z)
 ////            } else if (formula.operator == Operator.PAR) {
 ////                return buildParExpressionNet(formula, z)
 ////            } else if (formula.operator == Operator.ALT) {
 ////                return buildAltExpressionNet(formula, z)
 //            } else {
-//                log.warn("You should not be here."); return null
+//                throw new RuntimeException() 
 //            }
 //        }
 //    }

@@ -22,13 +22,10 @@ public class LPPNLoaderListener extends LPPNBaseListener {
     // Mapping of nodes
     private ParseTreeProperty<Atom> atomNodes = new ParseTreeProperty<Atom>();
     private ParseTreeProperty<Parameter> parameterNodes = new ParseTreeProperty<Parameter>();
-    private ParseTreeProperty<Position> positionNodes = new ParseTreeProperty<Position>();
     private ParseTreeProperty<Literal> literalNodes = new ParseTreeProperty<Literal>();
     private ParseTreeProperty<ExtLiteral> extLiteralNodes = new ParseTreeProperty<ExtLiteral>();
-    private ParseTreeProperty<PositionRef> positionRefNodes = new ParseTreeProperty<PositionRef>();
     private ParseTreeProperty<Situation> situationNodes = new ParseTreeProperty<Situation>();
     private ParseTreeProperty<Expression> expressionNodes = new ParseTreeProperty<Expression>();
-    private ParseTreeProperty<EventConditionExpression> eventConditionExpressionNodes = new ParseTreeProperty<EventConditionExpression>();
     private ParseTreeProperty<Event> eventNodes = new ParseTreeProperty<Event>();
     private ParseTreeProperty<Operation> operationNodes = new ParseTreeProperty<Operation>();
     private ParseTreeProperty<LogicRule> logicRuleNodes = new ParseTreeProperty<LogicRule>();
@@ -150,7 +147,10 @@ public class LPPNLoaderListener extends LPPNBaseListener {
         if (ctx.body_situation() != null) {
             expression = Expression.build(situationNodes.get(ctx.body_situation()));
         } else if (ctx.body_constraint() != null) {
-            log.warn("to be implemented"); return;
+            log.error("to be implemented");
+            return;
+        } else if (ctx.WHEN() != null) {
+            expression = Expression.build(operationNodes.get(ctx.operation()).toExpression(), expressionNodes.get(ctx.body_expression(0)), Operator.IN);
         } else if (ctx.LPAR() != null) {
             expression = expressionNodes.get(ctx.body_expression(0));
         } else {
@@ -162,8 +162,7 @@ public class LPPNLoaderListener extends LPPNBaseListener {
             else if (ctx.PAR() != null) op = Operator.PAR;
             else if (ctx.ALT() != null) op = Operator.ALT;
             else {
-                log.warn("unknown operator in expression. using default AND.");
-                op = Operator.AND;
+                log.error("unknown operator in expression."); return;
             }
 
             expression = Expression.build(
@@ -180,6 +179,8 @@ public class LPPNLoaderListener extends LPPNBaseListener {
 
         if (ctx.head_situation() != null) {
             expression = Expression.build(situationNodes.get(ctx.head_situation()));
+        } else if (ctx.WHEN() != null) {
+            expression = Expression.build(operationNodes.get(ctx.operation()).toExpression(), expressionNodes.get(ctx.head_expression(0)), Operator.IN);
         } else if (ctx.LPAR() != null) {
             expression = expressionNodes.get(ctx.head_expression(0));
         } else {
@@ -212,46 +213,6 @@ public class LPPNLoaderListener extends LPPNBaseListener {
         expressionNodes.put(ctx, expressionNodes.get(ctx.body_expression()));
     }
 
-    public void exitEventcondition_expression(LPPNParser.Eventcondition_expressionContext ctx) {
-        EventConditionExpression expression;
-
-        if (ctx.body_situation() != null) {
-            expression = EventConditionExpression.build(Expression.build(situationNodes.get(ctx.body_situation())));
-        } else if (ctx.WHEN() != null) {
-            expression = EventConditionExpression.build(eventNodes.get(ctx.event()), expressionNodes.get(ctx.body_expression(0)));
-        } else if (ctx.LPAR() != null) {
-            expression = eventConditionExpressionNodes.get(ctx.eventcondition_expression(0));
-        } else {
-            Operator op;
-            if (ctx.AND() != null) op = Operator.AND;
-            else if (ctx.OR() != null) op = Operator.OR;
-            else if (ctx.XOR() != null) op = Operator.XOR;
-            else if (ctx.SEQ() != null) op = Operator.SEQ;
-            else if (ctx.PAR() != null) op = Operator.PAR;
-            else if (ctx.ALT() != null) op = Operator.ALT;
-            else {
-                log.warn("Unknown operator in expression.");
-                return;
-            }
-
-            if (op.isBinaryProcessOperator()) {
-                expression = EventConditionExpression.build(
-                        eventConditionExpressionNodes.get(ctx.eventcondition_expression(0)),
-                        eventConditionExpressionNodes.get(ctx.eventcondition_expression(1)),
-                        op
-                );
-            } else {
-                expression = EventConditionExpression.build(
-                        EventConditionExpression.build(expressionNodes.get(ctx.body_expression(0))),
-                        EventConditionExpression.build(expressionNodes.get(ctx.body_expression(1))),
-                        op
-                );
-            }
-        }
-
-        eventConditionExpressionNodes.put(ctx, expression);
-    }
-
     public void exitEvent(LPPNParser.EventContext ctx) {
         Event event = Event.build(extLiteralNodes.get(ctx.literal()));
         eventNodes.put(ctx, event);
@@ -259,11 +220,10 @@ public class LPPNLoaderListener extends LPPNBaseListener {
 
     public void exitCausalrule(LPPNParser.CausalruleContext ctx) {
         CausalRule rule = new CausalRule();
-        rule.setTrigger(eventConditionExpressionNodes.get(ctx.eventcondition_expression()));
+        rule.setCondition(expressionNodes.get(ctx.body_expression()));
         rule.setAction(operationNodes.get(ctx.operation()));
         causalRuleNodes.put(ctx, rule);
     }
-
 
     public void exitOperation(LPPNParser.OperationContext ctx) {
 

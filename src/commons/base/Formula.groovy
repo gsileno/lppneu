@@ -47,7 +47,6 @@ class Formula<T> {
 
         if (terms.size() > 1) {
             formula.operator = op
-            List<Formula> inputs = []
             for (T term in terms) {
                 Formula f = build(term)
                 formula.inputFormulas << f
@@ -58,14 +57,19 @@ class Formula<T> {
                 formula = build(terms[0].negate())
             else if (op == Operator.NULL)
                 formula = build(terms[0].nullify())
-            else
+            else if (op == Operator.OR || op == Operator.XOR || op == Operator.AND ||
+                     op == Operator.PAR || op == Operator.ALT || op == Operator.SEQ || op == Operator.OPT)
                 formula = build(terms[0])
+            else if (op == Operator.IN) {
+                formula.operator = op
+                Formula f = build(terms[0])
+                formula.inputFormulas << f
+                formula.inputPorts << terms[0]
+            } else throw new RuntimeException()
         }
 
         formula
     }
-
-
 
     // isUnary formula
     Formula<T> build(Formula<T> input, Operator op) {
@@ -91,7 +95,7 @@ class Formula<T> {
     Formula<T> buildFromFormulas(List<Formula<T>> inputs, Operator op) {
 
         // if there is only 1 element then simplify
-        if (inputs.size() == 1 && op != Operator.NEG && op != Operator.NULL) {
+        if (inputs.size() == 1 && op != Operator.NEG && op != Operator.NULL && op != Operator.IN) {
             return inputs[0]
         }
 

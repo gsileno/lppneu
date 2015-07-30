@@ -12,7 +12,7 @@ public class LPPNLoader {
 
     public LPPNLoader() {}
 
-    static Program parseString(String text) {
+    public static Program parseString(String text) {
 
         InputStream is = null;
 
@@ -25,7 +25,7 @@ public class LPPNLoader {
         return parse(is);
     }
 
-    static Program parseFile(String filename) throws FileNotFoundException {
+    public static Program parseFile(String filename) throws FileNotFoundException {
 
         InputStream is = null;
 

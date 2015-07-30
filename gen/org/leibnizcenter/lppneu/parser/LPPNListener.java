@@ -79,16 +79,6 @@ public interface LPPNListener extends ParseTreeListener {
 	 */
 	void exitCausalrule(@NotNull LPPNParser.CausalruleContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link LPPNParser#eventcondition_expression}.
-	 * @param ctx the parse tree
-	 */
-	void enterEventcondition_expression(@NotNull LPPNParser.Eventcondition_expressionContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link LPPNParser#eventcondition_expression}.
-	 * @param ctx the parse tree
-	 */
-	void exitEventcondition_expression(@NotNull LPPNParser.Eventcondition_expressionContext ctx);
-	/**
 	 * Enter a parse tree produced by {@link LPPNParser#head}.
 	 * @param ctx the parse tree
 	 */
