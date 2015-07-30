@@ -98,6 +98,13 @@ class Formula<T> {
         // aggregate all terms of the inputs
         List<T> terms = []
 
+//        List<Formula<T>> simplifiedInputs = []
+//        inputs.each() {
+//            if (it.inputFormulas.size() == 0 && it.inputPorts.size() == 1 && op != Operator.NEG && op != Operator.NULL) {
+//                simplifiedInputs << it
+//            }
+//        }
+
         inputs.each() {
             terms = terms - it.inputPorts + it.inputPorts
         }
