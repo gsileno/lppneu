@@ -1,6 +1,7 @@
-package org.leibnizcenter.lppneu.builders
+
 
 import groovy.xml.XmlUtil
+import org.leibnizcenter.lppneu.builders.LPPN2LPNold
 import org.leibnizcenter.lppneu.components.language.Atom
 import org.leibnizcenter.lppneu.components.language.Event
 import org.leibnizcenter.lppneu.components.language.Expression

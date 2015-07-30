@@ -1,5 +1,4 @@
-package org.leibnizcenter.lppneu.builders
-
+import org.leibnizcenter.lppneu.builders.LPPN2LPNold
 import org.leibnizcenter.lppneu.components.language.*
 import org.leibnizcenter.pneu.builders.PN2dot
 import org.leibnizcenter.pneu.components.petrinet.Net

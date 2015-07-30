@@ -108,8 +108,27 @@ variable : VARIABLE ;
 
 WS : (' ' | '\t' | '\n' | '\r' | '\f')+ -> skip ;
 
+// boolean operators
+AND : '&' | 'AND' | 'and' ;
+OR : '|' | 'OR' | 'or' ;
+XOR : 'XOR' | 'xor' ;
+
+// event operators
+SEQ : 'SEQ' | 'seq' ;
+PAR : 'PAR' | 'par' ;
+ALT : 'ALT' | 'alt' ;
+NOT : 'not' | 'NOT' ; // default negation
+NEG : 'neg' | 'NEG' ; // strong negation
+
+CAUSES : '->' |  '=>';
 IS_IMPLIED_BY : ':-' ;
+
+
 WHEN : ':' | 'in' ;
+PLUS : '+' ;
+MINUS : '-' ; // both for strong negation and arithmetic deletion
+
+TILDE : '~' ; // used for the union between default and strong
 
 DOT : '.' ;
 COMMA : ',' ;
@@ -125,26 +144,6 @@ GT : '>' ;
 LT : '<' ;
 GE : '>=' ;
 LE : '<=' ;
-
-// boolean operators
-AND : '&' | 'AND' | 'and' ;
-OR : '|' | 'OR' | 'or' ;
-XOR : 'XOR' | 'xor' ;
-
-// event operators
-SEQ : 'SEQ' | 'seq' ;
-PAR : 'PAR' | 'par' ;
-ALT : 'ALT' | 'alt' ;
-
-CAUSES : '->' ;
-
-NOT : 'not' | 'NOT' ; // default negation
-NEG : 'neg' | 'NEG' ; // strong negation
-PLUS : '+' ;
-MINUS : '-' ; // both for strong negation and arithmetic deletion
-
-TILDE : '~' ; // used for the union between default and strong
-
 
 DOMAIN : '#domain' ;
 

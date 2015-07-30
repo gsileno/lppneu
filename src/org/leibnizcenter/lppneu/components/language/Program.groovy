@@ -11,6 +11,7 @@ class Program {
     List<CausalRule> causalRules = []
 
     Map<Expression, Expression> reducedExpressionMap = [:]
+    Map<EventConditionExpression, EventConditionExpression> reducedEventConditionExpressionMap = [:]
 
     Program() {}
 
@@ -47,8 +48,34 @@ class Program {
         parameters
     }
 
+    List<Parameter> getEventConditionParameters(Formula<EventCondition> formula) {
+
+        List<Parameter> parameters = []
+        if (formula.isCompound()) {
+            for (inputFormula in formula.inputFormulas) {
+                parameters += getEventConditionParameters(inputFormula) - parameters
+            }
+        } else {
+            for (inputPort in formula.inputPorts) {
+                if (inputPort.event == null) {
+                    List<Parameter> conditionParameters = getParameters(inputPort.condition.formula)
+                    // neglect propositions
+                    if (conditionParameters != null) {
+                        parameters += conditionParameters - parameters
+                    }
+                }
+            }
+        }
+
+        parameters
+    }
+
     Atom newLogicPredicate() {
         return Atom.build("_e"+reducedExpressionMap.size())
+    }
+
+    Atom newCausalPredicate() {
+        return Atom.build("_ec"+reducedEventConditionExpressionMap.size())
     }
 
     Expression reduceExpression(Formula<Situation> formula) {
@@ -58,6 +85,8 @@ class Program {
 
         // Formula is compound
         if (formula.isCompound()) {
+            log.trace("formula is compound (${formula.dump()})")
+
             // first reduce all the input formulas
             for (input in formula.inputFormulas) {
                 inputReducedExpressions << reduceExpression(input)
@@ -94,6 +123,7 @@ class Program {
 
         // Formula is simple
         } else {
+            log.trace("formula is simple (${formula.dump()})")
             return Expression.buildFromSituations(formula.inputPorts, formula.operator)
         }
 
@@ -110,6 +140,36 @@ class Program {
             for (input in formula.inputFormulas) {
                 inputReducedExpressions << reduceEventConditionExpression(input)
             }
+
+            // combine the reduction into a new expression
+            EventConditionExpression expression = EventConditionExpression.buildFromExpressions(inputReducedExpressions, formula.operator)
+
+            // check if this compound expression has been already recorded
+            for (coupling in reducedEventConditionExpressionMap) {
+                log.trace(coupling.key.toString() + ": " + coupling.value.toString() + " ?= " + expression.toString() + " ")
+
+                if (coupling.value == expression) {
+                    return coupling.key
+                }
+            }
+
+            // otherwise this compound expression is new, record it
+
+            // construct a new reduced expression out of it
+            // 1. take all relevant parameters
+            List<Parameter> parameters = getParameters(formula)
+            // 2. create a new functor
+            Atom functor = newLogicPredicate()
+            // 3. create such reduced expression
+            reducedExpression = Expression.build(Literal.build(functor, parameters))
+
+            log.trace("reduced expression: "+reducedExpression+" (for "+expression+")")
+
+            // 4. associate compound with reduced expression
+            reducedExpressionMap.put(reducedExpression, expression)
+
+            return reducedExpression
+
         } else {
             log.trace("formula is simple (${formula.dump()})")
             for (input in formula.inputPorts) {

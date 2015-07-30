@@ -1,6 +1,7 @@
-package org.leibnizcenter.lppneu.builders
+
 
 import groovy.xml.XmlUtil
+import org.leibnizcenter.lppneu.builders.LPPN2LPN
 import org.leibnizcenter.lppneu.components.language.*
 import org.leibnizcenter.lppneu.parser.LPPNLoader
 import org.leibnizcenter.pneu.builders.PN2PNML

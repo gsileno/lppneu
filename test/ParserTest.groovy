@@ -1,7 +1,8 @@
-package org.leibnizcenter.lppneu.parser
+
 
 import groovy.io.FileType
 import org.leibnizcenter.lppneu.components.language.Program
+import org.leibnizcenter.lppneu.parser.LPPNLoader
 
 class ParserTest extends GroovyTestCase {
 

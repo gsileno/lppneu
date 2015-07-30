@@ -1,4 +1,4 @@
-package org.leibnizcenter.lppneu
+
 
 import org.leibnizcenter.lppneu.components.language.*
 import org.leibnizcenter.lppneu.parser.LPPNLoader
@@ -103,15 +103,17 @@ class ReductionTest extends GroovyTestCase {
 //    }
 
     void testReduceCausalRule() {
-        Program program = LPPNLoader.parseString("(a and b) seq ((a and b) and (a or b)) -> a.")
+        // Program program = LPPNLoader.parseString("a and b -> p.")
+        Program program = LPPNLoader.parseString("p :- a and b.")
         program.print()
 
         Program reducedProgram = program.reduce()
         reducedProgram.print()
     }
 
-//    void testReduceCausalRule() {
-//        Program program = LPPNLoader.parseString("(a in b) seq (a and b) and (a or b) -> p.")
+//    void testReduceCausalRule2() {
+//        Program program = LPPNLoader.parseString("p :- (a in b) seq (a and b) and (a or b).")
+//        // Program program = LPPNLoader.parseString("(a in b) seq (a and b) and (a or b) -> p.")
 //        program.print()
 //
 //        Program reducedProgram = program.reduce()

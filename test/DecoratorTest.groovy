@@ -1,6 +1,7 @@
-package org.leibnizcenter.lppneu.parser
+
 
 import org.leibnizcenter.lppneu.components.language.Program
+import org.leibnizcenter.lppneu.parser.LPPNLoader
 
 class DecoratorTest extends GroovyTestCase {
 
