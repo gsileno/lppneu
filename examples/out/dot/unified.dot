@@ -1,0 +1,36 @@
+digraph G {
+  rankdir="LR";
+
+  subgraph place {
+    node [shape=circle,fixedsize=true,width=.5];
+    _p0 [label="a"] ;
+  } 
+
+  subgraph transitions {
+    node [shape=rect,height=.5,width=.5];
+    _t0 [label="",height=.1,width=.1,style=filled,width=.1,color=black] ;
+  } 
+
+  subgraph cluster_0 {
+    color=lightgray ;
+
+    subgraph place {
+      node [shape=circle,fixedsize=true,width=.5];
+      _p0_0 [label="a"] ;
+    } 
+  }
+
+  subgraph cluster_1 {
+    color=lightgray ;
+
+    subgraph place {
+      node [shape=circle,fixedsize=true,width=.5];
+      _p0_1 [label="a"] ;
+    } 
+  }
+
+  _p0 -> _t0 [arrowhead=none] ;
+  _t0 -> _p0_0 [arrowhead=none] ;
+  _t0 -> _p0_1 [arrowhead=none] ;
+}
+

@@ -5,6 +5,7 @@ add OPT (optional) process operator
 test IN event/condition operator
 // switch event with operation with the IN operator
 consider the simplification (e IN c1) IN c2 = (e IN c1 AND c2) 
+expression comparison (a AND b) should be true for (b AND a), etc.
 
 ERRORS
 // "=>" in parsing does something against '->' 

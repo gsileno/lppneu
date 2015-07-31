@@ -2,69 +2,231 @@ package org.leibnizcenter.lppneu.builders
 
 import commons.base.Formula
 import groovy.util.logging.Log4j
+import org.leibnizcenter.lppneu.comparison.Comparison
 import org.leibnizcenter.lppneu.components.language.*
 import org.leibnizcenter.lppneu.components.petrinets.LPlace
 import org.leibnizcenter.lppneu.components.petrinets.LTransition
 import org.leibnizcenter.pneu.components.petrinet.Arc
+import org.leibnizcenter.pneu.components.petrinet.ArcType
 import org.leibnizcenter.pneu.components.petrinet.Net
+import org.leibnizcenter.pneu.components.petrinet.Node
 import org.leibnizcenter.pneu.components.petrinet.Place
 import org.leibnizcenter.pneu.components.petrinet.Transition
 
 @Log4j
 class LPPN2LPN {
 
-    static Net convert(Program program) {
-        Program reducedProgram = program.reduce()
+    Map<Expression, List<LPlace>> expressionPlaceMap
+    Map<Operation, List<LTransition>> operationTransitionMap
 
-        Net net = new Net()
+    Program program, reducedProgram
 
-        for (logicRule in reducedProgram.logicRules) {
-            Net subNet
+    Net net, simplifiedNet, unifiedNet
 
-            if (logicRule.isRule()) {
-                subNet = buildImplicationNet(logicRule.body.formula, logicRule.head.formula)
-            } else if (logicRule.isConstraint()) {
-                subNet = buildConstraintNet(logicRule.body.formula)
-            } else if (logicRule.isFact()) {
-                subNet = buildFactNet(logicRule.head.formula)
-            } else {
-                throw new RuntimeException()
+    void recordPlace(LPlace place) {
+
+        if (place.expression) {
+            if (expressionPlaceMap[place.expression] == null) expressionPlaceMap[place.expression] = []
+            expressionPlaceMap[place.expression] << place
+        } else {
+            throw new RuntimeException()
+        }
+    }
+
+    void recordTransition(LTransition transition) {
+        if (transition.operation) {
+            if (operationTransitionMap[transition.operation] == null) operationTransitionMap[transition.operation] = []
+            operationTransitionMap[transition.operation] << transition
+        } else if (transition.operator) {
+            return
+        } else {
+            throw new RuntimeException()
+        }
+    }
+
+    // map all places and transitions indexed by their logic content
+    void recordNet(Net net) {
+
+        // map places
+        for (p in net.placeList) {
+            recordPlace((LPlace) p)
+        }
+        // map transitions
+        for (t in net.transitionList) {
+            recordTransition((LTransition) t)
+        }
+
+        // nested nets
+        for (subNet in net.subNets) {
+            recordNet(subNet)
+        }
+    }
+
+    // the simplification look for cloned subnets
+    // once they are identified, it replaces them, i.e
+    // it replaces the cloned subnets with a root subent
+    // overwriting the associated inputs/outputs
+
+    static Net simplifyNet(Net net) {
+
+        Net simplifiedNet = net.clone()
+
+        List<Net> netList = simplifiedNet.getAllNets()
+
+        Map<Net, List<Net>> clonesNetMap = [:]
+
+        for (int i = netList.size() - 1; i > 0; i--) {
+            for (int j = i - 1; j >= 0; j--) {
+                Net ni = netList[i]
+                Net nj = netList[j]
+
+                if (Comparison.compare(ni, nj)) {
+                    if (!clonesNetMap[ni]) clonesNetMap[ni] = []
+                    clonesNetMap[ni] << nj
+                }
+            }
+        }
+
+        if (clonesNetMap.size() == 0) {
+            return net
+        } else {
+            for (coupling in clonesNetMap) {
+                // take the root
+                Net rootNet = coupling.key
+
+                // for each cloned net
+                for (cloneNet in coupling.value) {
+
+                    // change the link from the parent
+                    Net parent = cloneNet.parent
+                    if (parent) {
+                        parent.subNets -= [cloneNet]
+                        parent.subNets += rootNet
+                    }
+
+                    // for each input node
+                    // (the indexing correspond to that of the root net)
+                    for (int i = 0; i < cloneNet.inputs.size(); i++) {
+                        Node clonedNode = cloneNet.inputs[i]
+                        // for each of its input arcs
+                        for (arc in clonedNode.inputs) {
+                            // if the arc goes externally
+                            if (!cloneNet.arcList.contains(arc.source)) {
+                                // attach the arc to the root node
+                                arc.target = rootNet.inputs[i]
+                                // bind the arc to the rootNet
+                                rootNet.arcList << arc
+                            }
+                        }
+                    }
+
+                    // the same, for the output nodes
+                    for (int i = 0; i < cloneNet.outputs.size(); i++) {
+                        Node clonedNode = cloneNet.outputs[i]
+                        for (arc in clonedNode.outputs) {
+                            if (!cloneNet.arcList.contains(arc.target)) {
+                                arc.target = rootNet.outputs[i]
+                                rootNet.arcList << arc
+                            }
+                        }
+                    }
+                }
             }
 
-//            // anchor subnet to general index of places
-//            for (p in subNet.placeList) {
-//                if (placeNetMap[(LPlace) p] == null) placeNetMap[(LPlace) p] = []
-//                placeNetMap[(LPlace) p] << subNet
-//            }
-//
-//            // anchor subnet to general index of transitions
-//            for (t in subNet.transitionList) {
-//                if (transitionNetMap[(LTransition) t] == null) transitionNetMap[(LTransition) t] = []
-//                transitionNetMap[(LTransition) t] << subNet
-//            }
+        }
 
+        simplifiedNet
+    }
+
+    Net unifyNet(Net net) {
+        recordNet(net)
+
+        Net unifiedNet = net.clone()
+
+        for (coupling in expressionPlaceMap) {
+            if (coupling.value.size() > 1) {
+                LPlace pNexus = new LPlace(expression: coupling.key)
+                unifiedNet.placeList << pNexus
+                LTransition tNexus = new LTransition(link: true)
+                unifiedNet.transitionList << tNexus
+                unifiedNet.arcList << Arc.buildArc((Place) pNexus, (Transition) tNexus, ArcType.LINK)
+
+                for (p in coupling.value) {
+                    unifiedNet.arcList << Arc.buildArc((Transition) tNexus, (Place) p, ArcType.LINK)
+                }
+            }
+        }
+
+        for (coupling in operationTransitionMap) {
+            if (coupling.value.size() > 1) {
+                LTransition tNexus = new LTransition(operation: coupling.key)
+                unifiedNet.transitionList << tNexus
+                LPlace pNexus = new LPlace(link: true)  // this is a synchornization place
+                unifiedNet.placeList << pNexus
+                unifiedNet.arcList << Arc.buildArc((Transition) tNexus, (Place) pNexus, ArcType.LINK)
+
+                for (t in coupling.value) {
+                    unifiedNet.arcList << Arc.buildArc((Place) pNexus, (Transition) t, ArcType.LINK)
+                }
+            }
+        }
+
+        unifiedNet
+    }
+
+    void convert(Program source) {
+
+        // reset net and maps
+
+        net = new Net()
+        expressionPlaceMap = [:]
+        operationTransitionMap = [:]
+
+        program = source
+
+        reducedProgram = program.reduce()
+
+        for (logicRule in reducedProgram.logicRules) {
+            Net subNet = buildLogicRuleNet(logicRule)
             net.include(subNet)
         }
 
         for (causalRule in reducedProgram.causalRules) {
-
-            Net subNet
-
-            if (causalRule.isMechanism()) {
-                subNet = buildMechanismNet(causalRule.condition, causalRule.action)
-            } else {
-                throw new RuntimeException() 
-            }
-
+            Net subNet = buildCausalRuleNet(causalRule)
             net.include(subNet)
         }
 
-        net
+        simplifiedNet = simplifyNet(net)
+        unifiedNet = unifyNet(net)
     }
+
+    static Net buildLogicRuleNet(LogicRule logicRule) {
+        if (logicRule.isRule()) {
+            return buildImplicationNet(logicRule.body.formula, logicRule.head.formula)
+        } else if (logicRule.isConstraint()) {
+            return buildConstraintNet(logicRule.body.formula)
+        } else if (logicRule.isFact()) {
+            return buildFactNet(logicRule.head.formula)
+        } else {
+            throw new RuntimeException()
+        }
+    }
+
+    static Net buildCausalRuleNet(CausalRule causalRule) {
+        if (causalRule.isMechanism()) {
+            return buildMechanismNet(causalRule.condition, causalRule.action)
+        } else {
+            throw new RuntimeException()
+        }
+    }
+
 
     static Net buildConstraintNet(Formula<Situation> constraint) {
         Net net = new Net()
+
         // TODO
+        throw new RuntimeException()
+
         return net
     }
 
@@ -74,7 +236,6 @@ class LPPN2LPN {
     }
 
     static Net buildImplicationNet(Formula<Situation> body, Formula<Situation> head) {
-
         Net net = new Net()
 
         Net bodyNet = buildExpressionNet(body)
@@ -129,8 +290,8 @@ class LPPN2LPN {
                 net.transitionList += [tBridge]
 
                 net.arcList += Arc.buildArc((Transition) tIn, (Place) pBridge)
-                net.arcList += Arc.buildArc((Place) pBridge,(Transition) tBridge)
-                net.arcList += Arc.buildArc((Place) pIn,(Transition) tBridge)
+                net.arcList += Arc.buildArc((Place) pBridge, (Transition) tBridge)
+                net.arcList += Arc.buildArc((Place) pIn, (Transition) tBridge)
                 net.arcList += Arc.buildArc((Transition) tBridge, (Place) pOut)
             } else {
                 pOut = new LPlace(expression: expression)
@@ -140,7 +301,9 @@ class LPPN2LPN {
 
         }
 
-        if (pOut == null) { throw new RuntimeException()  }
+        if (pOut == null) {
+            throw new RuntimeException()
+        }
 
         net.outputs += [pOut]
         return net
@@ -165,7 +328,7 @@ class LPPN2LPN {
         } else if (formula.operator == Operator.OPT) {
             tOut = new LTransition(operator: Operator.OR)
         } else {
-            throw new RuntimeException() 
+            throw new RuntimeException()
         }
 
         net.placeList << pOut
@@ -219,13 +382,13 @@ class LPPN2LPN {
                     net.arcList += Arc.buildArc(pIn, t)
                     net.inputs += [pIn]
                 }
-            // Process expressions are transformed into actual Petri Nets
-            } else if (formula.operator == Operator.IN) {
+                // Process expressions are transformed into actual Petri Nets
+            } else if (formula.operator == Operator.OCCURS_IN || formula.operator == Operator.OCCURS) {
                 return buildEventConditionNet(formula)
             } else if (formula.operator.isBinaryProcessOperator()) {
                 return buildProcessNet(formula)
             } else {
-                throw new RuntimeException() 
+                throw new RuntimeException()
             }
         } else {
             net.inputs += [pOut]
@@ -261,6 +424,7 @@ class LPPN2LPN {
                  Expression.build(eventExpression.formula, Operator.NULL)],
                 Operator.OR
         ).formula)
+
         net.include(subNet)
         net.arcList += Arc.buildArc((Place) subNet.outputs[0], (Transition) tOut)
 
@@ -269,44 +433,11 @@ class LPPN2LPN {
         net.outputs += [pOut]
 
         net
-
-//        if (formula.isMereCondition()) {
-//            Expression targetExpression = formula.condition
-//            pOut = new LPlace(expression: targetExpression)
-//            tOut = new LTransition(operation: targetExpression.toOperation())
-//            net.placeList += [pOut]
-//            net.transitionList += [tOut]
-//            net.arcList += Arc.buildArc((Transition) tOut, (Place) pOut)
-//
-//            Net subNet = buildExpressionNet(Expression.buildFromExpressions(
-//                    [Expression.build(targetExpression.formula, Operator.NEG),
-//                     Expression.build(targetExpression.formula, Operator.NULL)],
-//                    Operator.OR
-//            ).formula)
-//            net.include(subNet)
-//            net.arcList += Arc.buildArc((Place) subNet.outputs[0], (Transition) tOut)
-//        } else if (eventCondition.isMereEvent()) {
-//            Expression targetExpression = Expression.build(eventCondition.event.toSituation())
-//            pOut = new LPlace(expression: targetExpression)
-//            tOut = new LTransition(operation: Operation.build(eventCondition.event))
-//            net.placeList += [pOut]
-//            net.transitionList += [tOut]
-//            net.arcList += Arc.buildArc((Transition) tOut, (Place) pOut)
-//
-//            Net subNet = buildExpressionNet(Expression.buildFromExpressions(
-//                    [Expression.build(targetExpression.formula, Operator.NEG),
-//                     Expression.build(targetExpression.formula, Operator.NULL)],
-//                    Operator.OR
-//            ).formula)
-//            net.include(subNet)
-//            net.arcList += Arc.buildArc((Place) subNet.outputs[0], (Transition) tOut)
-//        } else if (formula.isEventCondition()) {
-
     }
 
     static Net buildEventNet(Event event) {
         Net net = new Net()
-        LTransition t = new LTransition(event: event)
+        LTransition t = new LTransition(operation: Operation.build(event))
         net.transitionList += [t]
 
         // I/O
@@ -416,7 +547,7 @@ class LPPN2LPN {
                 } else if (formula.operator == Operator.NULL) {
                     return buildEventNet(formula.inputPorts[0].nullify())
                 } else {
-                    throw new RuntimeException() 
+                    throw new RuntimeException()
                 }
             }
         } else {
@@ -430,14 +561,13 @@ class LPPN2LPN {
                 } else if (formula.operator == Operator.ALT) {
                     return buildAltOperationNet(formula)
                 } else {
-                    throw new RuntimeException() 
+                    throw new RuntimeException()
                 }
             }
         }
     }
 
     static Net buildMechanismNet(Expression condition, Operation action) {
-
         Expression actualCondition
 
         Net net = new Net()
@@ -445,8 +575,8 @@ class LPPN2LPN {
         // transform condition action rule in event condition action
         // i.e. when the given condition is not described by an event IN a context
         // consider the "creation" of such condition as the event.
-        if (condition.formula.operator != Operator.IN) {
-            actualCondition = Expression.build(condition, Operator.IN)
+        if (condition.formula.operator != Operator.OCCURS_IN) {
+            actualCondition = Expression.build(condition, Operator.OCCURS)
         } else {
             actualCondition = condition
         }
@@ -456,7 +586,6 @@ class LPPN2LPN {
         net.include(triggerNet)
 
         LPlace pIn = (LPlace) triggerNet.outputs[0]
-        net.placeList += [pIn]
 
         // create consequent
         Expression consequent = action.toExpression()
@@ -475,131 +604,3 @@ class LPPN2LPN {
 
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-//    Map<Event, LTransition> eventTransitionMap = [:]
-//    Map<Expression, LPlace> expressionPlaceMap = [:]
-//    Map<Operation, Net> operationNetMap = [:]
-//    Map<EventConditionExpression, Net> eventConditionExpressionNetMap = [:]
-//
-//    Base<Situation> situationBase = new Base<Situation>()
-//
-//    ////////////// Situation, Expression
-//
-//    Net buildSituationNet(Situation situation, Integer z = 0) {
-//
-//        Net net = new Net(zIndex: z)
-//        Expression expression = Expression.build(situation)
-//        LPlace p
-//
-//        if (expressionPlaceMap[expression]) {
-//            p = expressionPlaceMap[expression]
-//        } else {
-//            p = new LPlace(situation: situation)
-//            expressionPlaceMap[expression] = p
-//        }
-//
-//        net.placeList << p
-//
-//        // I/O
-//        net.inputs.add(p)
-//        net.outputs.add(p)
-//
-//        net
-//    }
-//
-//    static Net buildLogicExpressionNet(Formula<Situation> formula, Integer z = 0) {
-//
-//        Net net = new Net(zIndex: z)
-//
-//        LTransition tOut = new LTransition(operator: formula.operator)
-//        LPlace pOut = new LPlace(expression: Expression.build(formula))
-//        net.transitionList << tOut
-//        net.placeList << pOut
-//
-//        if (formula.inputPorts) {
-//
-//            if (formula.inputPorts.size() == 1 &&
-//                    formula.operator != Operator.NEG &&
-//                    formula.operator != Operator.NULL) {
-//
-//            }
-//
-//        } else {
-//            for (input in formula.inputFormulas) {
-//
-//                // create subnet
-//                Net subNet = buildExpressionNet(input, z - 1)
-//                net.include(subNet)
-//
-//                // I/.. (Input/..)
-//                net.inputs.add(subNet.inputs[0])
-//
-//                // anchoring
-//                net.arcList += Arc.buildBiflowArcs((Place) subNet.outputs[0], (Transition) tOut)
-//
-//            }
-//
-//            net.arcList += Arc.buildDiodeArcs(tOut, pOut)
-//
-//            // ..O (..Output)
-//            net.outputs.add(pOut)
-//        }
-//
-//        return net
-//    }
-//
-//    static Net buildExpressionNet(Formula<Situation> formula, Integer z = 0) {
-//        if (formula.operator.isUnary()) {
-//            if (formula.inputFormulas.size() > 0) { // there are subformulas
-//                if (formula.operator == Operator.POS) {
-//                    return buildExpressionNet(formula.inputFormulas[0], z - 1)
-//                } else if (formula.operator == Operator.NEG || formula.operator == Operator.NULL) {
-//                    return buildNegNotExpressionNet(formula, z - 1)
-//                } else {
-//                    throw new RuntimeException() 
-//                }
-//            } else { // there are no subformulas, refer to literals
-//                if (formula.operator == Operator.POS) {
-//                    return buildSituationNet(formula.inputPorts[0], z)
-//                } else if (formula.operator == Operator.NEG) {
-//                    return buildSituationNet(formula.inputPorts[0].negate(), z)
-//                } else if (formula.operator == Operator.NULL) {
-//                    return buildSituationNet(formula.inputPorts[0].nullify(), z)
-//                } else {
-//                    throw new RuntimeException() 
-//                }
-//            }
-//        } else {
-//            if (formula.operator == Operator.AND || formula.operator == Operator.OR || formula.operator == Operator.XOR) {
-//              return buildLogicExpressionNet(formula, z)
-////            } else if (formula.operator == Operator.SEQ) {
-////                return buildSeqNet(formula, z)
-////            } else if (formula.operator == Operator.PAR) {
-////                return buildParExpressionNet(formula, z)
-////            } else if (formula.operator == Operator.ALT) {
-////                return buildAltExpressionNet(formula, z)
-//            } else {
-//                throw new RuntimeException() 
-//            }
-//        }
-//    }
-//
-//    static Net buildExpressionNet(Expression expression, Integer z = 0) {
-//        buildExpressionNet(expression.formula, z)
-//    }
-
-// }

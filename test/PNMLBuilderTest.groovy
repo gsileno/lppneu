@@ -27,9 +27,6 @@ class PNMLBuilderTest extends GroovyTestCase {
 
     Event eventP = Event.build(literalP)
     Event eventQ = Event.build(literalQ)
-    Event eventR = Event.build(literalR)
-    Event eventNEGP = Event.build(extLiteralNEGP)
-    Event eventNOTR = Event.build(extLiteralNOTR)
 
     Situation situationP = Situation.build(literalP)
     Situation situationQ = Situation.build(literalQ)
@@ -58,12 +55,7 @@ class PNMLBuilderTest extends GroovyTestCase {
     Operation operationNEGP = Operation.build(extLiteralNEGP)
     Operation operationP = Operation.build(eventP)
     Operation operationQ = Operation.build(eventQ)
-    Operation operationNEGNEGP = Operation.build(operationNEGP, Operator.NEG)
-    Operation operationPANDQ = Operation.buildFromOperations([operationP, operationQ], Operator.AND)
-    Operation operationNEGPORNOTR = Operation.buildFromEvents([eventNEGP, eventNOTR], Operator.OR)
-    Operation operationPANDQXORQ = Operation.buildFromOperations([operationPANDQ, operationQ], Operator.XOR)
     Operation operationPSEQQ = Operation.buildFromOperations([operationP, operationQ], Operator.SEQ)
-    Operation operationQSEQPANDQ = Operation.buildFromOperations([operationQ, operationPANDQ], Operator.SEQ)
     Operation operationPPARQ = Operation.buildFromEvents([eventP, eventQ], Operator.PAR)
     Operation operationQALTNEGP = Operation.buildFromOperations([operationQ, operationNEGP], Operator.ALT)
 

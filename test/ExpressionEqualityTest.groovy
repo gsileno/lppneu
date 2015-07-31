@@ -1,9 +1,8 @@
 
 
 import org.leibnizcenter.lppneu.components.language.*
-import org.leibnizcenter.lppneu.parser.LPPNLoader
 
-class ConversionTest extends GroovyTestCase {
+class ExpressionEqualityTest extends GroovyTestCase {
 
     Literal literalP = Literal.build(Atom.build("p"))
     Literal literalQ = Literal.build(Atom.build("q"))
@@ -40,7 +39,7 @@ class ConversionTest extends GroovyTestCase {
     Expression expressionQALTNEGP = Expression.buildFromExpressions([expressionQ, expressionNEGP], Operator.ALT)
     Expression expressionPSEQNEGPSEQQ = Expression.buildFromExpressions([expressionP, expressionNEGP, expressionQ], Operator.SEQ)
     Expression expressionQALTNEGPSEQQ = Expression.buildFromExpressions([expressionQALTNEGP, expressionQ], Operator.SEQ)
-    Expression complexExpression = Expression.buildFromExpressions(
+    Expression expressionComplex = Expression.buildFromExpressions(
             [ expressionR,
               Expression.buildFromExpressions(
                  [ Expression.buildFromExpressions([expressionQ, expressionPANDQ], Operator.SEQ),
@@ -64,15 +63,39 @@ class ConversionTest extends GroovyTestCase {
 
     Operation operationPSEQNEGPSEQQ = Operation.buildFromOperations([operationP, operationNEGP, operationQ], Operator.SEQ)
 
-    void testConversion() {
 
-        assert operationP.toExpression() == expressionP
-        assert expressionP.toOperation() == operationP
+    void testEquality() {
 
-        assert operationPPARQ.toExpression() == expressionPPARQ
-        assert expressionPPARQ.toOperation() == operationPPARQ
+        assert (expressionP == Expression.build(literalP))
+        assert (expressionP != Expression.build(extLiteralNEGP))
 
-        assert expressionPANDQ.toOperation() == operationPANDQ
+        assert (expressionP.formula.inputPorts[0].rootLiteral.functor.name != expressionQ.formula.inputPorts[0].rootLiteral.functor.name)
+        assert (expressionP.formula.inputPorts[0].rootLiteral.functor != expressionQ.formula.inputPorts[0].rootLiteral.functor)
+        assert (expressionP.formula.inputPorts[0].rootLiteral != expressionQ.formula.inputPorts[0].rootLiteral)
+        assert (expressionP.formula.inputPorts[0] != expressionQ.formula.inputPorts[0])
+        assert (expressionP.formula != expressionQ.formula)
+        assert (expressionP != expressionQ)
+
+        assert (expressionP.formula == Expression.build(literalP).formula)
+        assert (expressionP.formula != Expression.build(extLiteralNEGP).formula)
+
+        assert (literalP == ExtLiteral.build(Literal.build(Atom.build("p")), Polarity.POS).literal)
+        assert (extLiteralNEGP == ExtLiteral.build(literalP, Polarity.NEG))
+        assert (literalP != Expression.build(extLiteralNEGP))
 
     }
+
+    Map<Expression, Expression> testMap = [:]
+
+    void testHashmap() {
+
+        testMap.put(expressionP, expressionP)
+        testMap.put(expressionQ, expressionQ)
+        testMap.put(expressionNEGP, expressionP)
+        testMap.put(expressionP, expressionNEGP)
+        testMap.put(Expression.build(literalP), expressionP)
+
+        assert (testMap.size() == 3)
+    }
+
 }

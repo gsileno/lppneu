@@ -26,6 +26,27 @@ class Program {
 
     }
 
+    String toString() {
+        String output = ""
+
+        if (logicRules.size() > 0) {
+            output += "// logic rules\n"
+            for (rule in logicRules) {
+                output += rule.toString() + "\n"
+            }
+            if (causalRules.size() > 0) output += "\n"
+        }
+
+        if (causalRules.size() > 0) {
+            output += "// causal rules\n"
+            for (rule in causalRules) {
+                output += rule.toString() + "\n"
+            }
+        }
+
+        output
+    }
+
     List<Parameter> getParameters(Formula<Situation> formula) {
 
         List<Parameter> parameters = []
@@ -134,7 +155,7 @@ class Program {
             } else if (causalRule.isEventSeries()) {
                 reducedProgram.causalRules << causalRule
             } else {
-                log.error("Type of causal rule not accounted: "+causalRule)
+                log.error("Type of causal rule not accounted: " + causalRule)
                 throw new RuntimeException()
             }
         }

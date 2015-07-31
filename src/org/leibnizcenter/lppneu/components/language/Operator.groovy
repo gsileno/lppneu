@@ -24,11 +24,11 @@ import groovy.util.logging.Log4j
 
 @Log4j
 enum Operator {
-    POS, NEG, NULL,           // unary operators  (situations and events)
-    AND, OR, XOR,             // binary operators (situations)
-    SEQ, PAR, OPT, ALT, IN,   // binary operators (events and situations)
-
-    IMPLIES, INHIBITS,        // only for logical dependencies on situations
+    POS, NEG, NULL,                  // unary operators  (situations and events)
+    AND, OR, XOR,                    // binary operators (situations)
+    SEQ, PAR, OPT, ALT, OCCURS_IN,   // binary operators (events and situations)
+    IMPLIES, INHIBITS,               // only for logical dependencies on situations
+    OCCURS,                          // only for process occurrence without context
 
     // TOCHECK not formally correct:
     POS_INSTANCE, NEG_INSTANCE, NOT_INSTANCE,  // specific operators

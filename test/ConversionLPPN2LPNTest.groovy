@@ -1,18 +1,12 @@
-
-
-import groovy.xml.XmlUtil
 import org.leibnizcenter.lppneu.builders.LPPN2LPN
 import org.leibnizcenter.lppneu.components.language.*
 import org.leibnizcenter.lppneu.parser.LPPNLoader
-import org.leibnizcenter.pneu.builders.PN2PNML
 import org.leibnizcenter.pneu.builders.PN2dot
 import org.leibnizcenter.pneu.components.petrinet.Net
-import org.leibnizcenter.pneu.components.petrinet.Transition
-import org.leibnizcenter.pneu.parsers.PNML2PN
 
-class LPNBuilderTest extends GroovyTestCase {
+class ConversionLPPN2LPNTest extends GroovyTestCase {
 
-    void batchExport(Net net, String filename) {
+    static void batchExport(Net net, String filename) {
 
         def folder = new File('examples/out/dot/')
         if (!folder.exists()) folder.mkdirs()
@@ -25,10 +19,20 @@ class LPNBuilderTest extends GroovyTestCase {
         println "lpetri net exported to " + outputFile
     }
 
-    Net batchConvert(String code) {
+    static Net batchConvert(String code) {
         Program program = LPPNLoader.parseString(code)
         LPPN2LPN conversion = new LPPN2LPN()
-        return conversion.convert(program)
+        conversion.convert(program)
+
+//        println("#################################################")
+//        println("--- source program ------------")
+//        conversion.program.print()
+//        println("--- reduced program -----------")
+//        conversion.reducedProgram.print()
+//        println("--- net -----------------------")
+//        conversion.net.print()
+
+        return conversion.net
     }
 
     void testConversionBasicFact() {
@@ -41,10 +45,14 @@ class LPNBuilderTest extends GroovyTestCase {
 
     void testConversionCompoundLogicFact() {
         Net net = batchConvert("p or q.")
+
         assert net.subNets.size() == 3
         assert net.subNets[0].placeList.size() == 1
-        assert net.subNets[0].transitionList.size() == 1
-        assert net.subNets[0].arcList.size() == 3
+        assert net.subNets[0].transitionList.size() == 0
+        assert net.subNets[0].arcList.size() == 0
+        assert net.subNets[1].placeList.size() == 0
+        assert net.subNets[1].transitionList.size() == 1
+        assert net.subNets[1].arcList.size() == 2
 
     }
 

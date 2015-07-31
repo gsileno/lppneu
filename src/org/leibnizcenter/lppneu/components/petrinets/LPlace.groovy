@@ -1,23 +1,28 @@
 package org.leibnizcenter.lppneu.components.petrinets
 
 import org.leibnizcenter.lppneu.components.language.Expression
-import org.leibnizcenter.lppneu.components.language.Situation
 import org.leibnizcenter.pneu.components.petrinet.Place
 
 class LPlace extends Place {
 
+    // usually logic places contains a logic content
     Expression expression
-    Situation situation
 
-    void setSituation(Situation s) {
-        situation = s
-        name = s.toString()
+    // unless they are just synchronization places
+    Boolean link = false
+
+    String toString() {
+        expression.toString()
     }
 
-    void setExpression(Expression e) {
-        expression = e
-        name = e.toString()
+    String toMinString() {
+        expression.toString()
     }
 
+    @Override
+    Boolean isLink() {
+        link
+    }
 
 }
+

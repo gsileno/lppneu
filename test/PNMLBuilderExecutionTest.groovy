@@ -5,7 +5,7 @@ import org.leibnizcenter.pneu.builders.PN2dot
 import org.leibnizcenter.pneu.components.petrinet.Net
 import org.leibnizcenter.pneu.parsers.PNML2PN
 
-class BuilderExecutionTest extends GroovyTestCase {
+class PNMLBuilderExecutionTest extends GroovyTestCase {
 
     Literal literalP = Literal.build(Atom.build("p"))
     Literal literalQ = Literal.build(Atom.build("q"))

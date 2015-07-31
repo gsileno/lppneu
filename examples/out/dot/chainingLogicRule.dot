@@ -1,0 +1,78 @@
+digraph G {
+  rankdir="LR";
+
+  subgraph place {
+    node [shape=circle,fixedsize=true,width=.5];
+    _p0 [label="q"] ;
+  } 
+
+  subgraph transitions {
+    node [shape=rect,height=.5,width=.5];
+    _t0 [label="",height=.1,width=.1,style=filled,width=.1,color=black] ;
+  } 
+
+  subgraph cluster_0 {
+    color=lightgray ;
+
+    subgraph transitions {
+      node [shape=rect,height=.5,width=.5];
+      _t0_0 [label="IMPLIES"] ;
+    } 
+
+    subgraph cluster0_0 {
+      color=lightgray ;
+
+      subgraph place {
+        node [shape=circle,fixedsize=true,width=.5];
+        _p0_00 [label="p"] ;
+      } 
+    }
+
+    subgraph cluster0_1 {
+      color=lightgray ;
+
+      subgraph place {
+        node [shape=circle,fixedsize=true,width=.5];
+        _p0_01 [label="q"] ;
+      } 
+    }
+
+    _p0_00 -> _t0_0 [] ;
+    _t0_0 -> _p0_01 [] ;
+  }
+
+  subgraph cluster_1 {
+    color=lightgray ;
+
+    subgraph transitions {
+      node [shape=rect,height=.5,width=.5];
+      _t0_1 [label="IMPLIES"] ;
+    } 
+
+    subgraph cluster1_0 {
+      color=lightgray ;
+
+      subgraph place {
+        node [shape=circle,fixedsize=true,width=.5];
+        _p0_10 [label="q"] ;
+      } 
+    }
+
+    subgraph cluster1_1 {
+      color=lightgray ;
+
+      subgraph place {
+        node [shape=circle,fixedsize=true,width=.5];
+        _p0_11 [label="r"] ;
+      } 
+    }
+
+    _p0_10 -> _t0_1 [] ;
+    _t0_1 -> _p0_11 [] ;
+  }
+
+  _p0 -> _t0 [arrowhead=none] ;
+  _t0 -> _p0_01 [arrowhead=none] ;
+  _t0 -> _p0_10 [arrowhead=none] ;
+}
+

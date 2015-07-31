@@ -60,7 +60,7 @@ class Formula<T> {
             else if (op == Operator.OR || op == Operator.XOR || op == Operator.AND ||
                      op == Operator.PAR || op == Operator.ALT || op == Operator.SEQ || op == Operator.OPT)
                 formula = build(terms[0])
-            else if (op == Operator.IN) {
+            else if (op == Operator.OCCURS) {
                 formula.operator = op
                 Formula f = build(terms[0])
                 formula.inputFormulas << f
@@ -95,7 +95,7 @@ class Formula<T> {
     Formula<T> buildFromFormulas(List<Formula<T>> inputs, Operator op) {
 
         // if there is only 1 element then simplify
-        if (inputs.size() == 1 && op != Operator.NEG && op != Operator.NULL && op != Operator.IN) {
+        if (inputs.size() == 1 && op != Operator.NEG && op != Operator.NULL && op != Operator.OCCURS_IN) {
             return inputs[0]
         }
 

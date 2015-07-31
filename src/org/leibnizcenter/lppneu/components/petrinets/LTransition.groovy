@@ -10,15 +10,16 @@ import org.leibnizcenter.pneu.components.petrinet.Transition
 class LTransition extends Transition {
 
     // for causal dependencies
-    Event event
     Operation operation
 
     // for logic dependencies
     Operator operator
 
+    // if they are just synchronization places
+    Boolean link = false
+
     String toString() {
-        if (event != null) event.toString()
-        else if (operation != null) operation.toString()
+        if (operation != null) operation.toString()
         else if (operator != null) {
             String output = operator.toString()
 //            output += "("
@@ -29,4 +30,10 @@ class LTransition extends Transition {
             return output
         }
     }
+
+    @Override
+    Boolean isLink() {
+        return link
+    }
+
 }
