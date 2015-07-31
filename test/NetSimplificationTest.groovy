@@ -30,11 +30,25 @@ class NetSimplificationTest extends GroovyTestCase {
     void testTwoSimpleEqualFacts() {
         LPPN2LPN conversion = batchConvert("a. a.")
 
-        conversion.net.print()
+        assert conversion.net.subNets.size() == 2
+        assert conversion.simplifiedNet.subNets.size() == 1
+        assert conversion.unifiedNet.subNets.size() == 1
+    }
+
+    void testCompoundLogicRule() {
+        LPPN2LPN conversion = batchConvert("r :- p and q.")
+
+        conversion.program.print()
+        conversion.reducedProgram.print()
 
         batchExport(conversion.net, "source")
         batchExport(conversion.simplifiedNet, "simplified")
         batchExport(conversion.unifiedNet, "unified")
+
+        assert conversion.net.subNets.size() == 2
+        assert conversion.simplifiedNet.subNets.size() == 1
+        assert conversion.unifiedNet.subNets.size() == 1
     }
+
 
 }

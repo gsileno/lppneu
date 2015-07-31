@@ -91,31 +91,58 @@ class LPPN2LPN {
             return net
         } else {
             for (coupling in clonesNetMap) {
+
+                log.trace("root net: "+coupling.key)
+                log.trace("root net places: "+coupling.key.placeList)
+                log.trace("root net transitions: "+coupling.key.transitionList)
+                log.trace("root net arcs: "+coupling.key.arcList)
+                log.trace("root net subnets: "+coupling.key.subNets)
+
                 // take the root
                 Net rootNet = coupling.key
 
                 // for each cloned net
                 for (cloneNet in coupling.value) {
+                    log.trace("clone net: "+cloneNet)
+                    log.trace("clone net places: "+cloneNet.placeList)
+                    log.trace("clone net transitions: "+cloneNet.transitionList)
+                    log.trace("clone net arcs: "+cloneNet.arcList)
+                    log.trace("clone net subnets: "+cloneNet.subNets)
 
-                    // change the link from the parent
-                    Net parent = cloneNet.parent
-                    if (parent) {
+                    // change the link from the parents
+                    for (parent in cloneNet.parents) {
+                        log.trace("parent net: "+parent)
+                        log.trace("parent subnet: "+parent.subNets)
                         parent.subNets -= [cloneNet]
-                        parent.subNets += rootNet
+                        log.trace("parent subnet (remove clone net): "+parent.subNets)
+                        // TOCHECK: possible problems of recursions
+                        // when they have different levels
+                        parent.include(rootNet)
+                        log.trace("parent subnet (add root net): "+parent.subNets)
                     }
 
                     // for each input node
                     // (the indexing correspond to that of the root net)
                     for (int i = 0; i < cloneNet.inputs.size(); i++) {
                         Node clonedNode = cloneNet.inputs[i]
+
+                        log.trace("clone node: "+clonedNode)
+
                         // for each of its input arcs
                         for (arc in clonedNode.inputs) {
+                            log.trace("arc input to cloned node: "+arc)
+
                             // if the arc goes externally
                             if (!cloneNet.arcList.contains(arc.source)) {
+                                log.trace("the arc goes externally")
+
                                 // attach the arc to the root node
                                 arc.target = rootNet.inputs[i]
+                                log.trace("change arc output"+arc)
+
                                 // bind the arc to the rootNet
                                 rootNet.arcList << arc
+                                log.trace("add arc to rootNet"+rootNet.arcList)
                             }
                         }
                     }
@@ -197,7 +224,7 @@ class LPPN2LPN {
         }
 
         simplifiedNet = simplifyNet(net)
-        unifiedNet = unifyNet(net)
+        unifiedNet = unifyNet(simplifiedNet)
     }
 
     static Net buildLogicRuleNet(LogicRule logicRule) {

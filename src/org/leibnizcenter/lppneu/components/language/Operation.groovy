@@ -95,7 +95,7 @@ class Operation {
 
         List<Expression> inputExpressions = []
 
-        if (formula.isCompound()) {
+        if (formula.isAtomic()) {
             for (input in formula.inputFormulas) {
                 inputExpressions += build(input).toExpression()
             }
@@ -126,7 +126,7 @@ class Operation {
 //                output += formula.operator.toString()+"("
 //        }
 //
-//        if (formula.isCompound()) {
+//        if (formula.isAtomic()) {
 //            for (formula in formula.inputFormulas)
 //                output += formula.toString(formula.operator) + ", "
 //            output = output[0..-3]

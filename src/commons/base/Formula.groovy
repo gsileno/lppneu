@@ -121,8 +121,19 @@ class Formula<T> {
         formula
     }
 
-    Boolean isCompound() {
-        (inputFormulas.size() > 0)
+    Boolean isAtomic() {
+        (inputFormulas.size() == 0)
+    }
+
+    Boolean isSimple() {
+        for (input in inputFormulas) {
+            if (!input.isAtomic()) {
+                log.trace("${input} is not atomic")
+                return false
+            }
+        }
+        log.trace("${this} is simple")
+        return true
     }
 
     //////////////////
@@ -136,7 +147,7 @@ class Formula<T> {
 
         if (printOp) output += operator.toString()+"("
 
-        if (isCompound()) {
+        if (!isAtomic()) {
             for (formula in inputFormulas)
                 output += formula.toString(operator) + ", "
             output = output[0..-3]
@@ -144,6 +155,11 @@ class Formula<T> {
             for (T term in inputPorts) {
                 output += term.toString() + ", "
             }
+
+            if (output == "" ) {
+                print ("ERROR")
+            }
+
             output = output[0..-3]
         }
 

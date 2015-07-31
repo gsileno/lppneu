@@ -51,7 +51,7 @@ class Program {
 
         List<Parameter> parameters = []
 
-        if (formula.isCompound()) {
+        if (formula.isAtomic()) {
             for (inputFormula in formula.inputFormulas) {
                 parameters += getParameters(inputFormula) - parameters
             }
@@ -72,22 +72,39 @@ class Program {
         return Atom.build("_e" + reducedExpressionMap.size())
     }
 
-    Expression reduceExpression(Formula<Situation> formula) {
+    Expression reduceExpression(Formula<Situation> formula, Boolean root = true) {
+
+        log.trace("reducing formula ${formula}, (root == ${root})")
 
         List<Expression> inputReducedExpressions = []
         Expression expression, reducedExpression
 
-        // Formula is compound
-        if (formula.isCompound()) {
-            log.trace("formula is compound (${formula.dump()})")
-
-            // first reduce all the input formulas
+        if (formula.isAtomic()) {
+            log.trace("formula is atomic (${formula.dump()})")
+            return Expression.buildFromSituations(formula.inputPorts, formula.operator)
+        } else if (root && formula.isSimple()) {
+            log.trace("formula is simple and we are at root")
+            return Expression.build(formula)
+        } else {
+            log.trace("formula is compound, or simple (we are not at root) (root == ${formula.dump()})")
+            // first reduce all the input formulas (if necessary)
             for (input in formula.inputFormulas) {
-                inputReducedExpressions << reduceExpression(input)
+                if (!input.isAtomic()) {
+                    log.trace(input.toString()+" is not atomic: reduce it")
+                    inputReducedExpressions << reduceExpression(input, false)
+                } else {
+                    inputReducedExpressions << Expression.build(input)
+                }
             }
 
             // combine the reduction into a new expression
             expression = Expression.buildFromExpressions(inputReducedExpressions, formula.operator)
+
+            // if it is a root expression, it returns it
+            if (root) {
+                log.trace("new expression: " + expression)
+                return expression
+            }
 
             // check if this compound expression has been already recorded
             for (coupling in reducedExpressionMap) {
@@ -115,10 +132,6 @@ class Program {
 
             return reducedExpression
 
-            // Formula is simple
-        } else {
-            log.trace("formula is simple (${formula.dump()})")
-            return Expression.buildFromSituations(formula.inputPorts, formula.operator)
         }
 
     }
@@ -132,14 +145,15 @@ class Program {
             LogicRule reducedLogicRule = logicRule.clone()
 
             if (logicRule.isRule() || logicRule.isFact()) {
-                reducedLogicRule.head = reducedProgram.reduceExpression(logicRule.head.formula)
+                reducedLogicRule.head = reducedProgram.reduceExpression(logicRule.head.formula, true)
             }
 
             if (logicRule.isRule() || logicRule.isConstraint()) {
-                reducedLogicRule.body = reducedProgram.reduceExpression(logicRule.body.formula)
+                reducedLogicRule.body = reducedProgram.reduceExpression(logicRule.body.formula, true)
             }
 
             if (!logicRule.isRule() && !logicRule.isFact() && !logicRule.isConstraint()) {
+                log.error("Type of logic rule not accounted: " + logicRule)
                 throw new RuntimeException()
             }
 
@@ -149,7 +163,7 @@ class Program {
         for (causalRule in causalRules) {
             if (causalRule.isMechanism()) {
                 CausalRule reducedCausalRule = causalRule.clone()
-                reducedCausalRule.condition = reducedProgram.reduceExpression(causalRule.condition.formula)
+                reducedCausalRule.condition = reducedProgram.reduceExpression(causalRule.condition.formula, true)
                 reducedCausalRule.action = causalRule.action
                 reducedProgram.causalRules << reducedCausalRule
             } else if (causalRule.isEventSeries()) {

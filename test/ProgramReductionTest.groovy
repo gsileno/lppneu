@@ -31,11 +31,27 @@ class ProgramReductionTest extends GroovyTestCase {
     void testReduceComplexExpression() {
         Program program = new Program()
         program.reduceExpression(complexExpression.formula)
-        assert program.reducedExpressionMap.size() == 6
+        assert program.reducedExpressionMap.size() == 5
     }
 
     void testReduceFact() {
         Program program = LPPNLoader.parseString("a or b.")
+        assert program.logicRules.size() == 1
+
+        Program reducedProgram = program.reduce()
+        assert reducedProgram.logicRules.size() == 1
+    }
+
+    void testReduceCompoundFact() {
+        Program program = LPPNLoader.parseString("a or (c and b).")
+        assert program.logicRules.size() == 1
+
+        Program reducedProgram = program.reduce()
+        assert reducedProgram.logicRules.size() == 3
+    }
+
+    void testReduceCompoundFact2() {
+        Program program = LPPNLoader.parseString("a and (a and b).")
         assert program.logicRules.size() == 1
 
         Program reducedProgram = program.reduce()
@@ -44,6 +60,22 @@ class ProgramReductionTest extends GroovyTestCase {
 
     void testReduceProcessFact() {
         Program program = LPPNLoader.parseString("a seq b.")
+        assert program.logicRules.size() == 1
+
+        Program reducedProgram = program.reduce()
+        assert reducedProgram.logicRules.size() == 1
+    }
+
+    void testReduceCompoundProcessFact() {
+        Program program = LPPNLoader.parseString("a seq (b par c).")
+        assert program.logicRules.size() == 1
+
+        Program reducedProgram = program.reduce()
+        assert reducedProgram.logicRules.size() == 3
+    }
+
+    void testReduceCompoundProcessFact2() {
+        Program program = LPPNLoader.parseString("a seq (a seq c).")
         assert program.logicRules.size() == 1
 
         Program reducedProgram = program.reduce()
@@ -56,7 +88,7 @@ class ProgramReductionTest extends GroovyTestCase {
 
         assert program.logicRules.size() == 1
         Program reducedProgram = program.reduce()
-        assert reducedProgram.logicRules.size() == 5
+        assert reducedProgram.logicRules.size() == 3
     }
 
     void testReduceLogicRule2() {
@@ -64,7 +96,7 @@ class ProgramReductionTest extends GroovyTestCase {
         assert program.logicRules.size() == 1
 
         Program reducedProgram = program.reduce()
-        assert reducedProgram.logicRules.size() == 9
+        assert reducedProgram.logicRules.size() == 7
     }
 
     void testReduceCausalRule() {
@@ -73,7 +105,7 @@ class ProgramReductionTest extends GroovyTestCase {
         assert program.causalRules.size() == 1
 
         Program reducedProgram = program.reduce()
-        assert reducedProgram.logicRules.size() == 2
+        assert reducedProgram.logicRules.size() == 0
         assert reducedProgram.causalRules.size() == 1
     }
 
@@ -83,7 +115,7 @@ class ProgramReductionTest extends GroovyTestCase {
         assert program.causalRules.size() == 1
 
         Program reducedProgram = program.reduce()
-        assert reducedProgram.logicRules.size() == 8
+        assert reducedProgram.logicRules.size() == 6
         assert reducedProgram.causalRules.size() == 1
     }
 
@@ -96,4 +128,5 @@ class ProgramReductionTest extends GroovyTestCase {
         assert reducedProgram.logicRules.size() == 6
         assert reducedProgram.causalRules.size() == 3
     }
+
 }
