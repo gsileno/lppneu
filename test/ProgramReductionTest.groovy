@@ -47,7 +47,7 @@ class ProgramReductionTest extends GroovyTestCase {
         assert program.logicRules.size() == 1
 
         Program reducedProgram = program.reduce()
-        assert reducedProgram.logicRules.size() == 3
+        assert reducedProgram.logicRules.size() == 2
     }
 
     void testReduceCompoundFact2() {
@@ -55,7 +55,7 @@ class ProgramReductionTest extends GroovyTestCase {
         assert program.logicRules.size() == 1
 
         Program reducedProgram = program.reduce()
-        assert reducedProgram.logicRules.size() == 3
+        assert reducedProgram.logicRules.size() == 2
     }
 
     void testReduceProcessFact() {
@@ -71,7 +71,7 @@ class ProgramReductionTest extends GroovyTestCase {
         assert program.logicRules.size() == 1
 
         Program reducedProgram = program.reduce()
-        assert reducedProgram.logicRules.size() == 3
+        assert reducedProgram.logicRules.size() == 2
     }
 
     void testReduceCompoundProcessFact2() {
@@ -79,7 +79,7 @@ class ProgramReductionTest extends GroovyTestCase {
         assert program.logicRules.size() == 1
 
         Program reducedProgram = program.reduce()
-        assert reducedProgram.logicRules.size() == 3
+        assert reducedProgram.logicRules.size() == 2
     }
 
     void testReduceLogicRule() {
@@ -88,7 +88,7 @@ class ProgramReductionTest extends GroovyTestCase {
 
         assert program.logicRules.size() == 1
         Program reducedProgram = program.reduce()
-        assert reducedProgram.logicRules.size() == 3
+        assert reducedProgram.logicRules.size() == 2
     }
 
     void testReduceLogicRule2() {
@@ -96,7 +96,7 @@ class ProgramReductionTest extends GroovyTestCase {
         assert program.logicRules.size() == 1
 
         Program reducedProgram = program.reduce()
-        assert reducedProgram.logicRules.size() == 7
+        assert reducedProgram.logicRules.size() == 4
     }
 
     void testReduceCausalRule() {
@@ -115,7 +115,7 @@ class ProgramReductionTest extends GroovyTestCase {
         assert program.causalRules.size() == 1
 
         Program reducedProgram = program.reduce()
-        assert reducedProgram.logicRules.size() == 6
+        assert reducedProgram.logicRules.size() == 3
         assert reducedProgram.causalRules.size() == 1
     }
 
@@ -125,7 +125,7 @@ class ProgramReductionTest extends GroovyTestCase {
         assert program.causalRules.size() == 3
 
         Program reducedProgram = program.reduce()
-        assert reducedProgram.logicRules.size() == 6
+        assert reducedProgram.logicRules.size() == 3
         assert reducedProgram.causalRules.size() == 3
     }
 

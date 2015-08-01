@@ -150,6 +150,8 @@ public class LPPNLoaderListener extends LPPNBaseListener {
             log.error("to be implemented");
             return;
         } else if (ctx.WHEN() != null) {
+            log.trace("operation: "+operationNodes.get(ctx.operation()));
+            log.trace("expression: "+operationNodes.get(ctx.operation()).toExpression());
             expression = Expression.build(operationNodes.get(ctx.operation()).toExpression(), expressionNodes.get(ctx.body_expression(0)), Operator.OCCURS_IN);
         } else if (ctx.LPAR() != null) {
             expression = expressionNodes.get(ctx.body_expression(0));
@@ -265,6 +267,13 @@ public class LPPNLoaderListener extends LPPNBaseListener {
 
     public void exitNormrule(LPPNParser.NormruleContext ctx) {
         LogicRule rule = new LogicRule();
+
+        if (ctx.IS_EQUIVALENT_TO() != null) { // double implication
+            rule.setBiconditional(true);
+        } else { // normal implication
+            rule.setBiconditional(false);
+        }
+
         rule.setHead(expressionNodes.get(ctx.head()));
         rule.setBody(expressionNodes.get(ctx.body()));
         logicRuleNodes.put(ctx, rule);

@@ -19,7 +19,7 @@ eventfact : CAUSES operation DOT ;
 logicrule : normrule | constraint ;
 
 /** A normal rule has a head and body. */
-normrule : head IS_IMPLIED_BY body DOT ;
+normrule : head ( IS_IMPLIED_BY | IS_EQUIVALENT_TO ) body DOT ;
 
 /** A constraint has NO head, only a body. */
 constraint : IS_IMPLIED_BY body DOT ;
@@ -115,6 +115,7 @@ NEG : 'neg' | 'NEG' ; // strong negation
 
 CAUSES : '->' |  '=>';
 IS_IMPLIED_BY : ':-' ;
+IS_EQUIVALENT_TO : '::-' ;
 
 WHEN : ':' | 'in' ;
 PLUS : '+' ;

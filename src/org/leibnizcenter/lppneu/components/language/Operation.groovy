@@ -95,13 +95,13 @@ class Operation {
 
         List<Expression> inputExpressions = []
 
-        if (formula.isAtomic()) {
+        if (!formula.isAtomic()) {
             for (input in formula.inputFormulas) {
-                inputExpressions += build(input).toExpression()
+                inputExpressions << build(input).toExpression()
             }
         } else {
             for (input in formula.inputPorts) {
-                inputExpressions += Expression.build(input.toSituation())
+                inputExpressions << Expression.build(input.toSituation())
             }
         }
 

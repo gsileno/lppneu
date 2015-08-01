@@ -176,8 +176,7 @@ class Program {
 
         // introduce definitions as logic rules
         for (coupling in reducedProgram.reducedExpressionMap) {
-            reducedProgram.logicRules << new LogicRule(head: coupling.key, body: coupling.value)
-            reducedProgram.logicRules << new LogicRule(head: coupling.value, body: coupling.key)
+            reducedProgram.logicRules << new LogicRule(head: coupling.key, body: coupling.value, biconditional: true)
         }
 
         reducedProgram

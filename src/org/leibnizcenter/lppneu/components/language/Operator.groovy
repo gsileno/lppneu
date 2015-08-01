@@ -27,7 +27,7 @@ enum Operator {
     POS, NEG, NULL,                  // unary operators  (situations and events)
     AND, OR, XOR,                    // binary operators (situations)
     SEQ, PAR, OPT, ALT, OCCURS_IN,   // binary operators (events and situations)
-    IMPLIES, INHIBITS,               // only for logical dependencies on situations
+    IMPLIES, INHIBITS, DEFINES,      // only for logical dependencies on situations
     OCCURS,                          // only for process occurrence without context
 
     // TOCHECK not formally correct:

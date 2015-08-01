@@ -15,8 +15,14 @@ class LogicRule {
     Expression head
     Expression body
 
+    Boolean biconditional
+
     Boolean isFact() {
         (body == null)
+    }
+
+    Boolean isBiconditional() {
+        (biconditional)
     }
 
     Boolean isConstraint() {
@@ -32,15 +38,22 @@ class LogicRule {
 
         if (head != null)
             output += head.toString()
-        if (body != null)
-            output += " :- " + body.toString()
+        if (body != null) {
+            if (isBiconditional()) output += " ::- "
+            else output += " :- "
+            output += body.toString()
+        }
 
         output
     }
 
     Expression toExpression() {
         if (isRule())
-            Expression.build(body, head, Operator.IMPLIES)
+            if (isBiconditional()) {
+                Expression.build(body, head, Operator.DEFINES)
+            } else {
+                Expression.build(body, head, Operator.IMPLIES)
+            }
         else if (isFact())
             head
         else if (isConstraint())
