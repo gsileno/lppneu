@@ -1,0 +1,68 @@
+digraph G {
+  rankdir="LR";
+
+  subgraph cluster_0 {
+    label="CAUSES(OCCURS(AND(p, q)), r)" ;
+    color=darkblue ;
+
+    subgraph place {
+      node [shape=circle,fixedsize=true,width=.5];
+      _p0_0 [label="r"] ;
+    } 
+
+    subgraph cluster0_0 {
+      label="OCCURS(AND(p, q))" ;
+      color=darkblue ;
+
+      subgraph place {
+        node [shape=circle,fixedsize=true,width=.5];
+        _p0_00 [label="OCCURS(AND(p, q))"] ;
+        _p1_00 [label="q"] ;
+      } 
+
+      subgraph transitions {
+        node [shape=rect,height=.5,width=.5];
+        _t0_00 [label="p"] ;
+      } 
+
+      subgraph cluster00_0 {
+        label="OR(NEG(p), NULL(p))" ;
+        color=darkblue ;
+
+        subgraph place {
+          node [shape=circle,fixedsize=true,width=.5];
+          _p0_000 [label="OR(NEG(p), NULL(p))"] ;
+          _p1_000 [label="NEG(p)"] ;
+          _p2_000 [label="NULL(p)"] ;
+        } 
+
+        subgraph transitions {
+          node [shape=rect,height=.5,width=.5];
+          _t0_000 [label="OR"] ;
+        } 
+
+        _t0_000 -> _p0_000 [] ;
+        _p1_000 -> _t0_000 [] ;
+        _p2_000 -> _t0_000 [] ;
+      }
+
+      _t0_00 -> _p0_00 [] ;
+      _p1_00 -> _t0_00 [] ;
+      _p0_000 -> _t0_00 [] ;
+    }
+
+    subgraph cluster0_1 {
+      label="r" ;
+      color=darkred ;
+
+      subgraph transitions {
+        node [shape=rect,height=.5,width=.5];
+        _t0_01 [label="r"] ;
+      } 
+    }
+
+    _p0_00 -> _t0_01 [] ;
+    _t0_01 -> _p0_0 [] ;
+  }
+}
+

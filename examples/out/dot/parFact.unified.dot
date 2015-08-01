@@ -1,0 +1,73 @@
+digraph G {
+  rankdir="LR";
+
+  subgraph cluster_0 {
+    label="PAR(p, q)" ;
+    color=darkblue ;
+
+    subgraph place {
+      node [shape=circle,fixedsize=true,width=.5];
+      _p0_0 [label="PAR(p, q)"] ;
+      _p1_0 [label="p"] ;
+      _p2_0 [label="q"] ;
+    } 
+
+    subgraph transitions {
+      node [shape=rect,height=.5,width=.5];
+      _t0_0 [label="AND"] ;
+      _t1_0 [label="p"] ;
+      _t2_0 [label="q"] ;
+    } 
+
+    subgraph cluster0_0 {
+      label="OR(NEG(p), NULL(p))" ;
+      color=darkblue ;
+
+      subgraph place {
+        node [shape=circle,fixedsize=true,width=.5];
+        _p0_00 [label="OR(NEG(p), NULL(p))"] ;
+        _p1_00 [label="NEG(p)"] ;
+        _p2_00 [label="NULL(p)"] ;
+      } 
+
+      subgraph transitions {
+        node [shape=rect,height=.5,width=.5];
+        _t0_00 [label="OR"] ;
+      } 
+
+      _t0_00 -> _p0_00 [] ;
+      _p1_00 -> _t0_00 [] ;
+      _p2_00 -> _t0_00 [] ;
+    }
+
+    subgraph cluster0_1 {
+      label="OR(NEG(q), NULL(q))" ;
+      color=darkblue ;
+
+      subgraph place {
+        node [shape=circle,fixedsize=true,width=.5];
+        _p0_01 [label="OR(NEG(q), NULL(q))"] ;
+        _p1_01 [label="NEG(q)"] ;
+        _p2_01 [label="NULL(q)"] ;
+      } 
+
+      subgraph transitions {
+        node [shape=rect,height=.5,width=.5];
+        _t0_01 [label="OR"] ;
+      } 
+
+      _t0_01 -> _p0_01 [] ;
+      _p1_01 -> _t0_01 [] ;
+      _p2_01 -> _t0_01 [] ;
+    }
+
+    _t0_0 -> _p0_0 [] ;
+    _p1_0 -> _t0_0 [] ;
+    _t1_0 -> _p1_0 [] ;
+    _p0_00 -> _t1_0 [] ;
+    _p2_0 -> _t0_0 [] ;
+    _t2_0 -> _p2_0 [] ;
+    _p0_01 -> _t2_0 [] ;
+  }
+}
+

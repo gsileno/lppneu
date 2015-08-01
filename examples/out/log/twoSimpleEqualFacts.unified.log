@@ -1,0 +1,22 @@
+inputs: []
+outputs: []
+=====
+places: []
+transitions: []
+arcs: []
+=====
+parents: (1): [null]
+subnets: (1)
+--------
+    function: a, like a place
+    inputs: [a]
+    outputs: [a]
+    =====
+    places: [a]
+    transitions: []
+    arcs: []
+    =====
+    parents: (1): [org.leibnizcenter.pneu.components.petrinet.Net@86689a8]
+    subnets: (0)
+--------
+

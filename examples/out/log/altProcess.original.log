@@ -1,0 +1,45 @@
+inputs: []
+outputs: []
+=====
+places: []
+transitions: []
+arcs: []
+=====
+parents: (0): []
+subnets: (1)
+--------
+    function: ALT(p, q), like a transition
+    inputs: [start]
+    outputs: [end]
+    =====
+    places: [after start, before end]
+    transitions: [start, end]
+    arcs: [|start| -> after start, after start -> |p|, |p| -> before end, after start -> |q|, |q| -> before end, before end -> |end|]
+    =====
+    parents: (1): [org.leibnizcenter.pneu.components.petrinet.Net@55360888]
+    subnets: (2)
+    --------
+        function: p, like a transition
+        inputs: [p]
+        outputs: [p]
+        =====
+        places: []
+        transitions: [p]
+        arcs: []
+        =====
+        parents: (1): [org.leibnizcenter.pneu.components.petrinet.Net@4e6a446c]
+        subnets: (0)
+    --------
+        function: q, like a transition
+        inputs: [q]
+        outputs: [q]
+        =====
+        places: []
+        transitions: [q]
+        arcs: []
+        =====
+        parents: (1): [org.leibnizcenter.pneu.components.petrinet.Net@4e6a446c]
+        subnets: (0)
+    --------
+--------
+

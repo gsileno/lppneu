@@ -1,0 +1,45 @@
+inputs: []
+outputs: []
+=====
+places: []
+transitions: []
+arcs: []
+=====
+parents: (1): [null]
+subnets: (1)
+--------
+    function: IMPLIES(a, b), like a place
+    inputs: []
+    outputs: []
+    =====
+    places: []
+    transitions: [IMPLIES]
+    arcs: [a -> |IMPLIES|, |IMPLIES| -> b]
+    =====
+    parents: (1): [org.leibnizcenter.pneu.components.petrinet.Net@6cfdbc53]
+    subnets: (2)
+    --------
+        function: a, like a place
+        inputs: [a]
+        outputs: [a]
+        =====
+        places: [a]
+        transitions: []
+        arcs: []
+        =====
+        parents: (1): [org.leibnizcenter.pneu.components.petrinet.Net@657250c]
+        subnets: (0)
+    --------
+        function: b, like a place
+        inputs: [b]
+        outputs: [b]
+        =====
+        places: [b]
+        transitions: []
+        arcs: []
+        =====
+        parents: (1): [org.leibnizcenter.pneu.components.petrinet.Net@657250c]
+        subnets: (0)
+    --------
+--------
+

@@ -1,0 +1,45 @@
+inputs: []
+outputs: []
+=====
+places: []
+transitions: []
+arcs: []
+=====
+parents: (1): [null]
+subnets: (1)
+--------
+    function: SEQ(p, q), like a place
+    inputs: [NEG(p), NULL(p), NEG(q), NULL(q)]
+    outputs: [NEG(p), NULL(p), NEG(q), NULL(q)]
+    =====
+    places: [p, q, SEQ(p, q), AND(SEQ(p, q), q)]
+    transitions: [p, q, AND]
+    arcs: [OR(NEG(p), NULL(p)) -> |p|, |p| -> p, p -> |q|, OR(NEG(q), NULL(q)) -> |q|, |q| -> SEQ(p, q), SEQ(p, q) -> |AND|, q -> |AND|, |AND| -> AND(SEQ(p, q), q)]
+    =====
+    parents: (1): [org.leibnizcenter.pneu.components.petrinet.Net@47965ff3]
+    subnets: (2)
+    --------
+        function: OR(NEG(p), NULL(p)), like a place
+        inputs: [NEG(p), NULL(p)]
+        outputs: [NEG(p), NULL(p)]
+        =====
+        places: [OR(NEG(p), NULL(p)), NEG(p), NULL(p)]
+        transitions: [OR]
+        arcs: [|OR| -> OR(NEG(p), NULL(p)), NEG(p) -> |OR|, NULL(p) -> |OR|]
+        =====
+        parents: (1): [org.leibnizcenter.pneu.components.petrinet.Net@61756f3c]
+        subnets: (0)
+    --------
+        function: OR(NEG(q), NULL(q)), like a place
+        inputs: [NEG(q), NULL(q)]
+        outputs: [NEG(q), NULL(q)]
+        =====
+        places: [OR(NEG(q), NULL(q)), NEG(q), NULL(q)]
+        transitions: [OR]
+        arcs: [|OR| -> OR(NEG(q), NULL(q)), NEG(q) -> |OR|, NULL(q) -> |OR|]
+        =====
+        parents: (1): [org.leibnizcenter.pneu.components.petrinet.Net@61756f3c]
+        subnets: (0)
+    --------
+--------
+

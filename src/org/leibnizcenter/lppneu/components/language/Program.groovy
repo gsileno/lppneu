@@ -15,18 +15,10 @@ class Program {
     Program() {}
 
     void print() {
-
-        for (rule in logicRules) {
-            println rule
-        }
-
-        for (rule in causalRules) {
-            println rule
-        }
-
+        println(toLog())
     }
 
-    String toString() {
+    String toLog() {
         String output = ""
 
         if (logicRules.size() > 0) {

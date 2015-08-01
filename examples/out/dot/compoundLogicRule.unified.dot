@@ -1,0 +1,48 @@
+digraph G {
+  rankdir="LR";
+
+  subgraph cluster_0 {
+    label="IMPLIES(AND(p, q), r)" ;
+    color=darkblue ;
+
+    subgraph transitions {
+      node [shape=rect,height=.5,width=.5];
+      _t0_0 [label="IMPLIES"] ;
+    } 
+
+    subgraph cluster0_0 {
+      label="AND(p, q)" ;
+      color=darkblue ;
+
+      subgraph place {
+        node [shape=circle,fixedsize=true,width=.5];
+        _p0_00 [label="AND(p, q)"] ;
+        _p1_00 [label="p"] ;
+        _p2_00 [label="q"] ;
+      } 
+
+      subgraph transitions {
+        node [shape=rect,height=.5,width=.5];
+        _t0_00 [label="AND"] ;
+      } 
+
+      _t0_00 -> _p0_00 [] ;
+      _p1_00 -> _t0_00 [] ;
+      _p2_00 -> _t0_00 [] ;
+    }
+
+    subgraph cluster0_1 {
+      label="r" ;
+      color=darkblue ;
+
+      subgraph place {
+        node [shape=circle,fixedsize=true,width=.5];
+        _p0_01 [label="r"] ;
+      } 
+    }
+
+    _p0_00 -> _t0_0 [] ;
+    _t0_0 -> _p0_01 [] ;
+  }
+}
+

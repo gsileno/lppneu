@@ -1,0 +1,24 @@
+digraph G {
+  rankdir="LR";
+
+  subgraph cluster_0 {
+    label="a" ;
+    color=darkblue ;
+
+    subgraph place {
+      node [shape=circle,fixedsize=true,width=.5];
+      _p0_0 [label="a"] ;
+    } 
+  }
+
+  subgraph cluster_1 {
+    label="a" ;
+    color=darkblue ;
+
+    subgraph place {
+      node [shape=circle,fixedsize=true,width=.5];
+      _p0_1 [label="a"] ;
+    } 
+  }
+}
+

@@ -36,7 +36,7 @@ class NetSimplificationTest extends GroovyTestCase {
     }
 
     void testCompoundLogicRule() {
-        LPPN2LPN conversion = batchConvert("r :- p and q.")
+        LPPN2LPN conversion = batchConvert("r :- p and q. a :- p and q.")
 
         conversion.program.print()
         conversion.reducedProgram.print()
@@ -46,8 +46,8 @@ class NetSimplificationTest extends GroovyTestCase {
         batchExport(conversion.unifiedNet, "unified")
 
         assert conversion.net.subNets.size() == 2
-        assert conversion.simplifiedNet.subNets.size() == 1
-        assert conversion.unifiedNet.subNets.size() == 1
+        assert conversion.simplifiedNet.subNets.size() == 2
+        assert conversion.unifiedNet.subNets.size() == 2
     }
 
 

@@ -57,4 +57,8 @@ class NetEqualityTest extends GroovyTestCase {
         assert !Comparison.compare(batchConvert("a -> b."), batchConvert("b -> a."))
     }
 
+//    void testNetEquality7() {
+//        assert Comparison.compare(batchConvert("a ::- b."), batchConvert("b ::- a."))
+//    }
+
 }

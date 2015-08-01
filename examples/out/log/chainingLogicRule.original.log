@@ -1,0 +1,86 @@
+Net@1799010144
+inputs: []
+outputs: []
+=====
+places: []
+transitions: []
+arcs: []
+=====
+parents: (0): []
+subnets: (2)
+--------
+    Net@1947369699
+    function: IMPLIES(p, q) LPlace@1156188729, like a place
+    inputs: []
+    outputs: []
+    =====
+    places: []
+    transitions: [IMPLIES LTransition@1182825160]
+    arcs: [p LPlace@750714109 -> |IMPLIES LTransition@1182825160|, |IMPLIES LTransition@1182825160| -> q LPlace@1689083890]
+    =====
+    parents: (1): [Net@1799010144]
+    subnets: (2)
+    --------
+        Net@1624351292
+        function: p LPlace@164104645, like a place
+        inputs: [p LPlace@750714109]
+        outputs: [p LPlace@750714109]
+        =====
+        places: [p LPlace@750714109]
+        transitions: []
+        arcs: []
+        =====
+        parents: (1): [Net@1947369699]
+        subnets: (0)
+    --------
+        Net@785603838
+        function: q LPlace@737765767, like a place
+        inputs: [q LPlace@914243510]
+        outputs: [q LPlace@914243510]
+        =====
+        places: [q LPlace@914243510]
+        transitions: []
+        arcs: []
+        =====
+        parents: (1): [Net@1947369699]
+        subnets: (0)
+    --------
+--------
+    Net@274026379
+    function: IMPLIES(q, r) LPlace@58668191, like a place
+    inputs: []
+    outputs: []
+    =====
+    places: []
+    transitions: [IMPLIES LTransition@771207119]
+    arcs: [q LPlace@1689083890 -> |IMPLIES LTransition@771207119|, |IMPLIES LTransition@771207119| -> r LPlace@417225282]
+    =====
+    parents: (1): [Net@1799010144]
+    subnets: (2)
+    --------
+        Net@1356412685
+        function: q LPlace@341292164, like a place
+        inputs: [q LPlace@1689083890]
+        outputs: [q LPlace@1689083890]
+        =====
+        places: [q LPlace@1689083890]
+        transitions: []
+        arcs: []
+        =====
+        parents: (1): [Net@274026379]
+        subnets: (0)
+    --------
+        Net@1788210321
+        function: r LPlace@168579211, like a place
+        inputs: [r LPlace@417225282]
+        outputs: [r LPlace@417225282]
+        =====
+        places: [r LPlace@417225282]
+        transitions: []
+        arcs: []
+        =====
+        parents: (1): [Net@274026379]
+        subnets: (0)
+    --------
+--------
+

@@ -1,0 +1,45 @@
+inputs: []
+outputs: []
+=====
+places: []
+transitions: []
+arcs: []
+=====
+parents: (1): [null]
+subnets: (1)
+--------
+    function: SEQ(p, q), like a transition
+    inputs: [start]
+    outputs: [start]
+    =====
+    places: [after start, bridge 0, before end]
+    transitions: [start, end]
+    arcs: [|start| -> after start, after start -> |p|, |p| -> bridge 0, bridge 0 -> |q|, |q| -> before end, before end -> |end|]
+    =====
+    parents: (1): [org.leibnizcenter.pneu.components.petrinet.Net@7a6d4080]
+    subnets: (2)
+    --------
+        function: p, like a transition
+        inputs: [p]
+        outputs: [p]
+        =====
+        places: []
+        transitions: [p]
+        arcs: []
+        =====
+        parents: (1): [org.leibnizcenter.pneu.components.petrinet.Net@1aa5d24b]
+        subnets: (0)
+    --------
+        function: q, like a transition
+        inputs: [q]
+        outputs: [q]
+        =====
+        places: []
+        transitions: [q]
+        arcs: []
+        =====
+        parents: (1): [org.leibnizcenter.pneu.components.petrinet.Net@1aa5d24b]
+        subnets: (0)
+    --------
+--------
+

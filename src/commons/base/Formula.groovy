@@ -46,6 +46,9 @@ class Formula<T> {
         Formula<T> formula = new Formula<T>()
 
         if (terms.size() > 1) {
+            if (op == Operator.POS || op == Operator.NEG || op == Operator.NULL)
+                throw new RuntimeException()
+
             formula.operator = op
             for (T term in terms) {
                 Formula f = build(term)
@@ -75,7 +78,7 @@ class Formula<T> {
     Formula<T> build(Formula<T> input, Operator op) {
 
         // if reduction has to be applied
-        if (input.inputPorts.size() > 0) {
+        if (input.isAtomic()) {
             return buildFromTerms(input.inputPorts, op)
         } else {
             return new Formula<T>(

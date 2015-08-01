@@ -19,15 +19,11 @@ class LTransition extends Transition {
     Boolean link = false
 
     String toString() {
-        if (operation != null) operation.toString()
+        if (operation != null) operation.toString() + " LTransition@"+hashCode()
         else if (operator != null) {
-            String output = operator.toString()
-//            output += "("
-//            for (input in inputs) {
-//                output += input.source.name + ", "
-//            }
-//            output = output[0..-3] + ")"
-            return output
+            return operator.toString() + " LTransition@"+hashCode()
+        } else {
+            name + " LTransition@"+hashCode()
         }
     }
 
