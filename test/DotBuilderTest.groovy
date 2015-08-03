@@ -81,12 +81,27 @@ class DotBuilderTest extends GroovyTestCase {
 //        LPPN2LPN conversion = batchConvert("r :- p and q.")
 //        batchExport(conversion, "compoundLogicRule")
 //    }
-
-    void testChainingLogicRules() {
-        LPPN2LPN conversion = batchConvert("q :- p. r :- q.")
-        batchExport(conversion, "chainingLogicRule")
-    }
 //
+//    void testChainingLogicRules() {
+//        LPPN2LPN conversion = batchConvert("q :- p. r :- q.")
+//        batchExport(conversion, "chainingLogicRule")
+//    }
+
+//    void testChainingLogicRules2() {
+//        LPPN2LPN conversion = batchConvert("p :- a and b. q :- a and b.")
+//        batchExport(conversion, "chainingLogicRule2")
+//    }
+
+//    void testInversedRules() {
+//        LPPN2LPN conversion = batchConvert("a and b :- r. p :- a and b.")
+//        batchExport(conversion, "inversedRules")
+//    }
+
+    void testMultipleLogicRules() {
+        LPPN2LPN conversion = batchConvert("p :- a and a. -p :- b. p :- c.")
+        batchExport(conversion, "multipleLogicRules")
+    }
+
 //
 //    void testCompoundCausalRule() {
 //        LPPN2LPN conversion = batchConvert("p and q -> r.")
@@ -146,6 +161,11 @@ class DotBuilderTest extends GroovyTestCase {
 //    void testOptProcess() {
 //        LPPN2LPN conversion = batchConvert("-> p opt q.")
 //        batchExport(conversion, "optProcess")
+//    }
+//
+//    void testCompoundProcess() {
+//        LPPN2LPN conversion = batchConvert("-> a seq (b par c)")
+//        batchExport(conversion, "compoundProcess")
 //    }
 
 //        conversion.program.print()

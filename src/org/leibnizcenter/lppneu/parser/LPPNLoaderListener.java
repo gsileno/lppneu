@@ -164,7 +164,7 @@ public class LPPNLoaderListener extends LPPNBaseListener {
             else if (ctx.PAR() != null) op = Operator.PAR;
             else if (ctx.ALT() != null) op = Operator.ALT;
             else {
-                log.error("unknown operator in expression."); return;
+                throw new RuntimeException("Unknown operator in expression.");
             }
 
             expression = Expression.build(
@@ -194,8 +194,7 @@ public class LPPNLoaderListener extends LPPNBaseListener {
             else if (ctx.PAR() != null) op = Operator.PAR;
             else if (ctx.ALT() != null) op = Operator.ALT;
             else {
-                log.warn("unknown operator in expression. using default AND.");
-                op = Operator.AND;
+                throw new RuntimeException("Unknown operator in expression.");
             }
 
             expression = Expression.build(
@@ -233,14 +232,15 @@ public class LPPNLoaderListener extends LPPNBaseListener {
 
         if (ctx.event() != null) {
             operation = Operation.build(eventNodes.get(ctx.event()));
+        } else if (ctx.LPAR() != null) {
+            operation = operationNodes.get(ctx.operation(0));
         } else {
             Operator op;
             if (ctx.SEQ() != null) op = Operator.SEQ;
             else if (ctx.PAR() != null) op = Operator.PAR;
             else if (ctx.ALT() != null) op = Operator.ALT;
             else {
-                log.warn("Unknown operator in operation.");
-                return;
+                throw new RuntimeException("Unknown operator in operation.");
             }
 
             operation = Operation.build(
