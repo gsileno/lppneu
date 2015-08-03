@@ -63,12 +63,12 @@ class Formula<T> {
             else if (op == Operator.OR || op == Operator.XOR || op == Operator.AND ||
                      op == Operator.PAR || op == Operator.ALT || op == Operator.SEQ || op == Operator.OPT)
                 formula = build(terms[0])
-            else if (op == Operator.OCCURS) {
+            else if (op == Operator.OCCURS || op == Operator.TRIPLE || op == Operator.ASSOCIATION) {
                 formula.operator = op
                 Formula f = build(terms[0])
                 formula.inputFormulas << f
                 formula.inputPorts << terms[0]
-            } else throw new RuntimeException()
+            } else throw new RuntimeException("Unknown operator ${op}")
         }
 
         formula

@@ -83,23 +83,28 @@ class LPPN2LPN {
                     function: source.function)
         }
 
-        println source.arcList
-
         Net clone = sourceCloneMap[source]
 
         for (subNet in source.subNets) {
-                if (!sourceCloneMap[subNet]) {
-                    sourceCloneMap[subNet] = minimalNetClone(subNet, sourceCloneMap)
-                }
-                clone.subNets << sourceCloneMap[subNet]
+            if (!sourceCloneMap[subNet]) {
+                sourceCloneMap[subNet] = minimalNetClone(subNet, sourceCloneMap)
+            }
+            clone.subNets << sourceCloneMap[subNet]
         }
 
         for (parent in source.parents) {
-                if (!sourceCloneMap[parent]) {
-                    sourceCloneMap[parent] = minimalNetClone(parent, sourceCloneMap)
-                }
-                clone.parents << sourceCloneMap[parent]
+            if (!sourceCloneMap[parent]) {
+                sourceCloneMap[parent] = minimalNetClone(parent, sourceCloneMap)
+            }
+            clone.parents << sourceCloneMap[parent]
         }
+
+        // just to check the cloning
+        assert source.placeList.size() == clone.placeList.size()
+        assert source.transitionList.size() == clone.transitionList.size()
+        assert source.arcList.size() == clone.arcList.size()
+        assert source.parents.size() == clone.parents.size()
+        assert source.subNets.size() == clone.subNets.size()
 
         clone
     }
@@ -114,12 +119,12 @@ class LPPN2LPN {
 
         Net simplifiedNet = minimalNetClone(net)
 
-        new File("examples/out/log/pre-simplification-source.log").withWriter {
-            out -> out.println(net.toLog())
-        }
-        new File("examples/out/log/pre-simplification-clone.log").withWriter {
-            out -> out.println(simplifiedNet.toLog())
-        }
+//        new File("examples/out/log/pre-simplification-source.log").withWriter {
+//            out -> out.println(net.toLog())
+//        }
+//        new File("examples/out/log/pre-simplification-clone.log").withWriter {
+//            out -> out.println(simplifiedNet.toLog())
+//        }
 
         List<Net> netList = simplifiedNet.getAllNets()
 
@@ -145,27 +150,22 @@ class LPPN2LPN {
                 log.trace("I have to aggregate " + coupling.value.size() + " cloned nets on the following root net")
 
                 log.trace("root net: " + coupling.key)
-                log.trace("root net subnets: " + coupling.key.subNets)
+                log.trace("root net detail: " + coupling.key.toLog())
 
                 // take the root
                 Net rootNet = coupling.key
 
-                List<Place> rootAllPlaces = rootNet.getAllPlaces()
-                List<Transition> rootAllTransitions = rootNet.getAllTransitions()
-
                 // for each cloned net
                 for (cloneNet in coupling.value) {
                     log.trace("clone net: " + cloneNet)
-                    log.trace("clone net subnets: " + cloneNet.subNets)
-
-                    List<Place> cloneAllPlaces = rootNet.getAllPlaces()
-                    List<Transition> cloneAllTransitions = rootNet.getAllTransitions()
+                    log.trace("clone net detail: " + cloneNet.toLog())
 
                     // change the link from the parents
                     for (parent in cloneNet.parents) {
                         log.trace("change the link from the parent to the clone to the root instead...")
                         log.trace("parent net: " + parent)
-                        log.trace("parent subnet: " + parent.subNets)
+                        log.trace("parent net detail: " + parent.toLog())
+
                         parent.subNets -= [cloneNet]
                         log.trace("parent subnet (remove clone net): " + parent.subNets)
                         // TOCHECK: possible problems of recursions
@@ -178,36 +178,39 @@ class LPPN2LPN {
                             log.trace("arc of the parent: " + arc)
                             Integer pos
 
-                            pos = cloneNet.placeList.findIndexOf {it == arc.source}
+                            pos = cloneNet.placeList.findIndexOf { it == arc.source }
                             if (pos >= 0) {
                                 Arc newArc = new Arc(source: rootNet.placeList[pos], target: arc.target, weight: arc.weight)
                                 parent.arcList -= [arc]
                                 parent.arcList += [newArc]
+                                log.trace("modifying arc to: " + newArc)
                             }
 
-                            pos = cloneNet.placeList.findIndexOf {it == arc.target}
+                            pos = cloneNet.placeList.findIndexOf { it == arc.target }
                             if (pos >= 0) {
                                 Arc newArc = new Arc(source: arc.source, target: rootNet.placeList[pos], weight: arc.weight)
                                 parent.arcList -= [arc]
                                 parent.arcList += [newArc]
+                                log.trace("modifying arc to: " + newArc)
                             }
 
-                            pos = cloneNet.transitionList.findIndexOf {it == arc.source}
+                            pos = cloneNet.transitionList.findIndexOf { it == arc.source }
                             if (pos >= 0) {
                                 Arc newArc = new Arc(source: rootNet.transitionList[pos], target: arc.target, weight: arc.weight)
                                 parent.arcList -= [arc]
                                 parent.arcList += [newArc]
+                                log.trace("modifying arc to: " + newArc)
                             }
 
-                            pos = cloneNet.placeList.findIndexOf {it == arc.target}
+                            pos = cloneNet.transitionList.findIndexOf { it == arc.target }
                             if (pos >= 0) {
                                 Arc newArc = new Arc(source: arc.source, target: rootNet.transitionList[pos], weight: arc.weight)
-                                parent.arcList -= [arc]
-                                parent.arcList += [newArc]
+                                parent.arcList.remove(arc)
+                                parent.arcList.add(newArc)
+                                log.trace("modifying arc to: " + newArc)
                             }
                         }
 
-                        println parent.arcList
                     }
 
                     // for each input node
@@ -240,7 +243,7 @@ class LPPN2LPN {
                             }
                         }
 
-                        println rootNode.inputs
+                        println "root node (usually a place) input arcs: " + rootNode.inputs
                     }
 
                     // the same, for the output nodes
@@ -253,29 +256,32 @@ class LPPN2LPN {
 
                             if (!cloneNet.arcList.contains(arc.target)) {
                                 Arc newArc = new Arc(source: rootNode, target: arc.target, weight: arc.weight)
-                                if (arc.source.class == rootNode.class)
+                                if (arc.target.class == rootNode.class)
                                     throw new RuntimeException("You cannot link two nodes of the same type.")
                                 rootNode.outputs << newArc
                             }
                         }
 
-                        println rootNode.outputs
+                        println "root note (usually a place) output arcs: " + rootNode.outputs
                     }
                 }
             }
 
         }
 
-        new File("examples/out/log/post-simplification.log").withWriter {
-            out -> out.println(simplifiedNet.toLog())
-        }
-
-        new File("examples/out/log/post-simplification-source.log").withWriter {
-            out -> out.println(net.toLog())
-        }
+//        new File("examples/out/log/post-simplification-clone.log").withWriter {
+//            out -> out.println(simplifiedNet.toLog())
+//        }
+//
+//        new File("examples/out/log/post-simplification-source.log").withWriter {
+//            out -> out.println(net.toLog())
+//        }
 
         simplifiedNet
     }
+
+    // unification looks for all places with the same expression
+    // and all transitions with the same operation and attach them using nexus nodes
 
     Net unifyNet(Net net) {
         recordNet(net)
@@ -318,7 +324,7 @@ class LPPN2LPN {
             }
         }
 
-//        new File("examples/out/log/post-unification.log").withWriter {
+//        new File("examples/out/log/post-unification-clone.log").withWriter {
 //            out -> out.println(unifiedNet.toLog())
 //        }
 //
@@ -327,6 +333,137 @@ class LPPN2LPN {
 //        }
 
         unifiedNet
+    }
+
+    Map<Expression, Triple> expressionTripleMap = [:]
+
+    // transition anchoring
+    // for all places, it attaches the input transitions to a transition with the generating operation
+
+    Net transitionAnchoringNet(Net net) {
+
+        if (expressionTripleMap.size() == 0) {
+            throw new RuntimeException("You have to initialize the triple before")
+        }
+
+        Net transitionAnchoredNet = minimalNetClone(net)
+
+//        new File("examples/out/log/pre-transitionanchoring-source.log").withWriter {
+//            out -> out.println(net.toLog())
+//        }
+//
+//        new File("examples/out/log/pre-transitionanchoring-clone.log").withWriter {
+//            out -> out.println(unifiedNet.toLog())
+//        }
+
+        for (expression in expressionPlaceMap.keySet()) {
+            Expression refExpression = expression.positive()
+
+            if (!expressionTripleMap[refExpression]) {
+                expressionTripleMap[refExpression] = Triple.build(refExpression)
+            }
+
+            Triple triple = expressionTripleMap[refExpression]
+
+            // all positive places are generated by positive transitions
+            if (expression.isPositive()) {
+                for (place in expressionPlaceMap[expression]) {
+                    for (input in place.inputs) {
+                        triple.posList << ((LTransition) (input.source)).reconstructOperation()
+                    }
+                }
+            } else if (expression.isNegative()) {
+                for (place in expressionPlaceMap[expression]) {
+                    for (input in place.inputs) {
+                        triple.negList << ((LTransition) (input.source)).reconstructOperation()
+                    }
+                }
+            }
+        }
+
+        // for each operator of the triple, create a link from the associated operation
+        for (coupling in expressionTripleMap) {
+            Net subNet = new Net(function: new LPlace(expression: Expression.build(coupling.key, Operator.ASSOCIATION)))
+
+            Triple triple = expressionTripleMap[coupling.key]
+
+            // the first operation is the default notation (e.g. POS p, for p)
+
+            if (triple.posList.size() > 1) {
+                LTransition tNexus = new LTransition(operation: triple.positive.toOperation())
+                LPlace pNexus = new LPlace(link: true)
+                subNet.arcList << Arc.buildArc((Place) pNexus, (Transition) tNexus, ArcType.LINK)
+                for (int i = 1; i < triple.posList.size(); i++) {
+                    LTransition tOperator = new LTransition(operation: triple.posList[i])
+                    subNet.arcList << Arc.buildArc((Transition) tOperator, (Place) pNexus, ArcType.LINK)
+                }
+            }
+
+            if (triple.negList.size() > 1) {
+                LTransition tNexus = new LTransition(operation: triple.negative.toOperation())
+                LPlace pNexus = new LPlace(link: true)
+                subNet.arcList << Arc.buildArc((Place) pNexus, (Transition) tNexus, ArcType.LINK)
+                for (int i = 1; i < triple.negList.size(); i++) {
+                    LTransition tOperator = new LTransition(operation: triple.negList[i])
+                    subNet.arcList << Arc.buildArc((Transition) tOperator, (Place) pNexus, ArcType.LINK)
+                }
+            }
+
+            transitionAnchoredNet.include(subNet)
+        }
+
+//        new File("examples/out/log/post-transitionanchoring-clone.log").withWriter {
+//            out -> out.println(unifiedNet.toLog())
+//        }
+//
+//        new File("examples/out/log/post-transitionanchoring-source.log").withWriter {
+//            out -> out.println(net.toLog())
+//        }
+
+        transitionAnchoredNet
+    }
+
+    // triple anchoring
+    // for all places, it looks for other places of their propositional triple and relates them
+
+    Net tripleAnchoringNet(Net net) {
+
+        Net tripleAnchoredNet = minimalNetClone(net)
+
+//        new File("examples/out/log/pre-tripleanchoring-source.log").withWriter {
+//            out -> out.println(net.toLog())
+//        }
+//
+//        new File("examples/out/log/pre-tripleanchoring-clone.log").withWriter {
+//            out -> out.println(tripleAnchoredNet.toLog())
+//        }
+
+        // for each place, construct the associated triple if necessary
+        for (expression in expressionPlaceMap.keySet()) {
+            Expression refExpression = expression.positive()
+
+            log.trace("Source expression: "+expression)
+            log.trace("Reference expression for triple: "+refExpression)
+
+            if (!expressionTripleMap[refExpression]) {
+                expressionTripleMap[refExpression] = Triple.build(refExpression)
+            }
+        }
+
+        // for each triple reconstructed create a subNet
+        for (coupling in expressionTripleMap) {
+            tripleAnchoredNet.include(buildTripleNet(coupling.key))
+        }
+
+//        new File("examples/out/log/post-tripleanchoring-source.log").withWriter {
+//            out -> out.println(net.toLog())
+//        }
+//
+//        new File("examples/out/log/post-tripleanchoring-clone.log").withWriter {
+//            out -> out.println(tripleAnchoredNet.toLog())
+//        }
+
+        tripleAnchoredNet
     }
 
     void convert(Program source) {
@@ -423,12 +560,15 @@ class LPPN2LPN {
             LTransition tImplication = new LTransition(operator: Operator.IMPLIES)
             net.transitionList += [tImplication]
             net.arcList += Arc.buildArcs(pIn, tImplication, pOut)
-            log.trace("linking out arc " + net.arcList[-1])
+            log.trace("linking arc " + net.arcList[-1])
         } else {
             LTransition tNexus = new LTransition(link: true)
             net.transitionList += [tNexus]
             net.arcList << Arc.buildArc((Place) pIn, (Transition) tNexus, ArcType.LINK)
             net.arcList << Arc.buildArc((Transition) tNexus, (Place) pOut, ArcType.LINK)
+
+            log.trace("linking arcs " + net.arcList[-2] + " and " + net.arcList[-1])
+
         }
 
         return net
@@ -844,5 +984,43 @@ class LPPN2LPN {
         return net
     }
 
+    // propositional triple with strong and default negations
+    // notation: operation => outcome
+    // neg(p) => neg p
+    // neg(neg p) => p
+    // null(p) => null p
+    // null(neg p) => null p
+    // pos(p) => p
+    // pos(neg p) => neg p
+
+    static Net buildTripleNet(Expression expression) {
+        Net net = new Net(function: new LPlace(expression: Expression.build(expression, Operator.TRIPLE)))
+
+        Triple pTriple = Triple.build(expression)
+        LPlace pPlace = new LPlace(expression: pTriple.positive)
+        LPlace negpPlace = new LPlace(expression: pTriple.negative)
+        LPlace notpPlace = new LPlace(expression: pTriple.nullified)
+        net.placeList += [pPlace, negpPlace, notpPlace]
+
+        LTransition pospOperator =  new LTransition(operation: pTriple.positive.toOperation())
+        LTransition negnegpOperator =  new LTransition(operation: pTriple.positive.toOperation()) // double negation = assertion
+        LTransition negpOperator = new LTransition(operation: pTriple.negative.toOperation())
+        LTransition posnegpOperator = new LTransition(operation: pTriple.negative.toOperation())
+        LTransition notpOperator = new LTransition(operation: pTriple.nullified.toOperation())
+        LTransition notnegpOperator = new LTransition(operation: pTriple.nullified.toOperation())
+
+        for (t in [pospOperator, posnegpOperator, negpOperator, negnegpOperator, notpOperator, notnegpOperator]) {
+            net.transitionList << t
+        }
+
+        net.arcList = Arc.buildArcs(pPlace, negpOperator, negpPlace) +
+                Arc.buildArcs(negpPlace, negnegpOperator, pPlace) +
+                Arc.buildArcs(notpPlace, pospOperator, pPlace) +
+                Arc.buildArcs(notpPlace, posnegpOperator, negpPlace) +
+                Arc.buildArcs(pPlace, notpOperator, notpPlace) +
+                Arc.buildArcs(negpPlace, notnegpOperator, notpPlace)
+
+        net
+    }
 }
 

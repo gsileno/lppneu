@@ -30,6 +30,8 @@ enum Operator {
     IMPLIES, INHIBITS, DEFINES,      // logical dependencies on situations
     OCCURS_IN, OCCURS, CAUSES,       // event definition and causal dependency
 
+    TRIPLE, ASSOCIATION,             // just for labeling purposes (TODO: refactoring)
+
     // TOCHECK not formally correct:
     POS_INSTANCE, NEG_INSTANCE, NOT_INSTANCE,  // specific operators
     POS_THIS, NEG_THIS, NOT_THIS

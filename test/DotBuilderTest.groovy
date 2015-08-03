@@ -1,5 +1,9 @@
 import org.leibnizcenter.lppneu.builders.LPPN2LPN
+import org.leibnizcenter.lppneu.components.language.Atom
+import org.leibnizcenter.lppneu.components.language.Expression
+import org.leibnizcenter.lppneu.components.language.Literal
 import org.leibnizcenter.lppneu.components.language.Program
+import org.leibnizcenter.lppneu.components.language.Situation
 import org.leibnizcenter.lppneu.parser.LPPNLoader
 import org.leibnizcenter.pneu.builders.PN2dot
 import org.leibnizcenter.pneu.components.petrinet.Net
@@ -51,7 +55,7 @@ class DotBuilderTest extends GroovyTestCase {
         conversion.convert(program)
         return conversion
     }
-
+//
 //    void testSimpleFact() {
 //        LPPN2LPN conversion = batchConvert("a.")
 //        batchExport(conversion, "simpleFact")
@@ -86,22 +90,22 @@ class DotBuilderTest extends GroovyTestCase {
 //        LPPN2LPN conversion = batchConvert("q :- p. r :- q.")
 //        batchExport(conversion, "chainingLogicRule")
 //    }
-
+//
 //    void testChainingLogicRules2() {
 //        LPPN2LPN conversion = batchConvert("p :- a and b. q :- a and b.")
 //        batchExport(conversion, "chainingLogicRule2")
 //    }
-
+//
 //    void testInversedRules() {
 //        LPPN2LPN conversion = batchConvert("a and b :- r. p :- a and b.")
 //        batchExport(conversion, "inversedRules")
 //    }
-
-    void testMultipleLogicRules() {
-        LPPN2LPN conversion = batchConvert("p :- a and a. -p :- b. p :- c.")
-        batchExport(conversion, "multipleLogicRules")
-    }
-
+//
+//    void testMultipleLogicRules() {
+//        LPPN2LPN conversion = batchConvert("p :- a and a. -p :- b. p :- c.")
+//        batchExport(conversion, "multipleLogicRules")
+//    }
+//
 //
 //    void testCompoundCausalRule() {
 //        LPPN2LPN conversion = batchConvert("p and q -> r.")
@@ -168,12 +172,25 @@ class DotBuilderTest extends GroovyTestCase {
 //        batchExport(conversion, "compoundProcess")
 //    }
 
-//        conversion.program.print()
-//        conversion.reducedProgram.print()
-//        conversion.net.print()
-//        println conversion.situationPlaceMap
-//        println conversion.expressionPlaceMap
-//        println conversion.eventTransitionMap
-//        println conversion.operationTransitionMap
+//    void testTriple() {
+//        LPPN2LPN conversion = batchConvert("a. -a.")
+//        Net net = conversion.tripleAnchoringNet(conversion.net)
+//
+//        assert net.subNets.size() == 3
+//        assert net.subNets[2].placeList.size() == 3
+//        assert net.subNets[2].transitionList.size() == 6
+//        assert net.subNets[2].arcList.size() == 12
+//    }
 
+    void testTransitionAssociation() {
+        LPPN2LPN conversion = batchConvert("p. p :- a.")
+        Net net = conversion.transitionAnchoringNet(conversion.tripleAnchoringNet(conversion.net))
+
+        net.print()
+
+        assert net.subNets.size() == 3
+        assert net.subNets[2].placeList.size() == 3
+        assert net.subNets[2].transitionList.size() == 6
+        assert net.subNets[2].arcList.size() == 12
+    }
 }

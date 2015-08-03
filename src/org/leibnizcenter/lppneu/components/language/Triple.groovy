@@ -3,30 +3,28 @@ package org.leibnizcenter.lppneu.components.language
 import groovy.util.logging.Log4j
 
 @Log4j
-class PositionTriple {
+class Triple {
 
-    Position positive
-    Position negative
-    Position nullified
+    Expression positive
+    Expression negative
+    Expression nullified
 
-    List<Operation> posList
-    List<Operation> negList
-    List<Operation> notList
+    List<Operation> posList = []
+    List<Operation> negList = []
+    List<Operation> notList = []
 
-    static PositionTriple build(Position position) {
-        PositionTriple triple = new PositionTriple()
+    static Triple build(Expression position) {
+        Triple triple = new Triple()
 
-        Expression expression = position.ref.label
-
-        if (expression.polarity() == Polarity.POS) {
+        if (position.polarity() == Polarity.POS) {
             triple.positive = position
             triple.negative = position.negate()
             triple.nullified = position.nullify()
-        } else if (expression.polarity() == Polarity.NEG) {
+        } else if (position.polarity() == Polarity.NEG) {
             triple.positive = position.negate()
             triple.negative = position
             triple.nullified = position.nullify()
-        } else if (expression.polarity() == Polarity.NULL) {
+        } else if (position.polarity() == Polarity.NULL) {
             triple.positive = position.negative()
             triple.negative = position.positive()
             triple.nullified = position

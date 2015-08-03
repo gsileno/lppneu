@@ -2,12 +2,8 @@ package org.leibnizcenter.lppneu.components.language
 
 import commons.base.Formula
 import groovy.transform.EqualsAndHashCode
-import groovy.util.logging.Log4j
 
-/**
- * Represents an expression (of situations)
- */
-@Log4j @EqualsAndHashCode
+@EqualsAndHashCode
 class Expression {
 
     Formula<Situation> formula
@@ -96,16 +92,33 @@ class Expression {
 
     // to obtain the positive content we can take the internal part of the proposition
     Expression positive() {
-        if (!this.formula.operator.isUnary()) {
-            log.warn("You should not be here."); return null
+        if (!isPositive()) {
+            if (!this.formula.isAtomic())
+                return build(this.formula.inputFormulas[0])
+            else
+                return build(this.formula.inputPorts[0].rootLiteral)
+        } else {
+            return build(this.formula)
         }
-
-        return build(this.formula.inputFormulas[0])
     }
 
     // to obtain the negated content we can negate the internal part
     Expression negative() {
         return this.positive().negate()
+    }
+
+    Boolean isPositive() {
+        !isNegative() && !isNull()
+    }
+
+    Boolean isNegative() {
+        formula.operator == Operator.NEG ||
+                (formula.inputPorts.size() == 1 && formula.inputPorts[0].polarity == Polarity.NEG)
+    }
+
+    Boolean isNull() {
+        formula.operator == Operator.NULL ||
+                (formula.inputPorts.size() == 1 && formula.inputPorts[0].polarity == Polarity.NULL)
     }
 
     String toString() {

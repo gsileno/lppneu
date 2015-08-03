@@ -13,11 +13,13 @@ class LPlace extends Place {
 
     String toString() {
         if (expression) expression.toString() // + " LPlace@"+hashCode()
+        else if (link) "*"
         else name // + "LPlace@"+hashCode()
     }
 
     String toMinString() {
         if (expression) expression.toString() // + " LPlace@"+hashCode()
+        else if (link) "*"
         else name // + " LPlace@"+hashCode()
     }
 
