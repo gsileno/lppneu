@@ -44,7 +44,7 @@ class LPPN2LPN {
         } else if (transition.link) {
             return
         } else {
-                throw new RuntimeException()
+            throw new RuntimeException()
         }
     }
 
@@ -66,6 +66,41 @@ class LPPN2LPN {
         }
     }
 
+    // deep cloning done for nets
+    // by construction, you have only one parent
+    // things may change after simplification/unification
+    static Net minimalNetClone(Net source, Map<Net, Net> sourceCloneMap = [:], List<Net> ongoingCloning = []) {
+
+        ongoingCloning << source
+
+        Net clone = new Net(transitionList: source.transitionList.collect(),
+                placeList: source.placeList.collect(),
+                arcList: source.arcList.collect(),
+                inputs: source.inputs.collect(),
+                outputs: source.inputs.collect(),
+                function: source.function)
+
+        for (subNet in source.subNets) {
+            if (!ongoingCloning.contains(subNet)) {
+                if (!sourceCloneMap[subNet]) {
+                    sourceCloneMap[subNet] = minimalNetClone(subNet, sourceCloneMap, ongoingCloning)
+                }
+                clone.subNets << sourceCloneMap[subNet]
+            }
+        }
+
+        for (parent in source.parents) {
+            if (!ongoingCloning.contains(parent)) {
+                if (!sourceCloneMap[parent]) {
+                    sourceCloneMap[parent] = minimalNetClone(parent, sourceCloneMap, ongoingCloning)
+                }
+                clone.parents << sourceCloneMap[parent]
+            }
+        }
+
+        clone
+    }
+
     // the simplification look for cloned subnets
     // once they are identified, it replaces them, i.e
     // it replaces the cloned subnets with a root subent
@@ -73,7 +108,14 @@ class LPPN2LPN {
 
     static Net simplifyNet(Net net) {
 
-        Net simplifiedNet = net.clone()
+        Net simplifiedNet = minimalNetClone(net)
+
+//        new File("examples/out/log/pre-simplification-source.log").withWriter {
+//            out -> out.println(net.toLog())
+//        }
+//        new File("examples/out/log/pre-simplification-clone.log").withWriter {
+//            out -> out.println(simplifiedNet.toLog())
+//        }
 
         List<Net> netList = simplifiedNet.getAllNets()
 
@@ -96,68 +138,73 @@ class LPPN2LPN {
         } else {
             for (coupling in clonesNetMap) {
 
-                log.trace("root net: "+coupling.key)
-                log.trace("root net places: "+coupling.key.placeList)
-                log.trace("root net transitions: "+coupling.key.transitionList)
-                log.trace("root net arcs: "+coupling.key.arcList)
-                log.trace("root net subnets: "+coupling.key.subNets)
+                log.trace("I have to aggregate " + coupling.value.size() + " cloned nets on the following root net")
+
+                log.trace("root net: " + coupling.key)
+                log.trace("root net places: " + coupling.key.placeList)
+                log.trace("root net transitions: " + coupling.key.transitionList)
+                log.trace("root net arcs: " + coupling.key.arcList)
+                log.trace("root net subnets: " + coupling.key.subNets)
 
                 // take the root
                 Net rootNet = coupling.key
 
                 // for each cloned net
                 for (cloneNet in coupling.value) {
-                    log.trace("clone net: "+cloneNet)
-                    log.trace("clone net places: "+cloneNet.placeList)
-                    log.trace("clone net transitions: "+cloneNet.transitionList)
-                    log.trace("clone net arcs: "+cloneNet.arcList)
-                    log.trace("clone net subnets: "+cloneNet.subNets)
+                    log.trace("clone net: " + cloneNet)
+                    log.trace("clone net places: " + cloneNet.placeList)
+                    log.trace("clone net transitions: " + cloneNet.transitionList)
+                    log.trace("clone net arcs: " + cloneNet.arcList)
+                    log.trace("clone net subnets: " + cloneNet.subNets)
 
                     // change the link from the parents
                     for (parent in cloneNet.parents) {
-                        log.trace("parent net: "+parent)
-                        log.trace("parent subnet: "+parent.subNets)
+                        log.trace("change the link from the parent to the clone to the root instead...")
+                        log.trace("parent net: " + parent)
+                        log.trace("parent subnet: " + parent.subNets)
                         parent.subNets -= [cloneNet]
-                        log.trace("parent subnet (remove clone net): "+parent.subNets)
+                        log.trace("parent subnet (remove clone net): " + parent.subNets)
                         // TOCHECK: possible problems of recursions
                         // when they have different levels
                         parent.include(rootNet)
-                        log.trace("parent subnet (add root net): "+parent.subNets)
+                        log.trace("parent subnet (add root net): " + parent.subNets)
                     }
 
                     // for each input node
                     // (the indexing correspond to that of the root net)
                     for (int i = 0; i < cloneNet.inputs.size(); i++) {
+                        Node rootNode = rootNet.inputs[i]
                         Node clonedNode = cloneNet.inputs[i]
 
-                        log.trace("clone node: "+clonedNode)
+                        log.trace("clone node: " + clonedNode)
 
                         // for each of its input arcs
                         for (arc in clonedNode.inputs) {
-                            log.trace("arc input to cloned node: "+arc)
+                            log.trace("arc input to cloned node: " + arc)
 
                             // if the arc goes externally
                             if (!cloneNet.arcList.contains(arc.source)) {
-                                log.trace("the arc goes externally")
+                                log.trace("the arc comes from externally")
 
                                 // attach the arc to the root node
-                                arc.target = rootNet.inputs[i]
-                                log.trace("change arc output"+arc)
+                                Arc newArc = new Arc(source: arc.source, target: rootNode, weight: arc.weight)
+                                log.trace("change arc output " + arc)
 
                                 // bind the arc to the rootNet
-                                rootNet.arcList << arc
-                                log.trace("add arc to rootNet"+rootNet.arcList)
+                                rootNode.inputs << newArc
+                                log.trace("add arc to rootNode" + rootNode.inputs)
                             }
                         }
                     }
 
                     // the same, for the output nodes
                     for (int i = 0; i < cloneNet.outputs.size(); i++) {
+                        Node rootNode = rootNet.inputs[i]
                         Node clonedNode = cloneNet.outputs[i]
                         for (arc in clonedNode.outputs) {
                             if (!cloneNet.arcList.contains(arc.target)) {
-                                arc.target = rootNet.outputs[i]
-                                rootNet.arcList << arc
+                                Arc newArc = new Arc(source: rootNode, target: arc.target, weight: arc.weight)
+                                rootNode.outputs << newArc
                             }
                         }
                     }
@@ -166,13 +213,29 @@ class LPPN2LPN {
 
         }
 
+//        new File("examples/out/log/post-simplification.log").withWriter {
+//            out -> out.println(simplifiedNet.toLog())
+//        }
+//
+//        new File("examples/out/log/post-simplification-source.log").withWriter {
+//            out -> out.println(net.toLog())
+//        }
+
         simplifiedNet
     }
 
     Net unifyNet(Net net) {
         recordNet(net)
 
-        Net unifiedNet = net.clone()
+        Net unifiedNet = minimalNetClone(net)
+
+//        new File("examples/out/log/pre-unification-source.log").withWriter {
+//            out -> out.println(net.toLog())
+//        }
+//
+//        new File("examples/out/log/pre-unification-clone.log").withWriter {
+//            out -> out.println(unifiedNet.toLog())
+//        }
 
         for (coupling in expressionPlaceMap) {
             if (coupling.value.size() > 1) {
@@ -201,6 +264,14 @@ class LPPN2LPN {
                 }
             }
         }
+
+//        new File("examples/out/log/post-unification.log").withWriter {
+//            out -> out.println(unifiedNet.toLog())
+//        }
+//
+//        new File("examples/out/log/post-unification-source.log").withWriter {
+//            out -> out.println(net.toLog())
+//        }
 
         unifiedNet
     }
@@ -279,27 +350,27 @@ class LPPN2LPN {
                     Expression.build(Expression.build(body), Expression.build(head), Operator.DEFINES)))
         }
 
-        log.trace("create implication net "+net)
+        log.trace("create implication net " + net)
 
         Net bodyNet = buildExpressionNet(body)
         net.include(bodyNet)
-        log.trace("attaching body net "+bodyNet)
+        log.trace("attaching body net " + bodyNet)
 
         LPlace pIn = (LPlace) bodyNet.outputs[0]
-        log.trace("input place "+pIn)
+        log.trace("input place " + pIn)
 
         Net headNet = buildExpressionNet(head)
         net.include(headNet)
-        log.trace("attaching head net "+headNet)
+        log.trace("attaching head net " + headNet)
 
         LPlace pOut = (LPlace) headNet.outputs[0]
-        log.trace("output place "+pOut)
+        log.trace("output place " + pOut)
 
         if (!biconditional) {
             LTransition tImplication = new LTransition(operator: Operator.IMPLIES)
             net.transitionList += [tImplication]
             net.arcList += Arc.buildArcs(pIn, tImplication, pOut)
-            log.trace("linking out arc "+net.arcList[-1])
+            log.trace("linking out arc " + net.arcList[-1])
         } else {
             LTransition tNexus = new LTransition(link: true)
             net.transitionList += [tNexus]
@@ -529,7 +600,7 @@ class LPPN2LPN {
             t = (LTransition) subNet.outputs[0]
 
             // synchronization place
-            p = new LPlace(link: true, name: "bridge "+i)
+            p = new LPlace(link: true, name: "bridge " + i)
             net.placeList << p
         }
 
@@ -556,7 +627,7 @@ class LPPN2LPN {
         int i = 0
         for (input in formula.inputFormulas) {
             // preparatory place
-            LPlace pIn = new LPlace(link: true, name: "start bridge"+i)
+            LPlace pIn = new LPlace(link: true, name: "start bridge" + i)
             net.placeList << pIn
 
             // create subnet
@@ -564,7 +635,7 @@ class LPPN2LPN {
             net.include(subNet)
 
             // synchronization place
-            LPlace pOut = new LPlace(link: true, name: "end bridge "+i)
+            LPlace pOut = new LPlace(link: true, name: "end bridge " + i)
             net.placeList << pOut
 
             // anchoring

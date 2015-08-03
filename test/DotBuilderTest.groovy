@@ -86,7 +86,7 @@ class DotBuilderTest extends GroovyTestCase {
         LPPN2LPN conversion = batchConvert("q :- p. r :- q.")
         batchExport(conversion, "chainingLogicRule")
     }
-
+//
 //
 //    void testCompoundCausalRule() {
 //        LPPN2LPN conversion = batchConvert("p and q -> r.")

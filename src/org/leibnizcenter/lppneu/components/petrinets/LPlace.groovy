@@ -12,13 +12,13 @@ class LPlace extends Place {
     Boolean link = false
 
     String toString() {
-        if (expression) expression.toString() + " LPlace@"+hashCode()
-        else name + "LPlace@"+hashCode()
+        if (expression) expression.toString() // + " LPlace@"+hashCode()
+        else name // + "LPlace@"+hashCode()
     }
 
     String toMinString() {
-        if (expression) expression.toString() + " LPlace@"+hashCode()
-        else name + " LPlace@"+hashCode()
+        if (expression) expression.toString() // + " LPlace@"+hashCode()
+        else name // + " LPlace@"+hashCode()
     }
 
     @Override

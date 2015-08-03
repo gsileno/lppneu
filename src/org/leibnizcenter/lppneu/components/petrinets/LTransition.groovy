@@ -19,11 +19,11 @@ class LTransition extends Transition {
     Boolean link = false
 
     String toString() {
-        if (operation != null) operation.toString() + " LTransition@"+hashCode()
+        if (operation != null) operation.toString() // + " LTransition@"+hashCode()
         else if (operator != null) {
-            return operator.toString() + " LTransition@"+hashCode()
+            return operator.toString() // + " LTransition@"+hashCode()
         } else {
-            name + " LTransition@"+hashCode()
+            name // + " LTransition@"+hashCode()
         }
     }
 
