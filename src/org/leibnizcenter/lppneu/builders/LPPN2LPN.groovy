@@ -379,7 +379,11 @@ class LPPN2LPN {
                     }
                 }
             }
+
+            println triple.dump()
+
         }
+
 
         // for each operator of the triple, create a link from the associated operation
         for (coupling in expressionTripleMap) {
