@@ -186,11 +186,13 @@ class DotBuilderTest extends GroovyTestCase {
         LPPN2LPN conversion = batchConvert("p. p :- a.")
         Net net = conversion.transitionAnchoringNet(conversion.tripleAnchoringNet(conversion.net))
 
-        net.print()
+        assert net.subNets.size() == 6
+        assert net.subNets[4].placeList.size() == 2
+        assert net.subNets[4].transitionList.size() == 2
+        assert net.subNets[4].arcList.size() == 2
 
-        assert net.subNets.size() == 3
-        assert net.subNets[2].placeList.size() == 3
-        assert net.subNets[2].transitionList.size() == 6
-        assert net.subNets[2].arcList.size() == 12
+        assert net.subNets[5].placeList.size() == 2
+        assert net.subNets[5].transitionList.size() == 3
+        assert net.subNets[5].arcList.size() == 3
     }
 }

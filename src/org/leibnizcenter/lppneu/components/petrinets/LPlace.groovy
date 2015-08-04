@@ -1,6 +1,7 @@
 package org.leibnizcenter.lppneu.components.petrinets
 
 import org.leibnizcenter.lppneu.components.language.Expression
+import org.leibnizcenter.lppneu.components.language.Operator
 import org.leibnizcenter.pneu.components.petrinet.Place
 
 class LPlace extends Place {
@@ -26,6 +27,11 @@ class LPlace extends Place {
     @Override
     Boolean isLink() {
         link
+    }
+
+    @Override
+    Boolean isCluster() {
+        if (expression.formula.operator == Operator.TRIPLE || expression.formula.operator == Operator.ASSOCIATION) return false
     }
 
 }

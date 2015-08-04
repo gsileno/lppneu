@@ -31,6 +31,7 @@ enum Operator {
     OCCURS_IN, OCCURS, CAUSES,       // event definition and causal dependency
 
     TRIPLE, ASSOCIATION,             // just for labeling purposes (TODO: refactoring)
+    IS_IMPLIED_BY, IS_CAUSED_BY, IS_DEFINED_BY,  // for operation reconstruction when associating the transitions to the triples
 
     // TOCHECK not formally correct:
     POS_INSTANCE, NEG_INSTANCE, NOT_INSTANCE,  // specific operators

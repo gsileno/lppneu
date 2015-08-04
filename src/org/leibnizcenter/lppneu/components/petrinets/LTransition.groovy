@@ -32,9 +32,7 @@ class LTransition extends Transition {
     Operation reconstructOperation() {
         if (operation) return operation
         else if (operator) {
-
             log.trace("Reconstructing the original logic dependency...")
-
             List<Expression> inputExpressions = []
             for (input in inputs) {
                 if (!((LPlace) (input.source)).expression)
@@ -44,7 +42,13 @@ class LTransition extends Transition {
 
             log.trace("...involving ${inputExpressions} under ${operator}")
 
-            return Expression.buildFromExpressions(inputExpressions, operator).toOperation()
+            if (operator == Operator.IMPLIES) {
+                return Expression.buildFromExpressions(inputExpressions, Operator.IS_IMPLIED_BY).toOperation()
+            } else if (operator == Operator.CAUSES) {
+                return Expression.buildFromExpressions(inputExpressions, Operator.IS_CAUSED_BY).toOperation()
+            } else {
+                throw new RuntimeException("Yet to be implemented")
+            }
         }
     }
 
