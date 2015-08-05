@@ -1,6 +1,8 @@
 package org.leibnizcenter.lppneu.components.language
 
 import groovy.util.logging.Log4j
+import org.leibnizcenter.lppneu.components.petrinets.LPlace
+import org.leibnizcenter.lppneu.components.petrinets.LTransition
 
 @Log4j
 class Triple {
@@ -9,9 +11,19 @@ class Triple {
     Expression negative
     Expression nullified
 
-    List<Operation> posList = []
-    List<Operation> negList = []
-    List<Operation> notList = []
+    List<Operation> posOperationList = []
+    List<Operation> negOperationList = []
+    List<Operation> nullOperationList = []
+
+    // for the net
+
+    LPlace positivePlace
+    LPlace negativePlace
+    LPlace nullPlace
+
+    List<LTransition> posTransitionList = []
+    List<LTransition> negTransitionList = []
+    List<LTransition> nullTransitionList = []
 
     static Triple build(Expression position) {
         Triple triple = new Triple()

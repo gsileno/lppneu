@@ -31,7 +31,8 @@ class LPlace extends Place {
 
     @Override
     Boolean isCluster() {
-        if (expression.formula.operator == Operator.TRIPLE || expression.formula.operator == Operator.ASSOCIATION) return false
+        if (expression.formula.operator == Operator.ASSOCIATION) return false
+        return true
     }
 
 }
