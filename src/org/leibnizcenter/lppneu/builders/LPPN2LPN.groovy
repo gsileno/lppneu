@@ -130,10 +130,10 @@ class LPPN2LPN {
 
         // textual log output
 
-        folder = new File('log/log')
+        folder = new File('logs/log')
         if (!folder.exists()) folder.mkdirs()
 
-        outputFile = "log/log/" + filename + ".log"
+        outputFile = "logs/log/" + filename + ".log"
 
         new File(outputFile).withWriter {
             out -> out.println(net.toLog())
@@ -141,10 +141,10 @@ class LPPN2LPN {
 
         // dot output
 
-        folder = new File('log/dot')
+        folder = new File('logs/dot')
         if (!folder.exists()) folder.mkdirs()
 
-        outputFile = "log/dot/" + filename + ".dot"
+        outputFile = "logs/dot/" + filename + ".dot"
 
         new File(outputFile).withWriter {
             out -> out.println(PN2dot.simpleConversion(net))
@@ -153,13 +153,13 @@ class LPPN2LPN {
     }
 
     static private void logPreConversion(String typeConversion, Net net, Net convertedNet) {
-//        batchExport(net, typeConversion+".source.pre")
-//        batchExport(convertedNet, typeConversion+".clone.pre")
+        batchExport(net, typeConversion+".source.pre")
+        batchExport(convertedNet, typeConversion+".clone.pre")
     }
 
     static private void logPostConversion(String typeConversion, Net net, Net convertedNet) {
-//        batchExport(net, typeConversion+".source.post")
-//        batchExport(convertedNet, typeConversion+".clone.post")
+        batchExport(net, typeConversion+".source.post")
+        batchExport(convertedNet, typeConversion+".clone.post")
     }
 
     // triple anchoring
@@ -534,11 +534,17 @@ class LPPN2LPN {
         if (withTriples) transitionAnchoredNet = transitionAnchoringNet(tripleAnchoredNet) // put triples on the net
         else transitionAnchoredNet = transitionAnchoringNet(net)                           // leave triples out of the net
 
+        // TODO: optimization, rather then remapping, add to the general map while anchoring
         // remap the net now with the new transitions and places due to the anchoring
         mapNet(transitionAnchoredNet)
 
         // simplify the net, i.e. replicated cloned subnets with a similar one
         simplifiedNet = simplifyNet(transitionAnchoredNet)
+
+        // TODO: optimization, rather then remapping, remove from the general map while simplifying
+        // remap the net with the accounted reductions
+        mapNet(simplifiedNet)
+
         // unify the net, i.e. connect places and transitions with the same labels
         unifiedNet = unifyNet(simplifiedNet)
 
@@ -1005,7 +1011,7 @@ class LPPN2LPN {
     static Net buildEventSeriesNet(Operation action) {
 
         return buildOperationNet(action.formula)
-        
+
     }
 
 

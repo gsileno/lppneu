@@ -23,15 +23,6 @@ class ConversionLPPN2LPNTest extends GroovyTestCase {
         Program program = LPPNLoader.parseString(code)
         LPPN2LPN conversion = new LPPN2LPN()
         conversion.convert(program)
-
-//        println("#################################################")
-//        println("--- source program ------------")
-//        conversion.program.print()
-//        println("--- reduced program -----------")
-//        conversion.reducedProgram.print()
-//        println("--- net -----------------------")
-//        conversion.net.print()
-
         return conversion.net
     }
 
@@ -83,8 +74,8 @@ class ConversionLPPN2LPNTest extends GroovyTestCase {
         assert net.subNets[0].placeList.size() == 0
         assert net.subNets[0].subNets[0].placeList.size() == 1
         assert net.subNets[0].subNets[1].placeList.size() == 1
-        assert net.subNets[0].transitionList.size() == 1
-        assert net.subNets[0].arcList.size() == 2
+        assert net.subNets[0].transitionList.size() == 2
+        assert net.subNets[0].arcList.size() == 4
 
     }
 
@@ -116,23 +107,5 @@ class ConversionLPPN2LPNTest extends GroovyTestCase {
         assert net.subNets[0].transitionList.size() == 0
         assert net.subNets[0].arcList.size() == 2
     }
-
-    //    void testConversionYaleShooting() {
-//        Program program = LPPNLoader.parseFile("examples/basic/yaleshooting.lppn")
-//        // program.print()
-//
-//        LPPN2LPN conversion = new LPPN2LPN()
-//
-//        Net net = conversion.convert(program)
-//
-//        program.reduce().print()
-//
-//        assert net.subNets.size() == 4
-//        assert net.allArcs.size() == 14
-//        assert net.allPlaces.size() == 20
-//        assert net.allTransitions.size() == 6
-//
-//        batchExport(net, "test")
-//    }
 
 }

@@ -25,30 +25,28 @@ class NetUnificationTest extends GroovyTestCase {
         assert conversion.unifiedNet.getAllArcs().size() == 0
     }
 
-    void testUnifyLogicRules() {
-        LPPN2LPN conversion = batchConvert("b :- a. c :- b.")
-        assert conversion.net.getAllPlaces().size() == 4
-        assert conversion.net.getAllTransitions().size() == 2
-        assert conversion.net.getAllArcs().size() == 4
-
-        assert conversion.unifiedNet.getAllPlaces().size() == 4
-        assert conversion.unifiedNet.getAllTransitions().size() == 2
-        assert conversion.unifiedNet.getAllArcs().size() == 4
-
-        println PN2dot.simpleConversion(conversion.unifiedNet)
-    }
-
-    void testUnifyCausalRules() {
-        LPPN2LPN conversion = batchConvert("a -> b. b -> a.")
-
-        assert conversion.net.getAllPlaces().size() == 10
-        assert conversion.net.getAllTransitions().size() == 6
-        assert conversion.net.getAllArcs().size() == 14
-
-        assert conversion.unifiedNet.getAllPlaces().size() == 12
-        assert conversion.unifiedNet.getAllTransitions().size() == 8
-        assert conversion.unifiedNet.getAllArcs().size() == 20
-    }
+//    void testUnifyLogicRules() {
+//        LPPN2LPN conversion = batchConvert("b :- a. c :- b.")
+//        assert conversion.net.getAllPlaces().size() == 4
+//        assert conversion.net.getAllTransitions().size() == 2
+//        assert conversion.net.getAllArcs().size() == 4
+//
+//        assert conversion.unifiedNet.getAllPlaces().size() == 4
+//        assert conversion.unifiedNet.getAllTransitions().size() == 2
+//        assert conversion.unifiedNet.getAllArcs().size() == 4
+//    }
+//
+//    void testUnifyCausalRules() {
+//        LPPN2LPN conversion = batchConvert("a -> b. b -> a.")
+//
+//        assert conversion.net.getAllPlaces().size() == 10
+//        assert conversion.net.getAllTransitions().size() == 6
+//        assert conversion.net.getAllArcs().size() == 14
+//
+//        assert conversion.unifiedNet.getAllPlaces().size() == 12
+//        assert conversion.unifiedNet.getAllTransitions().size() == 8
+//        assert conversion.unifiedNet.getAllArcs().size() == 20
+//    }
 
 
 }

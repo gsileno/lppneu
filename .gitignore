@@ -49,4 +49,4 @@ crashlytics-build.properties
 
 # my own directories
 /examples/out/
-/log/
+/logs/

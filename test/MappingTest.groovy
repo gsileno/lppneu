@@ -38,17 +38,21 @@ class MappingTest extends GroovyTestCase {
 
     void testConversionSimpleLogicRule() {
         LPPN2LPN conversion = batchConvert("q :- p.")
-        assert conversion.expressionPlaceMap.size() == 2
+        assert conversion.expressionPlaceMap.size() == 4
         assert conversion.expressionPlaceMap[conversion.expressionPlaceMap.keySet()[0]].size() == 1
         assert conversion.expressionPlaceMap[conversion.expressionPlaceMap.keySet()[1]].size() == 1
+        assert conversion.expressionPlaceMap[conversion.expressionPlaceMap.keySet()[2]].size() == 1
+        assert conversion.expressionPlaceMap[conversion.expressionPlaceMap.keySet()[3]].size() == 1
         assert conversion.operationTransitionMap.size() == 0
     }
 
     void testConversionLogicRuleAndFact() {
         LPPN2LPN conversion = batchConvert("q :- p. p.")
-        assert conversion.expressionPlaceMap.size() == 2
+        assert conversion.expressionPlaceMap.size() == 4
         assert conversion.expressionPlaceMap[conversion.expressionPlaceMap.keySet()[0]].size() == 2
         assert conversion.expressionPlaceMap[conversion.expressionPlaceMap.keySet()[1]].size() == 1
+        assert conversion.expressionPlaceMap[conversion.expressionPlaceMap.keySet()[2]].size() == 1
+        assert conversion.expressionPlaceMap[conversion.expressionPlaceMap.keySet()[3]].size() == 1
         assert conversion.operationTransitionMap.size() == 0
     }
 
@@ -57,6 +61,9 @@ class MappingTest extends GroovyTestCase {
         assert conversion.expressionPlaceMap.size() == 5
         assert conversion.expressionPlaceMap[conversion.expressionPlaceMap.keySet()[0]].size() == 1
         assert conversion.expressionPlaceMap[conversion.expressionPlaceMap.keySet()[1]].size() == 1
+        assert conversion.expressionPlaceMap[conversion.expressionPlaceMap.keySet()[2]].size() == 1
+        assert conversion.expressionPlaceMap[conversion.expressionPlaceMap.keySet()[3]].size() == 1
+        assert conversion.expressionPlaceMap[conversion.expressionPlaceMap.keySet()[4]].size() == 1
         assert conversion.operationTransitionMap.size() == 2
     }
 
