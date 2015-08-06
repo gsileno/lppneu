@@ -95,6 +95,8 @@ class ProgramReductionTest extends GroovyTestCase {
         Program program = LPPNLoader.parseString("(a and b) seq ((a and b) and (a or b)) :- p.")
         assert program.logicRules.size() == 1
 
+        print program.logicRules
+
         Program reducedProgram = program.reduce()
         assert reducedProgram.logicRules.size() == 4
     }
