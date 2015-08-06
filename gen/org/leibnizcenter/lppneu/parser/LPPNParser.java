@@ -40,8 +40,8 @@ public class LPPNParser extends Parser {
 
 	private static final String[] _LITERAL_NAMES = {
 		null, null, null, null, null, null, null, null, null, null, null, "':-'", 
-		"'::-'", null, "'+'", "'-'", "'~'", "'.'", "','", "'('", "')'", "'{'", 
-		"'}'", "'='", "'!='", "'>'", "'<'", "'>='", "'<='", "'#domain'", "'..'"
+		null, null, "'+'", "'-'", "'~'", "'.'", "','", "'('", "')'", "'{'", "'}'", 
+		"'='", "'!='", "'>'", "'<'", "'>='", "'<='", "'#domain'", "'..'"
 	};
 	private static final String[] _SYMBOLIC_NAMES = {
 		null, "WS", "AND", "OR", "XOR", "SEQ", "PAR", "ALT", "NOT", "NEG", "CAUSES", 

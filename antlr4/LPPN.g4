@@ -115,7 +115,7 @@ NEG : 'neg' | 'NEG' ; // strong negation
 
 CAUSES : '->' |  '=>';
 IS_IMPLIED_BY : ':-' ;
-IS_EQUIVALENT_TO : '::-' ;
+IS_EQUIVALENT_TO : '::-' | ':=' | '::=' ;
 
 WHEN : ':' | 'in' ;
 PLUS : '+' ;
