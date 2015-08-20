@@ -21,6 +21,7 @@ public class LPPNLoaderListener extends LPPNBaseListener {
 
     // Mapping of nodes
     private ParseTreeProperty<Atom> atomNodes = new ParseTreeProperty<Atom>();
+    private ParseTreeProperty<Variable> variableNodes = new ParseTreeProperty<Variable>();
     private ParseTreeProperty<Parameter> parameterNodes = new ParseTreeProperty<Parameter>();
     private ParseTreeProperty<Literal> literalNodes = new ParseTreeProperty<Literal>();
     private ParseTreeProperty<ExtLiteral> extLiteralNodes = new ParseTreeProperty<ExtLiteral>();
@@ -61,16 +62,26 @@ public class LPPNLoaderListener extends LPPNBaseListener {
         log.trace("attaching predicate " + predicate + " to node.");
     }
 
+    public void exitVariable(LPPNParser.VariableContext ctx) {
+        Variable variable = Variable.build(ctx.VARIABLE().getText());
+        variableNodes.put(ctx, variable);
+        log.trace("attaching variable " + variable + " to node.");
+    }
+
     public void exitParameter(LPPNParser.ParameterContext ctx) {
+        Parameter parameter;
         if (ctx.pos_literal() != null) {
-            log.warn("to be implemented");
+            parameter = Parameter.build(literalNodes.get(ctx.pos_literal()));
         } else if (ctx.variable() != null) {
-            log.warn("to be implemented");
+            parameter = Parameter.build(variableNodes.get(ctx.variable()));
         } else if (ctx.constant() != null) {
-            log.warn("to be implemented");
+            throw new RuntimeException("to be implemented");
         } else if (ctx.num_expression() != null) {
-            log.warn("to be implemented");
+            throw new RuntimeException("to be implemented");
+        } else {
+            throw new RuntimeException("Unknown type of parameter.");
         }
+        parameterNodes.put(ctx, parameter);
     }
 
     // note: the list is constructed in inverse order

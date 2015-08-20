@@ -1,14 +1,10 @@
 import org.leibnizcenter.lppneu.builders.LPPN2LPN
-import org.leibnizcenter.lppneu.components.language.Atom
-import org.leibnizcenter.lppneu.components.language.Expression
-import org.leibnizcenter.lppneu.components.language.Literal
 import org.leibnizcenter.lppneu.components.language.Program
-import org.leibnizcenter.lppneu.components.language.Situation
 import org.leibnizcenter.lppneu.parser.LPPNLoader
-import org.leibnizcenter.pneu.builders.PN2dot
+import org.leibnizcenter.pneu.builders.PN2json
 import org.leibnizcenter.pneu.components.petrinet.Net
 
-class DotBuilderTest extends GroovyTestCase {
+class JsonBuilderTest extends GroovyTestCase {
 
     static void batchExport(Net net, String filename) {
 
@@ -26,15 +22,15 @@ class DotBuilderTest extends GroovyTestCase {
             out -> out.println(net.toLog())
         }
 
-        // dot output
+        // json output
 
-        folder = new File('examples/out/dot/')
+        folder = new File('examples/out/json/')
         if (!folder.exists()) folder.mkdirs()
 
-        outputFile = "examples/out/dot/" + filename + ".dot"
+        outputFile = "examples/out/json/" + filename + ".json"
 
         new File(outputFile).withWriter {
-            out -> out.println(PN2dot.simpleConversion(net))
+            out -> out.println(PN2json.simpleConversion(net))
         }
         println "lpetri net exported to " + outputFile
 
@@ -132,20 +128,22 @@ class DotBuilderTest extends GroovyTestCase {
 //        batchExport(conversion, "parFact")
 //    }
 //
-//    void testOptFact() {
-//        LPPN2LPN conversion = batchConvert("p opt q.")
-//        batchExport(conversion, "optFact")
-//    }
+//// PROBLEM
+////    void testOptFact() {
+////        LPPN2LPN conversion = batchConvert("p opt q.")
+////        batchExport(conversion, "optFact")
+////    }
 //
 //    void testEvent() {
 //        LPPN2LPN conversion = batchConvert("-> a.")
 //        batchExport(conversion, "event")
 //    }
 //
-//    void testConditionEvent() {
-//        LPPN2LPN conversion = batchConvert("-> a and b.")
-//        batchExport(conversion, "conditionEvent")
-//    }
+//    // PROBLEM
+////    void testConditionEvent() {
+////        LPPN2LPN conversion = batchConvert("-> a and b.")
+////        batchExport(conversion, "conditionEvent")
+////    }
 //
 //    void testSeqProcess() {
 //        LPPN2LPN conversion = batchConvert("-> p seq q.")
@@ -162,42 +160,19 @@ class DotBuilderTest extends GroovyTestCase {
 //        batchExport(conversion, "parProcess")
 //    }
 //
-//    void testOptProcess() {
-//        LPPN2LPN conversion = batchConvert("-> p opt q.")
-//        batchExport(conversion, "optProcess")
-//    }
+//    // PROBLEM
+////    void testOptProcess() {
+////        LPPN2LPN conversion = batchConvert("-> p opt q.")
+////        batchExport(conversion, "optProcess")
+////    }
 //
 //    void testCompoundProcess() {
-//        LPPN2LPN conversion = batchConvert("-> a seq (b par c)")
+//        LPPN2LPN conversion = batchConvert("-> a seq (b par c).")
 //        batchExport(conversion, "compoundProcess")
-//    }
-
-//    void testTriple() {
-//        LPPN2LPN conversion = batchConvert("a. -a.")
-//        Net net = conversion.tripleAnchoringNet(conversion.net)
-//
-//        assert net.subNets.size() == 3
-//        assert net.subNets[2].placeList.size() == 3
-//        assert net.subNets[2].transitionList.size() == 6
-//        assert net.subNets[2].arcList.size() == 12
 //    }
 
     void testSale() {
         LPPN2LPN conversion = batchConvert("offers(Seller, Good, Money) seq accepts(Buyer, Good, Money).")
         batchExport(conversion, "sale")
     }
-
-//    void testTransitionAssociation() {
-//        LPPN2LPN conversion = batchConvert("a -> b.")
-
-//        assert net.subNets.size() == 6
-//        assert net.subNets[4].placeList.size() == 2
-//        assert net.subNets[4].transitionList.size() == 2
-//        assert net.subNets[4].arcList.size() == 2
-//
-//        assert net.subNets[5].placeList.size() == 2
-//        assert net.subNets[5].transitionList.size() == 3
-//        assert net.subNets[5].arcList.size() == 3
-//    }
-
 }

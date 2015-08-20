@@ -5,6 +5,8 @@ import org.leibnizcenter.lppneu.components.petrinets.LTransition
 import org.leibnizcenter.pneu.components.petrinet.Arc
 import org.leibnizcenter.pneu.components.petrinet.Net
 
+// TO DO: refactoring
+
 class Comparison {
 
     // in order to avoid recursion, we check only the arcs which are defined in the net

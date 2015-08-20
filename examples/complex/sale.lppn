@@ -1,0 +1,1 @@
+offers(Seller, Good, Money) seq accepts(Buyer, Good, Money) seq pays(Buyer, Money, Seller) par delivers(Seller, Good, Buyer).

@@ -13,15 +13,17 @@ class LPlace extends Place {
     Boolean link = false
 
     String toString() {
-        if (expression) expression.toString() // + " LPlace@"+hashCode()
+        if (expression != null) expression.toString() // + " LPlace@"+hashCode()
         else if (link) "*"
-        else name // + "LPlace@"+hashCode()
+        else if (name) name // + "LPlace@"+hashCode()
+        else ""
     }
 
     String toMinString() {
-        if (expression) expression.toString() // + " LPlace@"+hashCode()
+        if (expression != null) expression.toString() // + " LPlace@"+hashCode()
         else if (link) "*"
-        else name // + " LPlace@"+hashCode()
+        else if (name) name // + " LPlace@"+hashCode()
+        else ""
     }
 
     @Override

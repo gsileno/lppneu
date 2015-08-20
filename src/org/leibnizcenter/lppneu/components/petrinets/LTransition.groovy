@@ -24,8 +24,10 @@ class LTransition extends Transition {
         else if (operator != null) {
             return operator.toString() // + " LTransition@"+hashCode()
         } else if (link) "*"
-        else {
+        else if (name) {
             name // + " LTransition@"+hashCode()
+        } else {
+            ""
         }
     }
 

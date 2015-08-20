@@ -1,0 +1,3 @@
+offers(Seller, Good, Money) : acceptable(Good, Money) -> accept(Good, Money, Seller).
+accept(Good, Money, Seller) :- sendTo(Seller, accepts(self, Good, Money)) seq waitFor(deliver(Good), Seller) par pay(Money, Seller).
+pay(Money, Seller) :- sendTo(bank, pays(self, Money, Seller)).

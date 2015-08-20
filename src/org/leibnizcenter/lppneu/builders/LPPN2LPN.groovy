@@ -85,6 +85,8 @@ class LPPN2LPN {
         innerMapNet(net)
     }
 
+    // TODO: refactor with Net class
+
     // deep cloning done for nets
     // by construction, you have only one parent
     // things may change after simplification/unification

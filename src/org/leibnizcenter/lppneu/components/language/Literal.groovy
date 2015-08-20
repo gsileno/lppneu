@@ -22,7 +22,7 @@ class Literal {
         if (parameters) {
             output += "("
             for (parameter in parameters) {
-                if (parameter.atom) output += parameter.atom.toString()
+                if (parameter.literal) output += parameter.literal.toString()
                 else if (parameter.variable) output += parameter.variable.toString()
                 output += ", "
             }

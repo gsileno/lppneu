@@ -1,0 +1,4 @@
+sells(Seller, Good, Money, Buyer) :- offers(Seller, Good, Money) seq accepts(Buyer, Good, Money) seq pays(Buyer, Money, Seller) par delivers(Seller, Good, Buyer).
+buys(Buyer, Good, Money, Seller) :- sells(Seller, Good, Money, Buyer).
+offers(Seller, Good, Money) :- liable(Seller, accepts(Buyer, Good, Money)).
+accepts(Buyer, Good, Money) :- duty(Seller, delivers(Seller, Good, Buyer)) and duty(Buyer, pays(Buyer, Money, Seller)).

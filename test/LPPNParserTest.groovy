@@ -31,4 +31,8 @@ class LPPNParserTest extends GroovyTestCase {
         batchTest("examples/basic")
     }
 
+    void testComplexParsing() {
+        batchTest("examples/complex")
+    }
+
 }
