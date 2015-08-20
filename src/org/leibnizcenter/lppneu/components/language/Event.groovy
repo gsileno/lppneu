@@ -82,6 +82,11 @@ class Event {
         )
     }
 
+    List<Variable> getVariables() {
+        if (rootLiteral) rootLiteral.getVariables()
+        else throw new RuntimeException("Not yet implemented.")
+    }
+
     String toString() {
         String output = ""
 

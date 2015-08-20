@@ -10,8 +10,8 @@ import org.leibnizcenter.lppneu.components.language.Operation
 import org.leibnizcenter.lppneu.components.language.Operator
 import org.leibnizcenter.lppneu.components.language.Program
 import org.leibnizcenter.lppneu.components.language.Situation
-import org.leibnizcenter.lppneu.components.petrinets.LPlace
-import org.leibnizcenter.lppneu.components.petrinets.LTransition
+import org.leibnizcenter.lppneu.components.lppetrinets.LPPlace
+import org.leibnizcenter.lppneu.components.lppetrinets.LPTransition
 import org.leibnizcenter.pneu.components.petrinet.Arc
 import org.leibnizcenter.pneu.components.petrinet.Net
 import org.leibnizcenter.pneu.components.petrinet.Place
@@ -30,7 +30,7 @@ class LPPN2LPNold {
 
     static Net buildSituationNet(Situation situation, Integer z = 0) {
         Net net = new Net(zIndex: z)
-        LPlace p = new LPlace(situation: situation)
+        LPPlace p = new LPPlace(situation: situation)
 
         net.placeList << p
 
@@ -44,8 +44,8 @@ class LPPN2LPNold {
     static Net buildNegNotExpressionNet(Formula<Situation> formula, Integer z = 0) {
 
         Net net = new Net(zIndex: z)
-        LTransition tOut = new LTransition(operation: Operation.buildFromSituationFormula(formula))
-        LPlace pOut = new LPlace(expression: Expression.build(formula))
+        LPTransition tOut = new LPTransition(operation: Operation.buildFromSituationFormula(formula))
+        LPPlace pOut = new LPPlace(expression: Expression.build(formula))
         net.transitionList << tOut
         net.placeList << pOut
 
@@ -67,8 +67,8 @@ class LPPN2LPNold {
 
         Net net = new Net(zIndex: z)
 
-        LTransition tOut = new LTransition()
-        LPlace pOut = new LPlace(expression: Expression.build(formula))
+        LPTransition tOut = new LPTransition()
+        LPPlace pOut = new LPPlace(expression: Expression.build(formula))
         net.transitionList << tOut
         net.placeList << pOut
 
@@ -98,11 +98,11 @@ class LPPN2LPNold {
     static Net buildOrExpressionNet(Formula<Situation> formula, Integer z = 0) {
         Net net = new Net(zIndex: z)
 
-        LPlace pOut = new LPlace(expression: Expression.build(formula))
+        LPPlace pOut = new LPPlace(expression: Expression.build(formula))
         net.placeList << pOut
 
         for (input in formula.inputFormulas) {
-            LTransition tOut = new LTransition()
+            LPTransition tOut = new LPTransition()
             net.transitionList << tOut
 
             // create subnet
@@ -127,12 +127,12 @@ class LPPN2LPNold {
     static Net buildXorExpressionNet(Formula<Situation> formula, Integer z = 0) {
         Net net = new Net(zIndex: z)
 
-        LPlace pOut = new LPlace(expression: Expression.build(formula))
+        LPPlace pOut = new LPPlace(expression: Expression.build(formula))
         net.placeList << pOut
 
-        Map<LPlace, LTransition> input2output = [:]
+        Map<LPPlace, LPTransition> input2output = [:]
         for (input in formula.inputFormulas) {
-            LTransition tOut = new LTransition()
+            LPTransition tOut = new LPTransition()
             net.transitionList << tOut
 
             // create subnet
@@ -143,7 +143,7 @@ class LPPN2LPNold {
             net.inputs.add(subNet.inputs[0])
 
             // save outputs for inhibitor arcs
-            input2output[(LPlace) subNet.outputs[0]] = tOut
+            input2output[(LPPlace) subNet.outputs[0]] = tOut
 
             // anchoring
             net.arcList += Arc.buildBiflowArcs((Place) subNet.outputs[0], (Transition) tOut)
@@ -168,20 +168,20 @@ class LPPN2LPNold {
 
         Net net = new Net(zIndex: z)
 
-        LTransition tOut = null
-        LPlace pBridge
+        LPTransition tOut = null
+        LPPlace pBridge
 
         for (int i = 0; i < formula.inputFormulas.size(); i++) {
             Formula<Situation> input = formula.inputFormulas[i]
 
-            tOut = new LTransition()
+            tOut = new LPTransition()
 
             if (pBridge) {
                 net.arcList << Arc.buildArc(pBridge, tOut)
             }
 
             if (i != formula.inputFormulas.size() - 1) {
-                pBridge = new LPlace()
+                pBridge = new LPPlace()
                 net.placeList << pBridge
                 net.arcList += Arc.buildDiodeArcs(tOut, pBridge)
             }
@@ -205,7 +205,7 @@ class LPPN2LPNold {
                     log.warn("You should not be here."); return null
                 }
 
-                LTransition tIn = new LTransition(operation: operation)
+                LPTransition tIn = new LPTransition(operation: operation)
                 net.transitionList << tIn
                 net.arcList << Arc.buildArc((Transition) tIn, (Place) subNetInput)
 
@@ -223,7 +223,7 @@ class LPPN2LPNold {
         }
 
         // define outputs
-        LPlace pOut = new LPlace(expression: Expression.build(formula))
+        LPPlace pOut = new LPPlace(expression: Expression.build(formula))
         net.placeList << pOut
         net.outputs.add(pOut)
 
@@ -295,7 +295,7 @@ class LPPN2LPNold {
 
     static Net buildEventNet(Event event, Integer z = 0) {
         Net net = new Net(zIndex: z)
-        LTransition t = new LTransition(event: event)
+        LPTransition t = new LPTransition(event: event)
         net.transitionList += [t]
 
         // I/O
@@ -308,11 +308,11 @@ class LPPN2LPNold {
 
     static Net buildSeqOperationNet(Formula<Event> formula, Integer z = 0) {
         Net net = new Net(zIndex: z)
-        LTransition t; LPlace p
+        LPTransition t; LPPlace p
 
         // preparatory nodes
-        t = new LTransition()
-        p = new LPlace()
+        t = new LPTransition()
+        p = new LPPlace()
 
         net.transitionList << t
         net.placeList << p
@@ -325,15 +325,15 @@ class LPPN2LPNold {
 
             // anchoring
             net.arcList += Arc.buildArcs((Transition) t, (Place) p, (Transition) subNet.inputs[0])
-            t = (LTransition) subNet.outputs[0]
+            t = (LPTransition) subNet.outputs[0]
 
             // synchronization place
-            p = new LPlace()
+            p = new LPPlace()
             net.placeList << p
         }
 
         // output transition
-        LTransition tOut = new LTransition()
+        LPTransition tOut = new LPTransition()
         net.transitionList << tOut
 
         // final anchoring
@@ -344,13 +344,13 @@ class LPPN2LPNold {
 
     static Net buildParOperationNet(Formula<Event> formula, Integer z = 0) {
         Net net = new Net(zIndex: z)
-        LTransition tIn = new LTransition()
-        LTransition tOut = new LTransition()
+        LPTransition tIn = new LPTransition()
+        LPTransition tOut = new LPTransition()
         net.transitionList += [tIn, tOut]
 
         for (input in formula.inputFormulas) {
             // preparatory place
-            LPlace pIn = new LPlace()
+            LPPlace pIn = new LPPlace()
             net.placeList << pIn
 
             // create subnet
@@ -358,7 +358,7 @@ class LPPN2LPNold {
             net.include(subNet)
 
             // synchronization place
-            LPlace pOut = new LPlace()
+            LPPlace pOut = new LPPlace()
             net.placeList << pOut
 
             // anchoring
@@ -371,10 +371,10 @@ class LPPN2LPNold {
     static Net buildAltOperationNet(Formula<Event> formula, Integer z = 0) {
         Net net = new Net(zIndex: z)
 
-        LTransition tIn = new LTransition()
-        LTransition tOut = new LTransition()
-        LPlace pIn = new LPlace()
-        LPlace pOut = new LPlace()
+        LPTransition tIn = new LPTransition()
+        LPTransition tOut = new LPTransition()
+        LPPlace pIn = new LPPlace()
+        LPPlace pOut = new LPPlace()
 
         net.transitionList += [tIn, tOut]
         net.placeList += [pIn, pOut]
@@ -431,7 +431,7 @@ class LPPN2LPNold {
     }
 
 
-    static LPlace convert(Expression expression) {
+    static LPPlace convert(Expression expression) {
         convert(expression.formula)
     }
 
@@ -441,8 +441,8 @@ class LPPN2LPNold {
             // for the head:
             // create an index for the
 
-            LPlace pHead = convert(logicRule.head)
-            LPlace pBody = convert(logicRule.body)
+            LPPlace pHead = convert(logicRule.head)
+            LPPlace pBody = convert(logicRule.body)
 
 
         }

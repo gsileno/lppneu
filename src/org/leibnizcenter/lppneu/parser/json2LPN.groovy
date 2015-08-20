@@ -1,14 +1,10 @@
 package org.leibnizcenter.lppneu.parser
 
 import groovy.io.FileType
-import groovy.json.JsonParser
 import groovy.json.JsonSlurper
 import org.leibnizcenter.lppneu.components.language.Expression
-import org.leibnizcenter.lppneu.components.language.Program
-import org.leibnizcenter.lppneu.components.petrinets.LPlace
-import org.leibnizcenter.lppneu.components.petrinets.LTransition
-import org.leibnizcenter.pneu.components.graphics.Area
-import org.leibnizcenter.pneu.components.graphics.Point
+import org.leibnizcenter.lppneu.components.lppetrinets.LPPlace
+import org.leibnizcenter.lppneu.components.lppetrinets.LPTransition
 import org.leibnizcenter.pneu.components.petrinet.*
 
 class json2LPN {
@@ -40,7 +36,7 @@ class json2LPN {
         loadJson(records)
     }
 
-    static Net loadJson(records, Map<String, Net> netMap = [:], Map<String, LPlace> lPlaceMap = [:], Map<String, LTransition> lTransitionMap = [:]) {
+    static Net loadJson(records, Map<String, Net> netMap = [:], Map<String, LPPlace> lPlaceMap = [:], Map<String, LPTransition> lTransitionMap = [:]) {
 
         if (netMap[records["id"].toString()]) {
             return netMap[records["id"].toString()]
@@ -55,7 +51,7 @@ class json2LPN {
         for (item in records["places"]) {
             if (!lPlaceMap[item["id"].toString()]) {
                 Expression expression = LPPNLoader.parseString(item["label"].toString()+".").logicRules[0].head
-                LPlace p = new LPlace(id: item["id"], expression: expression)
+                LPPlace p = new LPPlace(id: item["id"], expression: expression)
                 lPlaceMap[item["id"].toString()] = p
             }
             net.placeList << lPlaceMap[item["id"].toString()]
@@ -64,7 +60,7 @@ class json2LPN {
         for (item in records["transitions"]) {
             if (!lTransitionMap[item["id"].toString()]) {
                 Expression expression = LPPNLoader.parseString(item["label"].toString()+".").logicRules[0].head
-                LTransition t = new LTransition(id: item["id"], operation: expression.toOperation())
+                LPTransition t = new LPTransition(id: item["id"], operation: expression.toOperation())
                 lTransitionMap[item["id"].toString()] = t
             }
             net.transitionList << lTransitionMap[item["id"].toString()]

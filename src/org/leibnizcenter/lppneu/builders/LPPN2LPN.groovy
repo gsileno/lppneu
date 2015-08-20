@@ -2,10 +2,10 @@ package org.leibnizcenter.lppneu.builders
 
 import commons.base.Formula
 import groovy.util.logging.Log4j
-import org.leibnizcenter.lppneu.comparison.Comparison
+import org.leibnizcenter.lppneu.comparison.NetComparison
 import org.leibnizcenter.lppneu.components.language.*
-import org.leibnizcenter.lppneu.components.petrinets.LPlace
-import org.leibnizcenter.lppneu.components.petrinets.LTransition
+import org.leibnizcenter.lppneu.components.lppetrinets.LPPlace
+import org.leibnizcenter.lppneu.components.lppetrinets.LPTransition
 import org.leibnizcenter.pneu.builders.PN2dot
 import org.leibnizcenter.pneu.components.petrinet.Arc
 import org.leibnizcenter.pneu.components.petrinet.ArcType
@@ -14,20 +14,18 @@ import org.leibnizcenter.pneu.components.petrinet.Node
 import org.leibnizcenter.pneu.components.petrinet.Place
 import org.leibnizcenter.pneu.components.petrinet.Transition
 
-import javax.management.RuntimeErrorException
-
 @Log4j
 class LPPN2LPN {
 
-    Map<Expression, List<LPlace>> expressionPlaceMap
-    Map<Operation, List<LTransition>> operationTransitionMap
+    Map<Expression, List<LPPlace>> expressionPlaceMap
+    Map<Operation, List<LPTransition>> operationTransitionMap
     Map<Expression, Triple> expressionTripleMap
 
     Program program, reducedProgram
 
     Net net, tripleAnchoredNet, transitionAnchoredNet, simplifiedNet, unifiedNet
 
-    void mapPlace(LPlace place) {
+    void mapPlace(LPPlace place) {
 
         if (place.expression) {
             if (expressionPlaceMap[place.expression] == null) expressionPlaceMap[place.expression] = []
@@ -39,7 +37,7 @@ class LPPN2LPN {
         }
     }
 
-    void mapTransition(LTransition transition) {
+    void mapTransition(LPTransition transition) {
         if (transition.operation) {
             if (operationTransitionMap[transition.operation] == null) operationTransitionMap[transition.operation] = []
             operationTransitionMap[transition.operation] << transition
@@ -58,11 +56,11 @@ class LPPN2LPN {
 
         // map places
         for (p in net.placeList) {
-            mapPlace((LPlace) p)
+            mapPlace((LPPlace) p)
         }
         // map transitions
         for (t in net.transitionList) {
-            mapTransition((LTransition) t)
+            mapTransition((LPTransition) t)
         }
 
         // nested nets
@@ -230,7 +228,7 @@ class LPPN2LPN {
                 for (place in expressionPlaceMap[expression]) {
                     log.trace("Number of inputs to the place ${place}: "+ place.inputs.size())
                     for (input in place.inputs) {
-                        LTransition tInput = (LTransition) (input.source)
+                        LPTransition tInput = (LPTransition) (input.source)
                         if (tInput.operation) {
                             triple.posOperationList << tInput.operation
                         } else {
@@ -244,7 +242,7 @@ class LPPN2LPN {
                 for (place in expressionPlaceMap[expression]) {
                     log.trace("Number of inputs to the place ${place}: "+ place.inputs.size())
                     for (input in place.inputs) {
-                        LTransition tInput = (LTransition) (input.source)
+                        LPTransition tInput = (LPTransition) (input.source)
                         if (tInput.operation) {
                             triple.negOperationList << tInput.operation
                         } else {
@@ -264,22 +262,22 @@ class LPPN2LPN {
             // if at least a trnasition is attached you have to create it, as it is useful for the triple
             if (triple.posTransitionList.size() > 0 || triple.negTransitionList.size() > 0) {
 
-                Net subNet = new Net(function: new LPlace(expression: Expression.build(coupling.key, Operator.ASSOCIATION)))
+                Net subNet = new Net(function: new LPPlace(expression: Expression.build(coupling.key, Operator.ASSOCIATION)))
 
-                LTransition tNexus
-                LPlace pNexus
+                LPTransition tNexus
+                LPPlace pNexus
 
                 if (triple.posTransitionList.size() > 0) {
 
-                    tNexus = new LTransition(operation: triple.positive.toOperation())
-                    pNexus = new LPlace(link: true)
+                    tNexus = new LPTransition(operation: triple.positive.toOperation())
+                    pNexus = new LPPlace(link: true)
 
                     subNet.transitionList << tNexus
                     subNet.placeList << pNexus
                     subNet.arcList << Arc.buildArc((Place) pNexus, (Transition) tNexus, ArcType.LINK)
 
                     for (int i = 0; i < triple.posTransitionList.size(); i++) {
-                        LTransition tOperator = (LTransition) triple.posTransitionList[i]
+                        LPTransition tOperator = (LPTransition) triple.posTransitionList[i]
                         subNet.arcList << Arc.buildArc((Transition) tOperator, (Place) pNexus, ArcType.LINK)
                     }
 
@@ -287,15 +285,15 @@ class LPPN2LPN {
 
                 if (triple.negTransitionList.size() > 0) {
 
-                    tNexus = new LTransition(operation: triple.negative.toOperation())
-                    pNexus = new LPlace(link: true)
+                    tNexus = new LPTransition(operation: triple.negative.toOperation())
+                    pNexus = new LPPlace(link: true)
 
                     subNet.transitionList << tNexus
                     subNet.placeList << pNexus
                     subNet.arcList << Arc.buildArc((Place) pNexus, (Transition) tNexus, ArcType.LINK)
 
                     for (int i = 0; i < triple.negTransitionList.size(); i++) {
-                        LTransition tOperator = (LTransition) triple.negTransitionList[i]
+                        LPTransition tOperator = (LPTransition) triple.negTransitionList[i]
                         subNet.arcList << Arc.buildArc((Transition) tOperator, (Place) pNexus, ArcType.LINK)
                     }
                 }
@@ -332,7 +330,7 @@ class LPPN2LPN {
                 for (int j = i - 1; j >= 0; j--) {
                     Net nj = netList[j]
                     if (!alreadyAccounted.contains(nj)) {
-                        if (Comparison.compare(ni, nj)) {
+                        if (NetComparison.compare(ni, nj)) {
                             if (!clonesNetMap[ni]) clonesNetMap[ni] = []
                             clonesNetMap[ni] << nj
                             alreadyAccounted << nj // take out a net which has already been associated
@@ -487,9 +485,9 @@ class LPPN2LPN {
 
         for (coupling in expressionPlaceMap) {
             if (coupling.value.size() > 1) {
-                LPlace pNexus = new LPlace(expression: coupling.key)
+                LPPlace pNexus = new LPPlace(expression: coupling.key)
                 unifiedNet.placeList << pNexus
-                LTransition tNexus = new LTransition(link: true)
+                LPTransition tNexus = new LPTransition(link: true)
                 unifiedNet.transitionList << tNexus
                 unifiedNet.arcList << Arc.buildArc((Place) pNexus, (Transition) tNexus, ArcType.LINK)
 
@@ -501,9 +499,9 @@ class LPPN2LPN {
 
         for (coupling in operationTransitionMap) {
             if (coupling.value.size() > 1) {
-                LTransition tNexus = new LTransition(operation: coupling.key)
+                LPTransition tNexus = new LPTransition(operation: coupling.key)
                 unifiedNet.transitionList << tNexus
-                LPlace pNexus = new LPlace(link: true)  // this is a synchornization place
+                LPPlace pNexus = new LPPlace(link: true)  // this is a synchornization place
                 unifiedNet.placeList << pNexus
                 unifiedNet.arcList << Arc.buildArc((Transition) tNexus, (Place) pNexus, ArcType.LINK)
 
@@ -631,10 +629,10 @@ class LPPN2LPN {
         Expression bodyExpression = Expression.build(body)
 
         if (!biconditional) {
-            net = new Net(function: new LPlace(expression:
+            net = new Net(function: new LPPlace(expression:
                     Expression.build(bodyExpression, headExpression, Operator.IMPLIES)))
         } else {
-            net = new Net(function: new LPlace(expression:
+            net = new Net(function: new LPPlace(expression:
                     Expression.build(bodyExpression, headExpression, Operator.DEFINES)))
         }
 
@@ -644,18 +642,18 @@ class LPPN2LPN {
         net.include(bodyNet)
         log.trace("attaching body net " + bodyNet)
 
-        LPlace pIn = (LPlace) bodyNet.outputs[0]
+        LPPlace pIn = (LPPlace) bodyNet.outputs[0]
         log.trace("input place " + pIn)
 
         Net headNet = buildExpressionNet(head)
         net.include(headNet)
         log.trace("attaching head net " + headNet)
 
-        LPlace pOut = (LPlace) headNet.outputs[0]
+        LPPlace pOut = (LPPlace) headNet.outputs[0]
         log.trace("contrapositive: output place " + pOut)
 
         if (!biconditional) {
-            LTransition tImplication = new LTransition(operator: Operator.IMPLIES)
+            LPTransition tImplication = new LPTransition(operator: Operator.IMPLIES)
             net.transitionList += [tImplication]
             net.arcList += Arc.buildArcs(pIn, tImplication, pOut)
 
@@ -664,22 +662,22 @@ class LPPN2LPN {
             bodyNet = buildExpressionNet(headExpression.negate())
             net.include(bodyNet)
             log.trace("contrapositive: attaching body net " + bodyNet)
-            pIn = (LPlace) bodyNet.outputs[0]
+            pIn = (LPPlace) bodyNet.outputs[0]
             log.trace("contrapositive: input place " + pIn)
 
             headNet = buildExpressionNet(bodyExpression.negate())
             net.include(headNet)
             log.trace("contrapositive: attaching head net " + headNet)
-            pOut = (LPlace) headNet.outputs[0]
+            pOut = (LPPlace) headNet.outputs[0]
             log.trace("contrapositive: output place " + pOut)
 
-            tImplication = new LTransition(operator: Operator.IMPLIES)
+            tImplication = new LPTransition(operator: Operator.IMPLIES)
             net.transitionList += [tImplication]
             net.arcList += Arc.buildArcs(pIn, tImplication, pOut)
 
         } else { // biconditional
-            LTransition tNexus = new LTransition(operator: Operator.IMPLIES, link: true)
-            LTransition tNexus2 = new LTransition(operator: Operator.IMPLIES, link: true)
+            LPTransition tNexus = new LPTransition(operator: Operator.IMPLIES, link: true)
+            LPTransition tNexus2 = new LPTransition(operator: Operator.IMPLIES, link: true)
             net.transitionList += [tNexus, tNexus2]
             net.arcList << Arc.buildArc((Place) pIn, (Transition) tNexus, ArcType.LINK)
             net.arcList << Arc.buildArc((Transition) tNexus, (Place) pOut, ArcType.LINK)
@@ -692,7 +690,7 @@ class LPPN2LPN {
 
     static Net buildSeqExpressionNet(Formula<Situation> formula) {
 
-        Net net = new Net(function: new LPlace(expression: Expression.build(formula)))
+        Net net = new Net(function: new LPPlace(expression: Expression.build(formula)))
 
         List<Expression> seqInputs = []
 
@@ -801,17 +799,17 @@ class LPPN2LPN {
             return buildSeqExpressionNet(formula)
         }
 
-        Net net = new Net(function: new LPlace(expression: Expression.build(formula)))
+        Net net = new Net(function: new LPPlace(expression: Expression.build(formula)))
 
-        LPlace pOut = new LPlace(expression: Expression.build(formula))
+        LPPlace pOut = new LPPlace(expression: Expression.build(formula))
 
-        LTransition tOut
+        LPTransition tOut
         if (formula.operator == Operator.PAR) {
-            tOut = new LTransition(operator: Operator.AND)
+            tOut = new LPTransition(operator: Operator.AND)
         } else if (formula.operator == Operator.ALT) {
-            tOut = new LTransition(operator: Operator.XOR)
+            tOut = new LPTransition(operator: Operator.XOR)
         } else if (formula.operator == Operator.OPT) {
-            tOut = new LTransition(operator: Operator.OR)
+            tOut = new LPTransition(operator: Operator.OR)
         } else {
             throw new RuntimeException()
         }
@@ -824,8 +822,8 @@ class LPPN2LPN {
 
         for (input in formula.inputFormulas) {
 
-            LPlace pIn = new LPlace(expression: Expression.build(input))
-            LTransition tIn = new LTransition(operation: Expression.build(input).toOperation())
+            LPPlace pIn = new LPPlace(expression: Expression.build(input))
+            LPTransition tIn = new LPTransition(operation: Expression.build(input).toOperation())
             net.placeList << pIn
             net.transitionList << tIn
             net.arcList += Arc.buildArc((Place) pIn, (Transition) tOut)
@@ -848,21 +846,21 @@ class LPPN2LPN {
     }
 
     static Net buildExpressionNet(Formula<Situation> formula) {
-        Net net = new Net(function: new LPlace(expression: Expression.build(formula)))
+        Net net = new Net(function: new LPPlace(expression: Expression.build(formula)))
 
-        LPlace pOut = new LPlace(expression: Expression.build(formula))
+        LPPlace pOut = new LPPlace(expression: Expression.build(formula))
         net.placeList += [pOut]
         net.outputs += [pOut]
 
         if (formula.operator != Operator.POS) {
             // Logic expressions are only partially transformed into Petri Nets
             if (formula.operator.isLogicOperator()) {
-                LTransition t = new LTransition(operator: formula.operator)
+                LPTransition t = new LPTransition(operator: formula.operator)
                 net.transitionList += [t]
                 net.arcList += Arc.buildArc(t, pOut)
 
                 for (input in formula.inputPorts) {
-                    LPlace pIn = new LPlace(expression: Expression.build(input))
+                    LPPlace pIn = new LPPlace(expression: Expression.build(input))
                     net.placeList += [pIn]
                     net.arcList += Arc.buildArc(pIn, t)
                     net.inputs += [pIn]
@@ -883,7 +881,7 @@ class LPPN2LPN {
     }
 
     static Net buildEventConditionNet(Formula<Situation> formula) {
-        Net net = new Net(function: new LPlace(expression: Expression.build(formula)))
+        Net net = new Net(function: new LPPlace(expression: Expression.build(formula)))
 
         if (formula.operator != Operator.OCCURS && formula.operator != Operator.OCCURS_IN) {
             throw new RuntimeException("Wrong operator: expecting OCCURS, or OCCURS_IN, found ${formula.operator}.")
@@ -891,10 +889,10 @@ class LPPN2LPN {
 
         Expression eventExpression = Expression.build(formula.inputPorts[0])
 
-        LPlace pOut
-        LTransition tOut
-        pOut = new LPlace(expression: Expression.build(formula))
-        tOut = new LTransition(operation: eventExpression.toOperation())
+        LPPlace pOut
+        LPTransition tOut
+        pOut = new LPPlace(expression: Expression.build(formula))
+        tOut = new LPTransition(operation: eventExpression.toOperation())
 
         net.placeList += [pOut]
         net.transitionList += [tOut]
@@ -903,7 +901,7 @@ class LPPN2LPN {
         // if a catalyst context is specified about the occurrence
         if (formula.inputPorts[1] != null) {
             Expression conditionExpression = Expression.build(formula.inputPorts[1])
-            LPlace pCatalyst = new LPlace(expression: conditionExpression)
+            LPPlace pCatalyst = new LPPlace(expression: conditionExpression)
             net.arcList += Arc.buildArc((Place) pCatalyst, (Transition) tOut)
             net.placeList += [pCatalyst]
         }
@@ -925,8 +923,8 @@ class LPPN2LPN {
     }
 
     static Net buildEventNet(Event event) {
-        Net net = new Net(function: new LTransition(operation: Operation.build(event)))
-        LTransition t = new LTransition(operation: Operation.build(event))
+        Net net = new Net(function: new LPTransition(operation: Operation.build(event)))
+        LPTransition t = new LPTransition(operation: Operation.build(event))
         net.transitionList += [t]
 
         // I/O
@@ -937,13 +935,13 @@ class LPPN2LPN {
     }
 
     static Net buildSeqOperationNet(Formula<Event> formula) {
-        Net net = new Net(function: new LTransition(operation: Operation.build(formula)))
-        LTransition t
-        LPlace p
+        Net net = new Net(function: new LPTransition(operation: Operation.build(formula)))
+        LPTransition t
+        LPPlace p
 
         // preparatory nodes
-        t = new LTransition(link: true, name: "start")
-        p = new LPlace(link: true, name: "after start")
+        t = new LPTransition(link: true, name: "start")
+        p = new LPPlace(link: true, name: "after start")
 
         net.inputs << t
         net.transitionList << t
@@ -958,17 +956,17 @@ class LPPN2LPN {
 
             // anchoring
             net.arcList += Arc.buildArcs((Transition) t, (Place) p, (Transition) subNet.inputs[0])
-            t = (LTransition) subNet.outputs[0]
+            t = (LPTransition) subNet.outputs[0]
 
             // synchronization place
-            p = new LPlace(link: true, name: "bridge " + i)
+            p = new LPPlace(link: true, name: "bridge " + i)
             net.placeList << p
         }
 
         p.name = "before end"
 
         // output transition
-        LTransition tOut = new LTransition(link: true, name: "end")
+        LPTransition tOut = new LPTransition(link: true, name: "end")
         net.transitionList << tOut
 
         // final anchoring
@@ -980,15 +978,15 @@ class LPPN2LPN {
     }
 
     static Net buildParOperationNet(Formula<Event> formula) {
-        Net net = new Net(function: new LTransition(operation: Operation.build(formula)))
-        LTransition tIn = new LTransition(link: true, name: "start")
-        LTransition tOut = new LTransition(link: true, name: "end")
+        Net net = new Net(function: new LPTransition(operation: Operation.build(formula)))
+        LPTransition tIn = new LPTransition(link: true, name: "start")
+        LPTransition tOut = new LPTransition(link: true, name: "end")
         net.transitionList += [tIn, tOut]
 
         int i = 0
         for (input in formula.inputFormulas) {
             // preparatory place
-            LPlace pIn = new LPlace(link: true, name: "start bridge" + i)
+            LPPlace pIn = new LPPlace(link: true, name: "start bridge" + i)
             net.placeList << pIn
 
             // create subnet
@@ -996,7 +994,7 @@ class LPPN2LPN {
             net.include(subNet)
 
             // synchronization place
-            LPlace pOut = new LPlace(link: true, name: "end bridge " + i)
+            LPPlace pOut = new LPPlace(link: true, name: "end bridge " + i)
             net.placeList << pOut
 
             // anchoring
@@ -1012,12 +1010,12 @@ class LPPN2LPN {
     }
 
     static Net buildAltOperationNet(Formula<Event> formula) {
-        Net net = new Net(function: new LTransition(operation: Operation.build(formula)))
+        Net net = new Net(function: new LPTransition(operation: Operation.build(formula)))
 
-        LTransition tIn = new LTransition(link: true, name: "start")
-        LTransition tOut = new LTransition(link: true, name: "end")
-        LPlace pIn = new LPlace(link: true, name: "after start")
-        LPlace pOut = new LPlace(link: true, name: "before end")
+        LPTransition tIn = new LPTransition(link: true, name: "start")
+        LPTransition tOut = new LPTransition(link: true, name: "end")
+        LPPlace pIn = new LPPlace(link: true, name: "after start")
+        LPPlace pOut = new LPPlace(link: true, name: "before end")
 
         net.transitionList += [tIn, tOut]
         net.placeList += [pIn, pOut]
@@ -1101,15 +1099,15 @@ class LPPN2LPN {
         Net triggerNet = buildExpressionNet(antecedent)
         net.include(triggerNet)
 
-        LPlace pIn = (LPlace) triggerNet.outputs[0]
+        LPPlace pIn = (LPPlace) triggerNet.outputs[0]
 
         // create consequent
         Expression consequent = action.toExpression()
-        LPlace pOut = new LPlace(expression: consequent)
+        LPPlace pOut = new LPPlace(expression: consequent)
         net.placeList += [pOut]
 
         // define net function as causal dependency between antecedent and consequent
-        net.function = new LPlace(expression: Expression.build(antecedent, consequent, Operator.CAUSES))
+        net.function = new LPPlace(expression: Expression.build(antecedent, consequent, Operator.CAUSES))
 
         Net actionNet = buildOperationNet(action.formula)
         net.include(actionNet)
@@ -1138,21 +1136,21 @@ class LPPN2LPN {
     // pos(neg p) => neg p
 
     static Net buildTripleNet(Expression expression) {
-        Net net = new Net(function: new LPlace(expression: Expression.build(expression, Operator.TRIPLE)))
+        Net net = new Net(function: new LPPlace(expression: Expression.build(expression, Operator.TRIPLE)))
 
         Triple pTriple = Triple.build(expression)
-        LPlace pPlace = new LPlace(expression: pTriple.positive)
-        LPlace negpPlace = new LPlace(expression: pTriple.negative)
-        LPlace notpPlace = new LPlace(expression: pTriple.nullified)
+        LPPlace pPlace = new LPPlace(expression: pTriple.positive)
+        LPPlace negpPlace = new LPPlace(expression: pTriple.negative)
+        LPPlace notpPlace = new LPPlace(expression: pTriple.nullified)
         net.placeList += [pPlace, negpPlace, notpPlace]
 
-        LTransition pospOperator = new LTransition(operation: pTriple.positive.toOperation())
-        LTransition negnegpOperator = new LTransition(operation: pTriple.positive.toOperation())
+        LPTransition pospOperator = new LPTransition(operation: pTriple.positive.toOperation())
+        LPTransition negnegpOperator = new LPTransition(operation: pTriple.positive.toOperation())
         // double negation = assertion
-        LTransition negpOperator = new LTransition(operation: pTriple.negative.toOperation())
-        LTransition posnegpOperator = new LTransition(operation: pTriple.negative.toOperation())
-        LTransition notpOperator = new LTransition(operation: pTriple.nullified.toOperation())
-        LTransition notnegpOperator = new LTransition(operation: pTriple.nullified.toOperation())
+        LPTransition negpOperator = new LPTransition(operation: pTriple.negative.toOperation())
+        LPTransition posnegpOperator = new LPTransition(operation: pTriple.negative.toOperation())
+        LPTransition notpOperator = new LPTransition(operation: pTriple.nullified.toOperation())
+        LPTransition notnegpOperator = new LPTransition(operation: pTriple.nullified.toOperation())
 
         for (t in [pospOperator, posnegpOperator, negpOperator, negnegpOperator, notpOperator, notnegpOperator]) {
             net.transitionList << t

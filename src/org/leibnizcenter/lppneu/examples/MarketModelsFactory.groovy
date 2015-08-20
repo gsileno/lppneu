@@ -2,8 +2,8 @@ package org.leibnizcenter.lppneu.examples
 
 import org.leibnizcenter.lppneu.components.language.Program
 import org.leibnizcenter.lppneu.components.language.Expression
-import org.leibnizcenter.lppneu.components.petrinets.LPlace
-import org.leibnizcenter.lppneu.components.petrinets.LTransition
+import org.leibnizcenter.lppneu.components.lppetrinets.LPPlace
+import org.leibnizcenter.lppneu.components.lppetrinets.LPTransition
 import org.leibnizcenter.lppneu.parser.LPPNLoader
 import org.leibnizcenter.pneu.builders.PN2dot
 import org.leibnizcenter.pneu.components.petrinet.Arc
@@ -53,23 +53,23 @@ class MarketModelsFactory {
         return program.logicRules[0].head
     }
 
-    static LTransition createTransition(String label = null) {
-        LTransition tr
+    static LPTransition createTransition(String label = null) {
+        LPTransition tr
         if (label != null)
-            tr = new LTransition(operation: parse(label).toOperation())
+            tr = new LPTransition(operation: parse(label).toOperation())
         else
-            tr = new LTransition()
+            tr = new LPTransition()
         tr
     }
 
-    static LTransition createTransition(Net net, String label = null) {
-        LTransition tr = createTransition(label)
+    static LPTransition createTransition(Net net, String label = null) {
+        LPTransition tr = createTransition(label)
         net.transitionList << tr
         tr
     }
 
-    static LTransition propagateTransition(Net net, LTransition source) {
-        LTransition target = new LTransition(operation: source.operation,
+    static LPTransition propagateTransition(Net net, LPTransition source) {
+        LPTransition target = new LPTransition(operation: source.operation,
                 operator: source.operator,
                 link: source.link)
         net.transitionList << target
@@ -77,28 +77,28 @@ class MarketModelsFactory {
         target
     }
 
-    static LPlace createPlace(String label = null) {
-        LPlace pl
+    static LPPlace createPlace(String label = null) {
+        LPPlace pl
         if (label != null)
-            pl = new LPlace(expression: parse(label))
+            pl = new LPPlace(expression: parse(label))
         else
-            pl = new LPlace()
+            pl = new LPPlace()
         pl
     }
 
-    static LPlace createPlace(Net net, String label = null) {
-        LPlace pl = createPlace(label)
+    static LPPlace createPlace(Net net, String label = null) {
+        LPPlace pl = createPlace(label)
         net.placeList << pl
         pl
     }
 
-    static void bridgeTransitions(Net net, LTransition t1, LTransition t2) {
+    static void bridgeTransitions(Net net, LPTransition t1, LPTransition t2) {
 
         if (!net.transitionList.contains(t1) || !net.transitionList.contains(t2)) {
             throw new RuntimeException("Error: this net does not contain the transition(s) to bridge")
         }
 
-        LPlace pBridge = createPlace(net)
+        LPPlace pBridge = createPlace(net)
         List<Arc> arcs = Arc.buildArcs(t1, pBridge, t2)
 
         net.arcList += arcs
@@ -109,13 +109,13 @@ class MarketModelsFactory {
 
         sale.function = createTransition("sells(Seller, Good, Money, Buyer)")
 
-        LTransition tIn = createTransition(sale)
-        LTransition tOut = createTransition(sale)
+        LPTransition tIn = createTransition(sale)
+        LPTransition tOut = createTransition(sale)
 
-        LTransition t1 = createTransition(sale, "offers(Seller, Buyer, Good, Money)")
-        LTransition t2 = createTransition(sale, "accepts(Buyer, Seller, Good, Money)")
-        LTransition t3 = createTransition(sale, "pays(Buyer, Seller, Money)")
-        LTransition t4 = createTransition(sale, "delivers(Seller, Buyer, Good)")
+        LPTransition t1 = createTransition(sale, "offers(Seller, Buyer, Good, Money)")
+        LPTransition t2 = createTransition(sale, "accepts(Buyer, Seller, Good, Money)")
+        LPTransition t3 = createTransition(sale, "pays(Buyer, Seller, Money)")
+        LPTransition t4 = createTransition(sale, "delivers(Seller, Buyer, Good)")
 
         bridgeTransitions(sale, tIn, t1)
         bridgeTransitions(sale, t1, t2)
@@ -131,13 +131,13 @@ class MarketModelsFactory {
 
         sale.function = createTransition("sells(Seller, Good, Money, Buyer)")
 
-        LTransition tIn = createTransition(sale)
-        LTransition tOut = createTransition(sale)
+        LPTransition tIn = createTransition(sale)
+        LPTransition tOut = createTransition(sale)
 
-        LTransition t1 = createTransition(sale, "offers(Seller, Buyer, Good, Money)")
-        LTransition t2 = createTransition(sale, "accepts(Buyer, Seller, Good, Money)")
-        LTransition t3 = createTransition(sale, "pays(Buyer, Seller, Money)")
-        LTransition t4 = createTransition(sale, "delivers(Seller, Buyer, Good)")
+        LPTransition t1 = createTransition(sale, "offers(Seller, Buyer, Good, Money)")
+        LPTransition t2 = createTransition(sale, "accepts(Buyer, Seller, Good, Money)")
+        LPTransition t3 = createTransition(sale, "pays(Buyer, Seller, Money)")
+        LPTransition t4 = createTransition(sale, "delivers(Seller, Buyer, Good)")
 
         bridgeTransitions(sale, tIn, t1)
         bridgeTransitions(sale, t1, t2)
@@ -153,13 +153,13 @@ class MarketModelsFactory {
 
         sale.function = createTransition("sells(Seller, Good, Money, Buyer)")
 
-        LTransition tIn = createTransition(sale)
-        LTransition tOut = createTransition(sale)
+        LPTransition tIn = createTransition(sale)
+        LPTransition tOut = createTransition(sale)
 
-        LTransition t1 = createTransition(sale, "offers(Seller, Buyer, Good, Money)")
-        LTransition t2 = createTransition(sale, "accepts(Buyer, Seller, Good, Money)")
-        LTransition t3 = createTransition(sale, "pays(Buyer, Seller, Money)")
-        LTransition t4 = createTransition(sale, "delivers(Seller, Buyer, Good)")
+        LPTransition t1 = createTransition(sale, "offers(Seller, Buyer, Good, Money)")
+        LPTransition t2 = createTransition(sale, "accepts(Buyer, Seller, Good, Money)")
+        LPTransition t3 = createTransition(sale, "pays(Buyer, Seller, Money)")
+        LPTransition t4 = createTransition(sale, "delivers(Seller, Buyer, Good)")
 
         bridgeTransitions(sale, tIn, t1)
         bridgeTransitions(sale, t1, t2)
@@ -176,15 +176,15 @@ class MarketModelsFactory {
 
         sale.function = createTransition("sells(Seller, Good, Money, Buyer)")
 
-        LTransition tIn = createTransition(sale)
-        LTransition tOut = createTransition(sale)
+        LPTransition tIn = createTransition(sale)
+        LPTransition tOut = createTransition(sale)
 
-        LTransition t1s = createTransition(sale, "offers(Seller, Buyer, Good, Money)")
-        LTransition t1b = propagateTransition(sale, t1s)
-        LTransition t2b = createTransition(sale, "accepts(Buyer, Seller, Good, Money)")
-        LTransition t2s = propagateTransition(sale, t2b)
-        LTransition t3 = createTransition(sale, "pays(Buyer, Seller, Money)")
-        LTransition t4 = createTransition(sale, "delivers(Seller, Buyer, Good)")
+        LPTransition t1s = createTransition(sale, "offers(Seller, Buyer, Good, Money)")
+        LPTransition t1b = propagateTransition(sale, t1s)
+        LPTransition t2b = createTransition(sale, "accepts(Buyer, Seller, Good, Money)")
+        LPTransition t2s = propagateTransition(sale, t2b)
+        LPTransition t3 = createTransition(sale, "pays(Buyer, Seller, Money)")
+        LPTransition t4 = createTransition(sale, "delivers(Seller, Buyer, Good)")
 
         bridgeTransitions(sale, tIn, t1s)
         bridgeTransitions(sale, t1b, t2b)
@@ -202,19 +202,19 @@ class MarketModelsFactory {
 
         sale.function = createTransition("sells(Seller, Good, Money, Buyer)")
 
-        LTransition tIn = createTransition(sale)
-        LTransition tOut = createTransition(sale)
+        LPTransition tIn = createTransition(sale)
+        LPTransition tOut = createTransition(sale)
 
-        LTransition t1s = createTransition(sale, "offers(Seller, Buyer, Good, Money)")
-        LTransition t1 = propagateTransition(sale, t1s)
-        LTransition t1b = propagateTransition(sale, t1)
-        LTransition t2b = createTransition(sale, "accepts(Buyer, Seller, Good, Money)")
-        LTransition t2 = propagateTransition(sale, t2b)
-        LTransition t2s = propagateTransition(sale, t2)
-        LTransition t3b = createTransition(sale, "pays(Buyer, Seller, Money)")
-        LTransition t3 = propagateTransition(sale, t3b)
-        LTransition t4s = createTransition(sale, "delivers(Seller, Buyer, Good)")
-        LTransition t4 = propagateTransition(sale, t4s)
+        LPTransition t1s = createTransition(sale, "offers(Seller, Buyer, Good, Money)")
+        LPTransition t1 = propagateTransition(sale, t1s)
+        LPTransition t1b = propagateTransition(sale, t1)
+        LPTransition t2b = createTransition(sale, "accepts(Buyer, Seller, Good, Money)")
+        LPTransition t2 = propagateTransition(sale, t2b)
+        LPTransition t2s = propagateTransition(sale, t2)
+        LPTransition t3b = createTransition(sale, "pays(Buyer, Seller, Money)")
+        LPTransition t3 = propagateTransition(sale, t3b)
+        LPTransition t4s = createTransition(sale, "delivers(Seller, Buyer, Good)")
+        LPTransition t4 = propagateTransition(sale, t4s)
 
         bridgeTransitions(sale, tIn, t1s)
         bridgeTransitions(sale, t1b, t2b)
@@ -232,19 +232,19 @@ class MarketModelsFactory {
 
         sale.function = createTransition("sells(Seller, Good, Money, Buyer)")
 
-        LTransition tIn = createTransition(sale)
-        LTransition tOut = createTransition(sale)
+        LPTransition tIn = createTransition(sale)
+        LPTransition tOut = createTransition(sale)
 
-        LTransition t1s = createTransition(sale, "offers(Seller, Buyer, Good, Money)")
-        LTransition t1 = propagateTransition(sale, t1s)
-        LTransition t1b = propagateTransition(sale, t1)
-        LTransition t2b = createTransition(sale, "accepts(Buyer, Seller, Good, Money)")
-        LTransition t2 = propagateTransition(sale, t2b)
-        LTransition t2s = propagateTransition(sale, t2)
-        LTransition t3b = createTransition(sale, "pays(Buyer, Seller, Money)")
-        LTransition t3 = propagateTransition(sale, t3b)
-        LTransition t4s = createTransition(sale, "delivers(Seller, Buyer, Good)")
-        LTransition t4 = propagateTransition(sale, t4s)
+        LPTransition t1s = createTransition(sale, "offers(Seller, Buyer, Good, Money)")
+        LPTransition t1 = propagateTransition(sale, t1s)
+        LPTransition t1b = propagateTransition(sale, t1)
+        LPTransition t2b = createTransition(sale, "accepts(Buyer, Seller, Good, Money)")
+        LPTransition t2 = propagateTransition(sale, t2b)
+        LPTransition t2s = propagateTransition(sale, t2)
+        LPTransition t3b = createTransition(sale, "pays(Buyer, Seller, Money)")
+        LPTransition t3 = propagateTransition(sale, t3b)
+        LPTransition t4s = createTransition(sale, "delivers(Seller, Buyer, Good)")
+        LPTransition t4 = propagateTransition(sale, t4s)
 
         bridgeTransitions(sale, tIn, t1s)
         bridgeTransitions(sale, t1b, t2b)

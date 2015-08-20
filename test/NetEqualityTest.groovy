@@ -1,5 +1,5 @@
 import org.leibnizcenter.lppneu.builders.LPPN2LPN
-import org.leibnizcenter.lppneu.comparison.Comparison
+import org.leibnizcenter.lppneu.comparison.NetComparison
 import org.leibnizcenter.lppneu.components.language.*
 import org.leibnizcenter.lppneu.parser.LPPNLoader
 import org.leibnizcenter.pneu.components.petrinet.Net
@@ -14,19 +14,19 @@ class NetEqualityTest extends GroovyTestCase {
     }
 
     void testNetEquality1() {
-        assert Comparison.compare(batchConvert("a."), batchConvert("a."))
+        assert NetComparison.compare(batchConvert("a."), batchConvert("a."))
     }
 
     void testNetUnEquality1() {
-        assert !Comparison.compare(batchConvert("a."), batchConvert("b."))
+        assert !NetComparison.compare(batchConvert("a."), batchConvert("b."))
     }
 
     void testNetEquality2() {
-        assert Comparison.compare(batchConvert("a. b."), batchConvert("b. a."))
+        assert NetComparison.compare(batchConvert("a. b."), batchConvert("b. a."))
     }
 
     void testNetUnEquality2() {
-        assert !Comparison.compare(batchConvert("a. b."), batchConvert("b. c."))
+        assert !NetComparison.compare(batchConvert("a. b."), batchConvert("b. c."))
     }
 
 //    void testNetEquality3() {
@@ -34,27 +34,27 @@ class NetEqualityTest extends GroovyTestCase {
 //    }
 
     void testNetUnEquality3() {
-        assert !Comparison.compare(batchConvert("a and b."), batchConvert("b and (b and a)."))
+        assert !NetComparison.compare(batchConvert("a and b."), batchConvert("b and (b and a)."))
     }
 
     void testNetUnEquality4() {
-        assert !Comparison.compare(batchConvert("a seq b."), batchConvert("b seq a."))
+        assert !NetComparison.compare(batchConvert("a seq b."), batchConvert("b seq a."))
     }
 
     void testNetEquality5() {
-        assert Comparison.compare(batchConvert("a :- b."), batchConvert("a :- b."))
+        assert NetComparison.compare(batchConvert("a :- b."), batchConvert("a :- b."))
     }
 
     void testNetUnEquality5() {
-        assert !Comparison.compare(batchConvert("a :- b."), batchConvert("b :- a."))
+        assert !NetComparison.compare(batchConvert("a :- b."), batchConvert("b :- a."))
     }
 
     void testNetEquality6() {
-        assert Comparison.compare(batchConvert("a -> b."), batchConvert("a -> b."))
+        assert NetComparison.compare(batchConvert("a -> b."), batchConvert("a -> b."))
     }
 
     void testNetUnEquality6() {
-        assert !Comparison.compare(batchConvert("a -> b."), batchConvert("b -> a."))
+        assert !NetComparison.compare(batchConvert("a -> b."), batchConvert("b -> a."))
     }
 
 //    void testNetEquality7() {

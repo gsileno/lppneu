@@ -125,8 +125,28 @@ class Expression {
         formula.toString()
     }
 
-    Operation toOperation() {
+    // get all the variables in the expression
+    List<Variable> getVariables() {
+        List<Variable> varList = []
+        for (situation in formula.inputPorts) {
+            List<Variable> localVarList = situation.getVariables()
+            varList = (varList - localVarList) + localVarList
+        }
+        varList
+    }
 
+    // get all the parameters in the expression
+    List<Parameter> getParameters() {
+        List<Parameter> paramList = []
+        for (situation in formula.inputPorts) {
+            List<Parameter> localParamList = situation.getParameters()
+            paramList = (paramList - localParamList) + localParamList
+        }
+        paramList
+    }
+
+    // transform the expression in operation (TODO: check for AND, etc.)
+    Operation toOperation() {
         List<Operation> inputOperations = []
 
         if (!formula.isAtomic()) {

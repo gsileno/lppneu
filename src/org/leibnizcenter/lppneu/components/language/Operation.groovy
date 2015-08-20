@@ -91,6 +91,16 @@ class Operation {
         )
     }
 
+    // get all the variables in the operation
+    List<Variable> getVariables() {
+        List<Variable> varList = []
+        for (event in formula.inputPorts) {
+            List<Variable> localVarList = event.getVariables()
+            varList = (varList - localVarList) + localVarList
+        }
+        varList
+    }
+
     Expression toExpression() {
 
         List<Expression> inputExpressions = []
@@ -109,40 +119,8 @@ class Operation {
 
     }
 
-    String toString(Operator superOperator = null) {
+    String toString() {
         formula.toString()
-//        String output = ""
-//
-//        Boolean printOp = (superOperator == null || formula.operator != superOperator)
-//
-//        if (printOp) {
-//            if (formula.operator == Operator.POS)
-//                output += "+"
-//            else if (formula.operator == Operator.NEG)
-//                output += "-"
-//            else if (formula.operator == Operator.NULL)
-//                output += "0"
-//            else
-//                output += formula.operator.toString()+"("
-//        }
-//
-//        if (formula.isAtomic()) {
-//            for (formula in formula.inputFormulas)
-//                output += formula.toString(formula.operator) + ", "
-//            output = output[0..-3]
-//        } else {
-//            for (Event term in formula.inputPorts) {
-//                output += term.toString() + ", "
-//            }
-//            output = output[0..-3]
-//        }
-//
-//        if (printOp && formula.operator != Operator.POS &&
-//                formula.operator != Operator.NEG &&
-//                formula.operator != Operator.NULL)
-//            output += ")"
-//
-//        output
     }
 
 }

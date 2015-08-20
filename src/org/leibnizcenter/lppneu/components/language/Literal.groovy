@@ -17,6 +17,16 @@ class Literal {
         new Literal(functor: functor, parameters: parameters)
     }
 
+    List<Variable> getVariables() {
+        List<Variable> variableList = []
+
+        for (parameter in parameters) {
+            if (parameter.variable)
+                variableList << parameter.variable
+        }
+        variableList
+    }
+
     String toString() {
         String output = functor.name
         if (parameters) {

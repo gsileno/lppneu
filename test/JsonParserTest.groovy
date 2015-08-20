@@ -1,4 +1,4 @@
-import org.leibnizcenter.lppneu.components.petrinets.LPlace
+import org.leibnizcenter.lppneu.components.lppetrinets.LPPlace
 import org.leibnizcenter.pneu.components.petrinet.Net
 import org.leibnizcenter.lppneu.parser.json2LPN
 
@@ -9,7 +9,7 @@ class JsonParserTest extends GroovyTestCase {
 
         assert net.subNets.size() == 1
         assert net.subNets[0].placeList.size() == 1
-        assert ((LPlace) net.subNets[0].placeList[0]).expression.toString() == "a"
+        assert ((LPPlace) net.subNets[0].placeList[0]).expression.toString() == "a"
     }
 
 }

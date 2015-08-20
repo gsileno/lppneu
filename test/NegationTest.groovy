@@ -1,5 +1,3 @@
-import org.leibnizcenter.lppneu.builders.LPPN2LPN
-import org.leibnizcenter.lppneu.comparison.Comparison
 import org.leibnizcenter.lppneu.components.language.Atom
 import org.leibnizcenter.lppneu.components.language.Event
 import org.leibnizcenter.lppneu.components.language.Expression
@@ -7,11 +5,7 @@ import org.leibnizcenter.lppneu.components.language.ExtLiteral
 import org.leibnizcenter.lppneu.components.language.Literal
 import org.leibnizcenter.lppneu.components.language.Operation
 import org.leibnizcenter.lppneu.components.language.Operator
-import org.leibnizcenter.lppneu.components.language.Polarity
-import org.leibnizcenter.lppneu.components.language.Program
 import org.leibnizcenter.lppneu.components.language.Situation
-import org.leibnizcenter.lppneu.parser.LPPNLoader
-import org.leibnizcenter.pneu.components.petrinet.Net
 
 class NegationTest extends GroovyTestCase {
 
