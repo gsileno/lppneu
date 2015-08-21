@@ -3,6 +3,7 @@ package org.leibnizcenter.lppneu.components.language
 import commons.base.Formula
 import groovy.transform.EqualsAndHashCode
 import groovy.util.logging.Log4j
+import org.leibnizcenter.lppneu.parser.LPPNLoader
 
 /**
  * Represents an expression of actions
@@ -117,6 +118,12 @@ class Operation {
 
         Expression.buildFromExpressions(inputExpressions, formula.operator)
 
+    }
+
+    // create an expression from string
+    static Operation parse(String code) {
+        // first create the expression and then transform it in a operation
+        return Expression.parse(code).toOperation()
     }
 
     String toString() {

@@ -2,6 +2,7 @@ package org.leibnizcenter.lppneu.examples
 
 import org.leibnizcenter.lppneu.components.language.Program
 import org.leibnizcenter.lppneu.components.language.Expression
+import org.leibnizcenter.lppneu.components.lppetrinets.LPNet
 import org.leibnizcenter.lppneu.components.lppetrinets.LPPlace
 import org.leibnizcenter.lppneu.components.lppetrinets.LPTransition
 import org.leibnizcenter.lppneu.parser.LPPNLoader
@@ -10,36 +11,6 @@ import org.leibnizcenter.pneu.components.petrinet.Arc
 import org.leibnizcenter.pneu.components.petrinet.Net
 
 class MarketModelsFactory {
-
-    static void batchExport(Net net, String filename) {
-
-        File folder
-        String outputFile
-
-        // textual log output
-
-        folder = new File('examples/out/log/')
-        if (!folder.exists()) folder.mkdirs()
-
-        outputFile = "examples/out/log/" + filename + ".log"
-
-        new File(outputFile).withWriter {
-            out -> out.println(net.toLog())
-        }
-
-        // dot output
-
-        folder = new File('examples/out/dot/')
-        if (!folder.exists()) folder.mkdirs()
-
-        outputFile = "examples/out/dot/" + filename + ".dot"
-
-        new File(outputFile).withWriter {
-            out -> out.println(PN2dot.simpleConversion(net))
-        }
-        println "lpetri net exported to " + outputFile
-
-    }
 
     static Expression parse(String code) {
         Program program = LPPNLoader.parseString(code + ".")
@@ -105,7 +76,7 @@ class MarketModelsFactory {
     }
 
     static Net basicSaleInstance1() {
-        Net sale = new Net()
+        Net sale = new LPNet()
 
         sale.function = createTransition("sells(Seller, Good, Money, Buyer)")
 
@@ -127,7 +98,7 @@ class MarketModelsFactory {
     }
 
     static Net basicSaleInstance2() {
-        Net sale = new Net()
+        Net sale = new LPNet()
 
         sale.function = createTransition("sells(Seller, Good, Money, Buyer)")
 
@@ -149,7 +120,7 @@ class MarketModelsFactory {
     }
 
     static Net basicSaleModel() {
-        Net sale = new Net()
+        Net sale = new LPNet()
 
         sale.function = createTransition("sells(Seller, Good, Money, Buyer)")
 
@@ -172,7 +143,7 @@ class MarketModelsFactory {
     }
 
     static Net basicSaleWith2Parties() {
-        Net sale = new Net()
+        Net sale = new LPNet()
 
         sale.function = createTransition("sells(Seller, Good, Money, Buyer)")
 
@@ -198,7 +169,7 @@ class MarketModelsFactory {
     }
 
     static Net basicSaleWithWorld() {
-        Net sale = new Net()
+        Net sale = new LPNet()
 
         sale.function = createTransition("sells(Seller, Good, Money, Buyer)")
 
@@ -228,7 +199,7 @@ class MarketModelsFactory {
     }
 
     static Net basicSaleWithWorldAndTimeline() {
-        Net sale = new Net()
+        Net sale = new LPNet()
 
         sale.function = createTransition("sells(Seller, Good, Money, Buyer)")
 

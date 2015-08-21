@@ -14,7 +14,7 @@ class ConversionLPPN2LPNTest extends GroovyTestCase {
         String outputFile = "examples/out/dot/" + filename + ".dot"
 
         new File(outputFile).withWriter {
-            out -> out.println(PN2dot.simpleConversion(net))
+            out -> out.println(PN2dot.convert(net))
         }
         println "lpetri net exported to " + outputFile
     }

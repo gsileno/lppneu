@@ -6,7 +6,7 @@ import groovy.util.logging.Log4j
 @Log4j @EqualsAndHashCode
 class Situation {
     Polarity polarity
-    PositionRef positionRef
+    AbstractPositionRef positionRef
     Literal rootLiteral
 
     static Situation build(Literal literal, Polarity polarity = Polarity.POS) {
@@ -45,7 +45,7 @@ class Situation {
         }
     }
 
-    static Situation build(PositionRef positionRef, Polarity polarity = Polarity.POS) {
+    static Situation build(AbstractPositionRef positionRef, Polarity polarity = Polarity.POS) {
         new Situation(
                 polarity: polarity,
                 positionRef: positionRef

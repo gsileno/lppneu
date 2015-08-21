@@ -17,14 +17,12 @@ class LPPlace extends Place {
     String toString() {
         if (expression != null) expression.toString() // + " LPlace@"+hashCode()
         else if (link) "*"
-        else if (name) name // + "LPlace@"+hashCode()
         else ""
     }
 
-    String toMinString() {
+    String label() {
         if (expression != null) expression.toString() // + " LPlace@"+hashCode()
         else if (link) "*"
-        else if (name) name // + " LPlace@"+hashCode()
         else ""
     }
 
@@ -39,11 +37,14 @@ class LPPlace extends Place {
 
     LPPlace clone() {
         return new LPPlace(
-                name: name,
                 marking: marking.collect(),
                 expression: expression,
                 link: link
         )
+    }
+
+    static Boolean compare(Place p1, Place p2) {
+        return compare((LPPlace) p1, (LPPlace) p2)
     }
 
     static Boolean compare(LPPlace p1, LPPlace p2) {

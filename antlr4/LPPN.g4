@@ -120,7 +120,6 @@ IS_EQUIVALENT_TO : '::-' | ':=' | '::=' ;
 WHEN : ':' | 'in' ;
 PLUS : '+' ;
 MINUS : '-' ; // both for strong negation and arithmetic deletion
-
 TILDE : '~' ; // used for the union between default and strong
 
 DOT : '.' ;

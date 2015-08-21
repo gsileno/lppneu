@@ -30,7 +30,7 @@ class TransitionAnchoringTest extends GroovyTestCase {
         outputFile = "log/dot/" + filename + ".dot"
 
         new File(outputFile).withWriter {
-            out -> out.println(PN2dot.simpleConversion(net))
+            out -> out.println(PN2dot.convert(net))
         }
         println "lpetri net exported to " + outputFile
 
@@ -40,9 +40,9 @@ class TransitionAnchoringTest extends GroovyTestCase {
         Program program = LPPNLoader.parseString(code)
         LPPN2LPN conversion = new LPPN2LPN()
 //        Net net = LPPN2LPN.buildProgramNet(program)
-//        conversion.mapNet(net)
-//        conversion.tripleAnchoredNet = conversion.tripleAnchoringNet(net)
-//        conversion.transitionAnchoredNet = conversion.transitionAnchoringNet(conversion.tripleAnchoredNet)
+//        convert.mapNet(net)
+//        convert.tripleAnchoredNet = convert.tripleAnchoringNet(net)
+//        convert.transitionAnchoredNet = convert.transitionAnchoringNet(convert.tripleAnchoredNet)
 
         conversion.convert(program)
         return conversion
@@ -50,33 +50,33 @@ class TransitionAnchoringTest extends GroovyTestCase {
 
 //
 //    void testConversionBasicFact() {
-//        LPPN2LPN conversion = batchConvert("p.")
-//        assert conversion.expressionTripleMap.size() == 1 // p
+//        LPPN2LPN convert = batchConvert("p.")
+//        assert convert.expressionTripleMap.size() == 1 // p
 //    }
 //
 //    void testConversionCompoundLogicFact() {
-//        LPPN2LPN conversion = batchConvert("p or q.")
-//        assert conversion.expressionTripleMap.size() == 3 // p, q, and p or q
+//        LPPN2LPN convert = batchConvert("p or q.")
+//        assert convert.expressionTripleMap.size() == 3 // p, q, and p or q
 //    }
 //
 //    void testConversionParFact() {
-//        LPPN2LPN conversion = batchConvert("p par q.")
-//        assert conversion.expressionTripleMap.size() == 5 // p, q, or(neg(p), null(p)), or(neg(q), null(p)), par(p, q)
+//        LPPN2LPN convert = batchConvert("p par q.")
+//        assert convert.expressionTripleMap.size() == 5 // p, q, or(neg(p), null(p)), or(neg(q), null(p)), par(p, q)
 //    }
 
     void testConversionSimpleLogicRule() {
         LPPN2LPN conversion = batchConvert("p -> q.")
-        // assert conversion.expressionTripleMap.size() == 2 // p, q.
+        // assert convert.expressionTripleMap.size() == 2 // p, q.
     }
 
 //    void testConversionLogicRuleAndFact() {
-//        LPPN2LPN conversion = batchConvert("q :- p. p.")
-//        assert conversion.expressionTripleMap.size() == 2 // p, q.
+//        LPPN2LPN convert = batchConvert("q :- p. p.")
+//        assert convert.expressionTripleMap.size() == 2 // p, q.
 //    }
 //
 //    void testConversionSimpleCausalRule() {
-//        LPPN2LPN conversion = batchConvert("a -> b.")
-//        assert conversion.expressionTripleMap.size() == 4 // a, b, occurs(a), or(neg(a), null(a))
+//        LPPN2LPN convert = batchConvert("a -> b.")
+//        assert convert.expressionTripleMap.size() == 4 // a, b, occurs(a), or(neg(a), null(a))
 //    }
 
 }

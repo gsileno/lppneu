@@ -23,13 +23,36 @@ class LPTransition extends Transition {
     // if they are just synchronization places
     Boolean link = false
 
+    String toString() {
+        if (operation != null) {
+            operation.toString() // + " LTransition@"+hashCode()
+        } else if (operator != null) {
+            return operator.toString() // + " LTransition@"+hashCode()
+        } else if (link) {
+            "*"
+        } else {
+            ""
+        }
+    }
+
+    String label() {
+        toString()
+    }
+
+    Boolean isLink() {
+        return link
+    }
+
     LPTransition clone() {
         return new LPTransition(
-                name: name,
                 operation: operation,
                 operator: operator,
                 link: link
         )
+    }
+
+    static Boolean compare(Transition t1, Transition t2) {
+        return compare((LPTransition) t1, (LPTransition) t2)
     }
 
     static Boolean compare(LPTransition t1, LPTransition t2) {
@@ -69,7 +92,7 @@ class LPTransition extends Transition {
                 // if it is already in the list of variables, add to the filter
                 if (allVarList.contains(var)) {
                     commonVarList << var
-                // otherwise add it to the list of variables
+                    // otherwise add it to the list of variables
                 } else {
                     allVarList << var
                 }
@@ -78,6 +101,11 @@ class LPTransition extends Transition {
     }
 
     // Operational Semantics
+
+    Boolean isEnabledIncludingEmission() {
+        isEnabled()
+    }
+
     Boolean isEnabled() {
 
         // initialize filter to unify tokens
@@ -131,21 +159,20 @@ class LPTransition extends Transition {
     }
 
     void fire() {
-        List<LPToken> tokens = consumeInputTokens()
-        produceOutputTokens(tokens)
+        consumeInputTokens()
+        produceOutputTokens()
     }
 
-    List<LPToken> consumeInputTokens() {
+    void consumeInputTokens() {
         List<LPToken> tokens = []
         for (elem in inputs) {
-            for (int i=0; i<elem.weight; i++) {
+            for (int i = 0; i < elem.weight; i++) {
                 tokens << ((LPPlace) elem.source).marking.pop()
             }
         }
-        return tokens
     }
 
-    void produceOutputTokens(List<Token> tokens) {
+    void produceOutputTokens() {
         for (elem in outputs) {
             if (elem.type == ArcType.NORMAL) {
                 if (elem.weight > 1)
@@ -156,24 +183,6 @@ class LPTransition extends Transition {
                 ((LPPlace) elem.target).flush()
             }
         }
-    }
-
-    String toString() {
-        if (operation != null) {
-            operation.toString() // + " LTransition@"+hashCode()
-        } else if (operator != null) {
-            return operator.toString() // + " LTransition@"+hashCode()
-        } else if (link) {
-            "*"
-        } else if (name) {
-            name // + " LTransition@"+hashCode()
-        } else {
-            ""
-        }
-    }
-
-    Boolean isLink() {
-        return link
     }
 
 }

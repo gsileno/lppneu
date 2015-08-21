@@ -5,7 +5,7 @@ import groovy.transform.EqualsAndHashCode
 import groovy.util.logging.Log4j
 
 @Log4j @EqualsAndHashCode @AutoClone
-class PositionRef {
+abstract class AbstractPositionRef {
 
     Expression label
 

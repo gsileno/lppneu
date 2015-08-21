@@ -6,9 +6,9 @@ import groovy.util.logging.Log4j
 @Log4j @EqualsAndHashCode
 class Event {
     Operator operator
-    PositionRef positionRef
+    AbstractPositionRef positionRef
     Literal rootLiteral
-    Position position
+    AbstractPosition position
 
     static Event build(ExtLiteral extLiteral) {
         new Event(
@@ -24,14 +24,14 @@ class Event {
         )
     }
 
-    static Event build(PositionRef positionRef, Operator operator = Operator.POS) {
+    static Event build(AbstractPositionRef positionRef, Operator operator = Operator.POS) {
         new Event(
                 operator: operator,
                 positionRef: positionRef
         )
     }
 
-    static Event build(Position position, Operator operator = Operator.POS) {
+    static Event build(AbstractPosition position, Operator operator = Operator.POS) {
         new Event(
                 operator: operator,
                 position: position

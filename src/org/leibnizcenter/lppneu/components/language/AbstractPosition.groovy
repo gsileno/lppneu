@@ -4,13 +4,13 @@ import groovy.transform.EqualsAndHashCode
 import groovy.util.logging.Log4j
 
 @Log4j @EqualsAndHashCode
-class Position {
+abstract class AbstractPosition {
 
-    Position parent
+    AbstractPosition parent
 
     Boolean instantiated
 
-    PositionRef ref
+    AbstractPositionRef ref
 
     String print() {
         String output = ""
@@ -24,26 +24,26 @@ class Position {
         output
     }
 
-    Position negate() {
-        Position negated = this.clone()
+    AbstractPosition negate() {
+        AbstractPosition negated = this.clone()
         negated.ref.label = negated.ref.label.negate()
         negated
     }
 
-    Position nullify() {
-        Position nullified = this.clone()
+    AbstractPosition nullify() {
+        AbstractPosition nullified = this.clone()
         nullified.ref.label = nullified.ref.label.nullify()
         nullified
     }
 
-    Position positive() {
-        Position positive = this.clone()
+    AbstractPosition positive() {
+        AbstractPosition positive = this.clone()
         positive.ref.label = positive.ref.label.positive()
         positive
     }
 
-    Position negative() {
-        Position negative = this.clone()
+    AbstractPosition negative() {
+        AbstractPosition negative = this.clone()
         negative.ref.label = negative.ref.label.negative()
         negative
     }

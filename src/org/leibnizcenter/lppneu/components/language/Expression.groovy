@@ -2,6 +2,7 @@ package org.leibnizcenter.lppneu.components.language
 
 import commons.base.Formula
 import groovy.transform.EqualsAndHashCode
+import org.leibnizcenter.lppneu.parser.LPPNLoader
 
 @EqualsAndHashCode
 class Expression {
@@ -161,5 +162,20 @@ class Expression {
 
         Operation.buildFromOperations(inputOperations, formula.operator)
 
+    }
+
+    // create an expression from string
+    static Expression parse(String code) {
+
+        // I force the expression as a fact, and then parse it as a program
+        Program program = LPPNLoader.parseString(code + ".")
+
+        if (program.parsingErrors.size() > 0)
+            throw new RuntimeException("Parsing errors: " + program.parsingErrors)
+
+        if (program.logicRules.size() > 1 || program.logicRules.size() == 0 || program.causalRules.size() != 0 || program.logicRules[0].body != null)
+            throw new RuntimeException("Invalid input: only simple facts expected.")
+
+        return program.logicRules[0].head
     }
 }

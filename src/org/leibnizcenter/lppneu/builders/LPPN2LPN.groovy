@@ -4,6 +4,7 @@ import commons.base.Formula
 import groovy.util.logging.Log4j
 import org.leibnizcenter.lppneu.comparison.NetComparison
 import org.leibnizcenter.lppneu.components.language.*
+import org.leibnizcenter.lppneu.components.lppetrinets.LPNet
 import org.leibnizcenter.lppneu.components.lppetrinets.LPPlace
 import org.leibnizcenter.lppneu.components.lppetrinets.LPTransition
 import org.leibnizcenter.pneu.builders.PN2dot
@@ -91,7 +92,7 @@ class LPPN2LPN {
     static Net minimalNetClone(Net source, Map<Net, Net> sourceCloneMap = [:]) {
 
         if (!sourceCloneMap[source]) {
-            sourceCloneMap[source] = new Net(transitionList: source.transitionList.collect(),
+            sourceCloneMap[source] = new LPNet(transitionList: source.transitionList.collect(),
                     placeList: source.placeList.collect(),
                     arcList: source.arcList.collect(),
                     inputs: source.inputs.collect(),
@@ -127,30 +128,8 @@ class LPPN2LPN {
 
     static void batchExport(Net net, String filename) {
 
-        File folder
-        String outputFile
-
-        // textual log output
-
-        folder = new File('logs/log')
-        if (!folder.exists()) folder.mkdirs()
-
-        outputFile = "logs/log/" + filename + ".log"
-
-        new File(outputFile).withWriter {
-            out -> out.println(net.toLog())
-        }
-
-        // dot output
-
-        folder = new File('logs/dot')
-        if (!folder.exists()) folder.mkdirs()
-
-        outputFile = "logs/dot/" + filename + ".dot"
-
-        new File(outputFile).withWriter {
-            out -> out.println(PN2dot.simpleConversion(net))
-        }
+        net.exportToLog(filename)
+        net.exportToDot(filename)
 
     }
 
@@ -262,7 +241,7 @@ class LPPN2LPN {
             // if at least a trnasition is attached you have to create it, as it is useful for the triple
             if (triple.posTransitionList.size() > 0 || triple.negTransitionList.size() > 0) {
 
-                Net subNet = new Net(function: new LPPlace(expression: Expression.build(coupling.key, Operator.ASSOCIATION)))
+                Net subNet = new LPNet(function: new LPPlace(expression: Expression.build(coupling.key, Operator.ASSOCIATION)))
 
                 LPTransition tNexus
                 LPPlace pNexus
@@ -565,7 +544,7 @@ class LPPN2LPN {
     static Net buildProgramNet(Program source) {
 
         // reset net and maps
-        Net net = new Net()
+        Net net = new LPNet()
 
         // reduce it, decomposing compound formulas
         Program reducedProgram = source.reduce()
@@ -609,7 +588,7 @@ class LPPN2LPN {
 
 
     static Net buildConstraintNet(Formula<Situation> constraint) {
-        Net net = new Net()
+        Net net = new LPNet()
 
         // TODO
         throw new RuntimeException()
@@ -629,10 +608,10 @@ class LPPN2LPN {
         Expression bodyExpression = Expression.build(body)
 
         if (!biconditional) {
-            net = new Net(function: new LPPlace(expression:
+            net = new LPNet(function: new LPPlace(expression:
                     Expression.build(bodyExpression, headExpression, Operator.IMPLIES)))
         } else {
-            net = new Net(function: new LPPlace(expression:
+            net = new LPNet(function: new LPPlace(expression:
                     Expression.build(bodyExpression, headExpression, Operator.DEFINES)))
         }
 
@@ -690,7 +669,7 @@ class LPPN2LPN {
 
     static Net buildSeqExpressionNet(Formula<Situation> formula) {
 
-        Net net = new Net(function: new LPPlace(expression: Expression.build(formula)))
+        Net net = new LPNet(function: new LPPlace(expression: Expression.build(formula)))
 
         List<Expression> seqInputs = []
 
@@ -738,7 +717,7 @@ class LPPN2LPN {
 
 //    static Net buildSeqExpressionNet(Formula<Situation> formula) {
 //
-//        Net net = new Net(function: new LPlace(expression: Expression.build(formula)))
+//        Net net = new LPNet(function: new LPlace(expression: Expression.build(formula)))
 //
 //        LPlace pOut
 //        LTransition tIn
@@ -799,7 +778,7 @@ class LPPN2LPN {
             return buildSeqExpressionNet(formula)
         }
 
-        Net net = new Net(function: new LPPlace(expression: Expression.build(formula)))
+        Net net = new LPNet(function: new LPPlace(expression: Expression.build(formula)))
 
         LPPlace pOut = new LPPlace(expression: Expression.build(formula))
 
@@ -846,7 +825,7 @@ class LPPN2LPN {
     }
 
     static Net buildExpressionNet(Formula<Situation> formula) {
-        Net net = new Net(function: new LPPlace(expression: Expression.build(formula)))
+        Net net = new LPNet(function: new LPPlace(expression: Expression.build(formula)))
 
         LPPlace pOut = new LPPlace(expression: Expression.build(formula))
         net.placeList += [pOut]
@@ -881,7 +860,7 @@ class LPPN2LPN {
     }
 
     static Net buildEventConditionNet(Formula<Situation> formula) {
-        Net net = new Net(function: new LPPlace(expression: Expression.build(formula)))
+        Net net = new LPNet(function: new LPPlace(expression: Expression.build(formula)))
 
         if (formula.operator != Operator.OCCURS && formula.operator != Operator.OCCURS_IN) {
             throw new RuntimeException("Wrong operator: expecting OCCURS, or OCCURS_IN, found ${formula.operator}.")
@@ -923,7 +902,7 @@ class LPPN2LPN {
     }
 
     static Net buildEventNet(Event event) {
-        Net net = new Net(function: new LPTransition(operation: Operation.build(event)))
+        Net net = new LPNet(function: new LPTransition(operation: Operation.build(event)))
         LPTransition t = new LPTransition(operation: Operation.build(event))
         net.transitionList += [t]
 
@@ -935,7 +914,7 @@ class LPPN2LPN {
     }
 
     static Net buildSeqOperationNet(Formula<Event> formula) {
-        Net net = new Net(function: new LPTransition(operation: Operation.build(formula)))
+        Net net = new LPNet(function: new LPTransition(operation: Operation.build(formula)))
         LPTransition t
         LPPlace p
 
@@ -978,7 +957,7 @@ class LPPN2LPN {
     }
 
     static Net buildParOperationNet(Formula<Event> formula) {
-        Net net = new Net(function: new LPTransition(operation: Operation.build(formula)))
+        Net net = new LPNet(function: new LPTransition(operation: Operation.build(formula)))
         LPTransition tIn = new LPTransition(link: true, name: "start")
         LPTransition tOut = new LPTransition(link: true, name: "end")
         net.transitionList += [tIn, tOut]
@@ -1010,7 +989,7 @@ class LPPN2LPN {
     }
 
     static Net buildAltOperationNet(Formula<Event> formula) {
-        Net net = new Net(function: new LPTransition(operation: Operation.build(formula)))
+        Net net = new LPNet(function: new LPTransition(operation: Operation.build(formula)))
 
         LPTransition tIn = new LPTransition(link: true, name: "start")
         LPTransition tOut = new LPTransition(link: true, name: "end")
@@ -1093,7 +1072,7 @@ class LPPN2LPN {
             antecedent = condition
         }
 
-        Net net = new Net()
+        Net net = new LPNet()
 
         // create antecedent
         Net triggerNet = buildExpressionNet(antecedent)
@@ -1136,7 +1115,7 @@ class LPPN2LPN {
     // pos(neg p) => neg p
 
     static Net buildTripleNet(Expression expression) {
-        Net net = new Net(function: new LPPlace(expression: Expression.build(expression, Operator.TRIPLE)))
+        Net net = new LPNet(function: new LPPlace(expression: Expression.build(expression, Operator.TRIPLE)))
 
         Triple pTriple = Triple.build(expression)
         LPPlace pPlace = new LPPlace(expression: pTriple.positive)

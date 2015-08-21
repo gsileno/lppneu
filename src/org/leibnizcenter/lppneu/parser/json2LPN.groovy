@@ -3,6 +3,7 @@ package org.leibnizcenter.lppneu.parser
 import groovy.io.FileType
 import groovy.json.JsonSlurper
 import org.leibnizcenter.lppneu.components.language.Expression
+import org.leibnizcenter.lppneu.components.lppetrinets.LPNet
 import org.leibnizcenter.lppneu.components.lppetrinets.LPPlace
 import org.leibnizcenter.lppneu.components.lppetrinets.LPTransition
 import org.leibnizcenter.pneu.components.petrinet.*
@@ -42,7 +43,7 @@ class json2LPN {
             return netMap[records["id"].toString()]
         }
 
-        Net net = new Net()
+        Net net = new LPNet()
 
         if (records["cluster"]) {
 
