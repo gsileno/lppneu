@@ -168,7 +168,7 @@ class Expression {
     static Expression parse(String code) {
 
         // I force the expression as a fact, and then parse it as a program
-        Program program = LPPNLoader.parseString(code + ".")
+        LPPNProgram program = LPPNLoader.parseString(code + ".")
 
         if (program.parsingErrors.size() > 0)
             throw new RuntimeException("Parsing errors: " + program.parsingErrors)

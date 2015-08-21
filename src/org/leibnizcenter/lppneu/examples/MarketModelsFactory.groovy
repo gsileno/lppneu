@@ -1,19 +1,23 @@
 package org.leibnizcenter.lppneu.examples
 
-import org.leibnizcenter.lppneu.components.language.Program
+import org.leibnizcenter.lppneu.components.language.LPPNProgram
 import org.leibnizcenter.lppneu.components.language.Expression
 import org.leibnizcenter.lppneu.components.lppetrinets.LPNet
 import org.leibnizcenter.lppneu.components.lppetrinets.LPPlace
 import org.leibnizcenter.lppneu.components.lppetrinets.LPTransition
 import org.leibnizcenter.lppneu.parser.LPPNLoader
-import org.leibnizcenter.pneu.builders.PN2dot
 import org.leibnizcenter.pneu.components.petrinet.Arc
 import org.leibnizcenter.pneu.components.petrinet.Net
 
 class MarketModelsFactory {
 
+    static void batchExport(Net net, String filename) {
+        net.exportToDot(filename)
+        net.exportToLog(filename)
+    }
+
     static Expression parse(String code) {
-        Program program = LPPNLoader.parseString(code + ".")
+        LPPNProgram program = LPPNLoader.parseString(code + ".")
 
         if (program.parsingErrors.size() > 0)
             throw new RuntimeException("Parsing errors: " + program.parsingErrors)

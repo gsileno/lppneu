@@ -4,7 +4,7 @@ import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
-import org.leibnizcenter.lppneu.components.language.Program;
+import org.leibnizcenter.lppneu.components.language.LPPNProgram;
 
 import java.io.*;
 
@@ -12,7 +12,7 @@ public class LPPNLoader {
 
     public LPPNLoader() {}
 
-    public static Program parseString(String text) {
+    public static LPPNProgram parseString(String text) {
 
         InputStream is = null;
 
@@ -25,7 +25,7 @@ public class LPPNLoader {
         return parse(is);
     }
 
-    public static Program parseFile(String filename) throws FileNotFoundException {
+    public static LPPNProgram parseFile(String filename) throws FileNotFoundException {
 
         InputStream is = null;
 
@@ -35,10 +35,10 @@ public class LPPNLoader {
     }
 
 
-    static Program parse(InputStream is) {
+    static LPPNProgram parse(InputStream is) {
 
         ANTLRInputStream input = null;
-        Program program = new Program();
+        LPPNProgram program = new LPPNProgram();
 
         try {
             input = new ANTLRInputStream(is);

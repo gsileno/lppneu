@@ -1,5 +1,5 @@
 import org.leibnizcenter.lppneu.builders.LPPN2LPN
-import org.leibnizcenter.lppneu.components.language.Program
+import org.leibnizcenter.lppneu.components.language.LPPNProgram
 import org.leibnizcenter.lppneu.parser.LPPNLoader
 import org.leibnizcenter.pneu.builders.PN2dot
 import org.leibnizcenter.pneu.components.petrinet.Net
@@ -37,7 +37,7 @@ class TransitionAnchoringTest extends GroovyTestCase {
     }
 
     static LPPN2LPN batchConvert(String code) {
-        Program program = LPPNLoader.parseString(code)
+        LPPNProgram program = LPPNLoader.parseString(code)
         LPPN2LPN conversion = new LPPN2LPN()
 //        Net net = LPPN2LPN.buildProgramNet(program)
 //        convert.mapNet(net)

@@ -1,7 +1,7 @@
 
 
 import groovy.io.FileType
-import org.leibnizcenter.lppneu.components.language.Program
+import org.leibnizcenter.lppneu.components.language.LPPNProgram
 import org.leibnizcenter.lppneu.parser.LPPNLoader
 
 class LPPNParserTest extends GroovyTestCase {
@@ -14,7 +14,7 @@ class LPPNParserTest extends GroovyTestCase {
 
         for (filename in files) {
             print "Testing file \"$path/$filename\"..."
-            Program program = LPPNLoader.parseFile(path+"/"+filename)
+            LPPNProgram program = LPPNLoader.parseFile(path+"/"+filename)
 
             if (program.parsingErrors.size() == 0) {
                 println " ok."

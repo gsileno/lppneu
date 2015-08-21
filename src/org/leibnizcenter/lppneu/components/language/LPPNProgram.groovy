@@ -4,7 +4,7 @@ import commons.base.Formula
 import groovy.util.logging.Log4j
 
 @Log4j
-class Program {
+class LPPNProgram {
 
     List<String> parsingErrors = []
     List<LogicRule> logicRules = []
@@ -12,7 +12,7 @@ class Program {
 
     Map<Expression, Expression> reducedExpressionMap = [:]
 
-    Program() {}
+    LPPNProgram() {}
 
     void print() {
         println(toLog())
@@ -128,9 +128,9 @@ class Program {
 
     }
 
-    Program reduce() {
+    LPPNProgram reduce() {
 
-        Program reducedProgram = new Program()
+        LPPNProgram reducedProgram = new LPPNProgram()
 
         for (logicRule in logicRules) {
 

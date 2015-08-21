@@ -1,5 +1,5 @@
 import org.leibnizcenter.lppneu.builders.LPPN2LPN
-import org.leibnizcenter.lppneu.components.language.Program
+import org.leibnizcenter.lppneu.components.language.LPPNProgram
 import org.leibnizcenter.lppneu.parser.LPPNLoader
 import org.leibnizcenter.pneu.builders.PN2dot
 import org.leibnizcenter.pneu.components.petrinet.Net
@@ -7,33 +7,8 @@ import org.leibnizcenter.pneu.components.petrinet.Net
 class DotBuilderTest extends GroovyTestCase {
 
     static void batchExport(Net net, String filename) {
-
-        File folder
-        String outputFile
-
-        // textual log output
-
-        folder = new File('examples/out/log/')
-        if (!folder.exists()) folder.mkdirs()
-
-        outputFile = "examples/out/log/" + filename + ".log"
-
-        new File(outputFile).withWriter {
-            out -> out.println(net.toLog())
-        }
-
-        // dot output
-
-        folder = new File('examples/out/dot/')
-        if (!folder.exists()) folder.mkdirs()
-
-        outputFile = "examples/out/dot/" + filename + ".dot"
-
-        new File(outputFile).withWriter {
-            out -> out.println(PN2dot.convert(net))
-        }
-        println "lpetri net exported to " + outputFile
-
+        net.exportToDot(filename)
+        net.exportToLog(filename)
     }
 
     static void batchExport(LPPN2LPN conversion, String filename) {
@@ -46,7 +21,7 @@ class DotBuilderTest extends GroovyTestCase {
     }
 
     static LPPN2LPN batchConvert(String code) {
-        Program program = LPPNLoader.parseString(code)
+        LPPNProgram program = LPPNLoader.parseString(code)
         LPPN2LPN conversion = new LPPN2LPN()
         conversion.convert(program)
         return conversion

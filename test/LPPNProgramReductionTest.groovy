@@ -3,7 +3,7 @@
 import org.leibnizcenter.lppneu.components.language.*
 import org.leibnizcenter.lppneu.parser.LPPNLoader
 
-class ProgramReductionTest extends GroovyTestCase {
+class LPPNProgramReductionTest extends GroovyTestCase {
 
     Literal literalP = Literal.build(Atom.build("p"))
     Literal literalQ = Literal.build(Atom.build("q"))
@@ -29,104 +29,104 @@ class ProgramReductionTest extends GroovyTestCase {
             ], Operator.AND)
 
     void testReduceComplexExpression() {
-        Program program = new Program()
+        LPPNProgram program = new LPPNProgram()
         program.reduceExpression(complexExpression.formula)
         assert program.reducedExpressionMap.size() == 5
     }
 
     void testReduceFact() {
-        Program program = LPPNLoader.parseString("a or b.")
+        LPPNProgram program = LPPNLoader.parseString("a or b.")
         assert program.logicRules.size() == 1
 
-        Program reducedProgram = program.reduce()
+        LPPNProgram reducedProgram = program.reduce()
         assert reducedProgram.logicRules.size() == 1
     }
 
     void testReduceCompoundFact() {
-        Program program = LPPNLoader.parseString("a or (c and b).")
+        LPPNProgram program = LPPNLoader.parseString("a or (c and b).")
         assert program.logicRules.size() == 1
 
-        Program reducedProgram = program.reduce()
+        LPPNProgram reducedProgram = program.reduce()
         assert reducedProgram.logicRules.size() == 2
     }
 
     void testReduceCompoundFact2() {
-        Program program = LPPNLoader.parseString("a and (a and b).")
+        LPPNProgram program = LPPNLoader.parseString("a and (a and b).")
         assert program.logicRules.size() == 1
 
-        Program reducedProgram = program.reduce()
+        LPPNProgram reducedProgram = program.reduce()
         assert reducedProgram.logicRules.size() == 2
     }
 
     void testReduceProcessFact() {
-        Program program = LPPNLoader.parseString("a seq b.")
+        LPPNProgram program = LPPNLoader.parseString("a seq b.")
         assert program.logicRules.size() == 1
 
-        Program reducedProgram = program.reduce()
+        LPPNProgram reducedProgram = program.reduce()
         assert reducedProgram.logicRules.size() == 1
     }
 
     void testReduceCompoundProcessFact() {
-        Program program = LPPNLoader.parseString("a seq (b par c).")
+        LPPNProgram program = LPPNLoader.parseString("a seq (b par c).")
         assert program.logicRules.size() == 1
 
-        Program reducedProgram = program.reduce()
+        LPPNProgram reducedProgram = program.reduce()
         assert reducedProgram.logicRules.size() == 2
     }
 
     void testReduceCompoundProcessFact2() {
-        Program program = LPPNLoader.parseString("a seq (a seq c).")
+        LPPNProgram program = LPPNLoader.parseString("a seq (a seq c).")
         assert program.logicRules.size() == 1
 
-        Program reducedProgram = program.reduce()
+        LPPNProgram reducedProgram = program.reduce()
         assert reducedProgram.logicRules.size() == 2
     }
 
     void testReduceLogicRule() {
-        Program program = new Program()
+        LPPNProgram program = new LPPNProgram()
         program.logicRules << new LogicRule(head: expressionPANDQ, body: expressionPANDQXORQ)
 
         assert program.logicRules.size() == 1
-        Program reducedProgram = program.reduce()
+        LPPNProgram reducedProgram = program.reduce()
         assert reducedProgram.logicRules.size() == 2
     }
 
     void testReduceLogicRule2() {
-        Program program = LPPNLoader.parseString("(a and b) seq ((a and b) and (a or b)) :- p.")
+        LPPNProgram program = LPPNLoader.parseString("(a and b) seq ((a and b) and (a or b)) :- p.")
         assert program.logicRules.size() == 1
 
         print program.logicRules
 
-        Program reducedProgram = program.reduce()
+        LPPNProgram reducedProgram = program.reduce()
         assert reducedProgram.logicRules.size() == 4
     }
 
     void testReduceCausalRule() {
-        Program program = LPPNLoader.parseString("a and b -> p.")
+        LPPNProgram program = LPPNLoader.parseString("a and b -> p.")
         assert program.logicRules.size() == 0
         assert program.causalRules.size() == 1
 
-        Program reducedProgram = program.reduce()
+        LPPNProgram reducedProgram = program.reduce()
         assert reducedProgram.logicRules.size() == 0
         assert reducedProgram.causalRules.size() == 1
     }
 
     void testReduceCausalRule2() {
-        Program program = LPPNLoader.parseString("(a and b) seq ((a and b) and (a or b)) -> p.")
+        LPPNProgram program = LPPNLoader.parseString("(a and b) seq ((a and b) and (a or b)) -> p.")
         assert program.logicRules.size() == 0
         assert program.causalRules.size() == 1
 
-        Program reducedProgram = program.reduce()
+        LPPNProgram reducedProgram = program.reduce()
         assert reducedProgram.logicRules.size() == 3
         assert reducedProgram.causalRules.size() == 1
     }
 
     void testReduceYaleShooting() {
-        Program program = LPPNLoader.parseFile("examples/basic/yaleshooting.lppn")
+        LPPNProgram program = LPPNLoader.parseFile("examples/basic/yaleshooting.lppn")
         assert program.logicRules.size() == 2
         assert program.causalRules.size() == 3
 
-        Program reducedProgram = program.reduce()
+        LPPNProgram reducedProgram = program.reduce()
         assert reducedProgram.logicRules.size() == 3
         assert reducedProgram.causalRules.size() == 3
     }

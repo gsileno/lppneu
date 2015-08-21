@@ -2,6 +2,8 @@ package org.leibnizcenter.lppneu.components.language
 
 import groovy.transform.EqualsAndHashCode
 import groovy.util.logging.Log4j
+import org.leibnizcenter.lppneu.components.position.AbstractPosition
+import org.leibnizcenter.lppneu.components.position.AbstractPositionRef
 
 @Log4j @EqualsAndHashCode
 class Event {

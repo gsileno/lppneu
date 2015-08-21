@@ -2,12 +2,13 @@ package org.leibnizcenter.lppneu.builders
 
 import commons.base.Formula
 import groovy.util.logging.Log4j
-import org.leibnizcenter.lppneu.comparison.NetComparison
 import org.leibnizcenter.lppneu.components.language.*
 import org.leibnizcenter.lppneu.components.lppetrinets.LPNet
 import org.leibnizcenter.lppneu.components.lppetrinets.LPPlace
 import org.leibnizcenter.lppneu.components.lppetrinets.LPTransition
-import org.leibnizcenter.pneu.builders.PN2dot
+import org.leibnizcenter.lppneu.components.mapper.Mapper
+import org.leibnizcenter.lppneu.components.position.AbstractTriple
+import org.leibnizcenter.lppneu.components.position.FactualTriple
 import org.leibnizcenter.pneu.components.petrinet.Arc
 import org.leibnizcenter.pneu.components.petrinet.ArcType
 import org.leibnizcenter.pneu.components.petrinet.Net
@@ -18,119 +19,13 @@ import org.leibnizcenter.pneu.components.petrinet.Transition
 @Log4j
 class LPPN2LPN {
 
-    Map<Expression, List<LPPlace>> expressionPlaceMap
-    Map<Operation, List<LPTransition>> operationTransitionMap
-    Map<Expression, Triple> expressionTripleMap
-
-    Program program, reducedProgram
+    LPPNProgram program, reducedProgram
 
     Net net, tripleAnchoredNet, transitionAnchoredNet, simplifiedNet, unifiedNet
 
-    void mapPlace(LPPlace place) {
-
-        if (place.expression) {
-            if (expressionPlaceMap[place.expression] == null) expressionPlaceMap[place.expression] = []
-            expressionPlaceMap[place.expression] << place
-        } else if (place.link) {
-            return
-        } else {
-            throw new RuntimeException()
-        }
-    }
-
-    void mapTransition(LPTransition transition) {
-        if (transition.operation) {
-            if (operationTransitionMap[transition.operation] == null) operationTransitionMap[transition.operation] = []
-            operationTransitionMap[transition.operation] << transition
-        } else if (transition.operator) {
-            return
-        } else if (transition.link) {
-            return
-        } else {
-            throw new RuntimeException()
-        }
-    }
-
-    // map all places and transitions indexed by their logic content
-    // inner function for traversal
-    void innerMapNet(Net net, List<Net> alreadyRecordedNets = []) {
-
-        // map places
-        for (p in net.placeList) {
-            mapPlace((LPPlace) p)
-        }
-        // map transitions
-        for (t in net.transitionList) {
-            mapTransition((LPTransition) t)
-        }
-
-        // nested nets
-        for (subNet in net.subNets) {
-            if (!alreadyRecordedNets.contains(subNet)) {
-                innerMapNet(subNet, alreadyRecordedNets)
-                alreadyRecordedNets << subNet
-            }
-        }
-    }
-
-    // map all places and transitions indexed by their logic content
-    // outer function for reset of maps
-    void mapNet(Net net) {
-
-        // set the maps as empty
-        expressionPlaceMap = [:]
-        operationTransitionMap = [:]
-
-        innerMapNet(net)
-    }
-
-    // TODO: refactor with Net class
-
-    // deep cloning done for nets
-    // by construction, you have only one parent
-    // things may change after simplification/unification
-    static Net minimalNetClone(Net source, Map<Net, Net> sourceCloneMap = [:]) {
-
-        if (!sourceCloneMap[source]) {
-            sourceCloneMap[source] = new LPNet(transitionList: source.transitionList.collect(),
-                    placeList: source.placeList.collect(),
-                    arcList: source.arcList.collect(),
-                    inputs: source.inputs.collect(),
-                    outputs: source.outputs.collect(),
-                    function: source.function)
-        }
-
-        Net clone = sourceCloneMap[source]
-
-        for (subNet in source.subNets) {
-            if (!sourceCloneMap[subNet]) {
-                sourceCloneMap[subNet] = minimalNetClone(subNet, sourceCloneMap)
-            }
-            clone.subNets << sourceCloneMap[subNet]
-        }
-
-        for (parent in source.parents) {
-            if (!sourceCloneMap[parent]) {
-                sourceCloneMap[parent] = minimalNetClone(parent, sourceCloneMap)
-            }
-            clone.parents << sourceCloneMap[parent]
-        }
-
-        // just to check the cloning
-        assert source.placeList.size() == clone.placeList.size()
-        assert source.transitionList.size() == clone.transitionList.size()
-        assert source.arcList.size() == clone.arcList.size()
-        assert source.parents.size() == clone.parents.size()
-        assert source.subNets.size() == clone.subNets.size()
-
-        clone
-    }
-
     static void batchExport(Net net, String filename) {
-
         net.exportToLog(filename)
         net.exportToDot(filename)
-
     }
 
     static private void logPreConversion(String typeConversion, Net net, Net convertedNet) {
@@ -143,32 +38,35 @@ class LPPN2LPN {
         batchExport(convertedNet, typeConversion+".clone.post")
     }
 
+    // map function
+    Mapper mapper = new Mapper()
+
     // triple anchoring
     // for all places, it looks for other places of their propositional triple and relates them
     Net tripleAnchoringNet(Net net) {
 
-        if (expressionPlaceMap == null) throw new RuntimeException("The net should be mapped before.")
+        if (mapper.expressionPlaceMap == null) throw new RuntimeException("The net should be mapped before.")
 
-        expressionTripleMap = [:]
+        mapper.expressionTripleMap = [:]
 
-        Net tripleAnchoredNet = minimalNetClone(net)
+        Net tripleAnchoredNet = net.minimalClone()
 
         logPreConversion("tripleAnchoring", net, tripleAnchoredNet)
 
         // for each place, construct the associated triple if necessary
-        for (expression in expressionPlaceMap.keySet()) {
+        for (expression in mapper.expressionPlaceMap.keySet()) {
             Expression refExpression = expression.positive()
 
             log.trace("Source expression: " + expression)
             log.trace("Reference expression for triple: " + refExpression)
 
-            if (expressionTripleMap[refExpression] == null) {
-                expressionTripleMap[refExpression] = Triple.build(refExpression)
+            if (mapper.expressionTripleMap[refExpression] == null) {
+                mapper.expressionTripleMap[refExpression] = FactualTriple.build(refExpression)
             }
         }
 
         // for each triple reconstructed create a subNet
-        for (coupling in expressionTripleMap) {
+        for (coupling in mapper.expressionTripleMap) {
             tripleAnchoredNet.include(buildTripleNet(coupling.key))
         }
 
@@ -182,29 +80,29 @@ class LPPN2LPN {
 
     Net transitionAnchoringNet(Net net) {
 
-        if (expressionPlaceMap == null) throw new RuntimeException("The net should be mapped before.")
+        if (mapper.expressionPlaceMap == null) throw new RuntimeException("The net should be mapped before.")
 
-        if (expressionTripleMap == null) { expressionTripleMap = [:] }
+        if (mapper.expressionTripleMap == null) { mapper.expressionTripleMap = [:] }
 
-        Net transitionAnchoredNet = minimalNetClone(net)
+        Net transitionAnchoredNet = net.minimalClone()
 
         logPreConversion("transitionAnchoring", net, transitionAnchoredNet)
 
-        for (expression in expressionPlaceMap.keySet()) {
+        for (expression in mapper.expressionPlaceMap.keySet()) {
             log.trace("Checking the places with expression: "+expression)
             Expression refExpression = expression.positive()
 
-            if (expressionTripleMap[refExpression] == null) {
-                expressionTripleMap[refExpression] = Triple.build(refExpression)
+            if (mapper.expressionTripleMap[refExpression] == null) {
+                mapper.expressionTripleMap[refExpression] = FactualTriple.build(refExpression)
             }
 
-            Triple triple = expressionTripleMap[refExpression]
+            AbstractTriple triple = mapper.expressionTripleMap[refExpression]
 
             // all positive places are generated by positive transitions
             if (expression.isPositive()) {
                 log.trace("The expression is positive")
-                log.trace("Number of places to be accounted: "+ expressionPlaceMap[expression].size())
-                for (place in expressionPlaceMap[expression]) {
+                log.trace("Number of places to be accounted: "+ mapper.expressionPlaceMap[expression].size())
+                for (place in mapper.expressionPlaceMap[expression]) {
                     log.trace("Number of inputs to the place ${place}: "+ place.inputs.size())
                     for (input in place.inputs) {
                         LPTransition tInput = (LPTransition) (input.source)
@@ -217,8 +115,8 @@ class LPPN2LPN {
                 }
             } else if (expression.isNegative()) {
                 log.trace("The expression is negative")
-                log.trace("Number of places to be accounted: "+ expressionPlaceMap[expression].size())
-                for (place in expressionPlaceMap[expression]) {
+                log.trace("Number of places to be accounted: "+ mapper.expressionPlaceMap[expression].size())
+                for (place in mapper.expressionPlaceMap[expression]) {
                     log.trace("Number of inputs to the place ${place}: "+ place.inputs.size())
                     for (input in place.inputs) {
                         LPTransition tInput = (LPTransition) (input.source)
@@ -234,9 +132,9 @@ class LPPN2LPN {
         }
 
         // for each operator of the triple, create a link from the associated transition
-        for (coupling in expressionTripleMap) {
+        for (coupling in mapper.expressionTripleMap) {
 
-            Triple triple = expressionTripleMap[coupling.key]
+            AbstractTriple triple = mapper.expressionTripleMap[coupling.key]
 
             // if at least a trnasition is attached you have to create it, as it is useful for the triple
             if (triple.posTransitionList.size() > 0 || triple.negTransitionList.size() > 0) {
@@ -294,7 +192,7 @@ class LPPN2LPN {
 
     static Net simplifyNet(Net net) {
 
-        Net simplifiedNet = minimalNetClone(net)
+        Net simplifiedNet = net.minimalClone()
 
         logPreConversion("simplification", net, simplifiedNet)
 
@@ -309,7 +207,7 @@ class LPPN2LPN {
                 for (int j = i - 1; j >= 0; j--) {
                     Net nj = netList[j]
                     if (!alreadyAccounted.contains(nj)) {
-                        if (NetComparison.compare(ni, nj)) {
+                        if (Net.compare(ni, nj)) {
                             if (!clonesNetMap[ni]) clonesNetMap[ni] = []
                             clonesNetMap[ni] << nj
                             alreadyAccounted << nj // take out a net which has already been associated
@@ -328,7 +226,6 @@ class LPPN2LPN {
             for (coupling in clonesNetMap) {
                 log.trace("OUTER cycle: root net: " + coupling.key)
                 log.trace("I have to aggregate " + coupling.value.size() + " cloned nets on the previous net")
-                // log.trace("root net detail: " + coupling.key.toLog())
 
                 // take the root
                 Net rootNet = coupling.key
@@ -456,13 +353,13 @@ class LPPN2LPN {
 
     Net unifyNet(Net net) {
 
-        if (expressionPlaceMap == null) throw new RuntimeException("The net should be mapped before.")
+        if (mapper.expressionPlaceMap == null) throw new RuntimeException("The net should be mapped before.")
 
-        Net unifiedNet = minimalNetClone(net)
+        Net unifiedNet = net.minimalClone()
 
         logPreConversion("unification", net, unifiedNet)
 
-        for (coupling in expressionPlaceMap) {
+        for (coupling in mapper.expressionPlaceMap) {
             if (coupling.value.size() > 1) {
                 LPPlace pNexus = new LPPlace(expression: coupling.key)
                 unifiedNet.placeList << pNexus
@@ -476,7 +373,7 @@ class LPPN2LPN {
             }
         }
 
-        for (coupling in operationTransitionMap) {
+        for (coupling in mapper.operationTransitionMap) {
             if (coupling.value.size() > 1) {
                 LPTransition tNexus = new LPTransition(operation: coupling.key)
                 unifiedNet.transitionList << tNexus
@@ -495,12 +392,10 @@ class LPPN2LPN {
         unifiedNet
     }
 
-    void convert(Program source, Boolean withTriples = false) {
+    void convert(LPPNProgram source, Boolean withTriples = false) {
 
         // reset net and maps
-        expressionPlaceMap = null
-        operationTransitionMap = null
-        expressionTripleMap = null
+        mapper = new Mapper()
 
         // save the original program
         program = source
@@ -516,7 +411,7 @@ class LPPN2LPN {
         net = buildProgramNet(reducedProgram)
 
         // map the net, i.e. map places and transitions to expressions and operations
-        mapNet(net)
+        mapper.mapNet(net)
 
         // create the subnets for the triples
         tripleAnchoredNet = tripleAnchoringNet(net)
@@ -527,27 +422,27 @@ class LPPN2LPN {
 
         // TODO: optimization, rather then remapping, remove from the general map while simplifying
         // remap the net with the accounted reductions
-        mapNet(simplifiedNet)
+        mapper.mapNet(simplifiedNet)
 
         // simplify the net, i.e. replicated cloned subnets with a similar one
         transitionAnchoredNet = transitionAnchoringNet(simplifiedNet)
 
         // TODO: optimization, rather then remapping, add to the general map while anchoring
         // remap the net now with the new transitions and places due to the anchoring
-        mapNet(transitionAnchoredNet)
+        mapper.mapNet(transitionAnchoredNet)
 
         // unify the net, i.e. connect places and transitions with the same labels
         unifiedNet = unifyNet(transitionAnchoredNet)
 
     }
 
-    static Net buildProgramNet(Program source) {
+    static Net buildProgramNet(LPPNProgram source) {
 
         // reset net and maps
         Net net = new LPNet()
 
         // reduce it, decomposing compound formulas
-        Program reducedProgram = source.reduce()
+        LPPNProgram reducedProgram = source.reduce()
 
         // create all logic rule nets
         for (logicRule in reducedProgram.logicRules) {
@@ -919,8 +814,8 @@ class LPPN2LPN {
         LPPlace p
 
         // preparatory nodes
-        t = new LPTransition(link: true, name: "start")
-        p = new LPPlace(link: true, name: "after start")
+        t = new LPTransition(link: true)
+        p = new LPPlace(link: true)
 
         net.inputs << t
         net.transitionList << t
@@ -938,14 +833,12 @@ class LPPN2LPN {
             t = (LPTransition) subNet.outputs[0]
 
             // synchronization place
-            p = new LPPlace(link: true, name: "bridge " + i)
+            p = new LPPlace(link: true)
             net.placeList << p
         }
 
-        p.name = "before end"
-
         // output transition
-        LPTransition tOut = new LPTransition(link: true, name: "end")
+        LPTransition tOut = new LPTransition(link: true)
         net.transitionList << tOut
 
         // final anchoring
@@ -958,14 +851,14 @@ class LPPN2LPN {
 
     static Net buildParOperationNet(Formula<Event> formula) {
         Net net = new LPNet(function: new LPTransition(operation: Operation.build(formula)))
-        LPTransition tIn = new LPTransition(link: true, name: "start")
-        LPTransition tOut = new LPTransition(link: true, name: "end")
+        LPTransition tIn = new LPTransition(link: true)
+        LPTransition tOut = new LPTransition(link: true)
         net.transitionList += [tIn, tOut]
 
         int i = 0
         for (input in formula.inputFormulas) {
             // preparatory place
-            LPPlace pIn = new LPPlace(link: true, name: "start bridge" + i)
+            LPPlace pIn = new LPPlace(link: true)
             net.placeList << pIn
 
             // create subnet
@@ -973,7 +866,7 @@ class LPPN2LPN {
             net.include(subNet)
 
             // synchronization place
-            LPPlace pOut = new LPPlace(link: true, name: "end bridge " + i)
+            LPPlace pOut = new LPPlace(link: true)
             net.placeList << pOut
 
             // anchoring
@@ -991,10 +884,10 @@ class LPPN2LPN {
     static Net buildAltOperationNet(Formula<Event> formula) {
         Net net = new LPNet(function: new LPTransition(operation: Operation.build(formula)))
 
-        LPTransition tIn = new LPTransition(link: true, name: "start")
-        LPTransition tOut = new LPTransition(link: true, name: "end")
-        LPPlace pIn = new LPPlace(link: true, name: "after start")
-        LPPlace pOut = new LPPlace(link: true, name: "before end")
+        LPTransition tIn = new LPTransition(link: true)
+        LPTransition tOut = new LPTransition(link: true)
+        LPPlace pIn = new LPPlace(link: true)
+        LPPlace pOut = new LPPlace(link: true)
 
         net.transitionList += [tIn, tOut]
         net.placeList += [pIn, pOut]
@@ -1117,10 +1010,10 @@ class LPPN2LPN {
     static Net buildTripleNet(Expression expression) {
         Net net = new LPNet(function: new LPPlace(expression: Expression.build(expression, Operator.TRIPLE)))
 
-        Triple pTriple = Triple.build(expression)
-        LPPlace pPlace = new LPPlace(expression: pTriple.positive)
-        LPPlace negpPlace = new LPPlace(expression: pTriple.negative)
-        LPPlace notpPlace = new LPPlace(expression: pTriple.nullified)
+        AbstractTriple pTriple = FactualTriple.build(expression)
+        LPPlace pPlace = new LPPlace(expression: pTriple.positive.ref.label)
+        LPPlace negpPlace = new LPPlace(expression: pTriple.negative.ref.label)
+        LPPlace notpPlace = new LPPlace(expression: pTriple.nullified.ref.label)
         net.placeList += [pPlace, negpPlace, notpPlace]
 
         LPTransition pospOperator = new LPTransition(operation: pTriple.positive.toOperation())

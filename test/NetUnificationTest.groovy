@@ -1,8 +1,6 @@
 import org.leibnizcenter.lppneu.builders.LPPN2LPN
 import org.leibnizcenter.lppneu.components.language.*
 import org.leibnizcenter.lppneu.parser.LPPNLoader
-import org.leibnizcenter.pneu.builders.PN2dot
-import org.leibnizcenter.pneu.components.petrinet.Net
 
 class NetUnificationTest extends GroovyTestCase {
 
@@ -20,7 +18,7 @@ class NetUnificationTest extends GroovyTestCase {
     }
 
     static LPPN2LPN batchConvert(String code) {
-        Program program = LPPNLoader.parseString(code)
+        LPPNProgram program = LPPNLoader.parseString(code)
         LPPN2LPN conversion = new LPPN2LPN()
         conversion.convert(program)
         return conversion
@@ -241,7 +239,7 @@ class NetUnificationTest extends GroovyTestCase {
 
     void testUnifyCompoundDefinition() {
         LPPN2LPN conversion = batchConvert("p := a and b.")
-        printResult(conversion)
+        // printResult(conversion)
 
         assert conversion.net.getAllPlaces().size() == 10
         assert conversion.net.getAllTransitions().size() == 5

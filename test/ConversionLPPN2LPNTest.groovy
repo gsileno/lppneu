@@ -20,7 +20,7 @@ class ConversionLPPN2LPNTest extends GroovyTestCase {
     }
 
     static Net batchConvert(String code) {
-        Program program = LPPNLoader.parseString(code)
+        LPPNProgram program = LPPNLoader.parseString(code)
         LPPN2LPN conversion = new LPPN2LPN()
         conversion.convert(program)
         return conversion.net

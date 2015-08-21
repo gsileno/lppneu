@@ -5,8 +5,6 @@ class MarketTest extends GroovyTestCase {
 
     void testBasicSaleInstance1() {
         Net net = MarketModelsFactory.basicSaleInstance1()
-
-
     }
 
     void testBasicSaleInstance2() {

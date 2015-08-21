@@ -43,7 +43,7 @@ class LPTransition extends Transition {
         return link
     }
 
-    LPTransition clone() {
+    Transition clone() {
         return new LPTransition(
                 operation: operation,
                 operator: operator,

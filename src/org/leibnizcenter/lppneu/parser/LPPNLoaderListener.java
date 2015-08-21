@@ -11,9 +11,9 @@ import java.util.List;
 
 public class LPPNLoaderListener extends LPPNBaseListener {
 
-    private Program program;
+    private LPPNProgram program;
 
-    public Program getProgram() { return program; }
+    public LPPNProgram getProgram() { return program; }
 
     private final static Logger log = Logger.getLogger("LoaderListener");
 
@@ -307,7 +307,7 @@ public class LPPNLoaderListener extends LPPNBaseListener {
     }
 
     public void exitProgram(LPPNParser.ProgramContext ctx) {
-        program = new Program();
+        program = new LPPNProgram();
 
         for (LPPNParser.CausalruleContext childCtx: ctx.causalrule()) {
             program.getCausalRules().add(causalRuleNodes.get(childCtx));
