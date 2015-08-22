@@ -51,6 +51,14 @@ class LPTransition extends Transition {
         )
     }
 
+    static Transition build() {
+        return new LPTransition()
+    }
+
+    static Transition build(String label) {
+        return new LPTransition(operation: Operation.parse(label))
+    }
+
     static Boolean compare(Transition t1, Transition t2) {
         return compare((LPTransition) t1, (LPTransition) t2)
     }

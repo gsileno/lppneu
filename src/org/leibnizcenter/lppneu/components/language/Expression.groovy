@@ -2,7 +2,7 @@ package org.leibnizcenter.lppneu.components.language
 
 import commons.base.Formula
 import groovy.transform.EqualsAndHashCode
-import org.leibnizcenter.lppneu.parser.LPPNLoader
+import org.leibnizcenter.lppneu.parsers.LPPNLoader
 
 @EqualsAndHashCode
 class Expression {

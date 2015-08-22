@@ -1,8 +1,10 @@
 package org.leibnizcenter.lppneu.components.lppetrinets
 
 import org.leibnizcenter.lppneu.components.language.Expression
+import org.leibnizcenter.lppneu.components.language.Operation
 import org.leibnizcenter.lppneu.components.language.Operator
 import org.leibnizcenter.pneu.components.petrinet.Place
+import org.leibnizcenter.pneu.components.petrinet.Transition
 
 class LPPlace extends Place {
 
@@ -41,6 +43,14 @@ class LPPlace extends Place {
                 expression: expression,
                 link: link
         )
+    }
+
+    static LPPlace build() {
+        return new LPPlace()
+    }
+
+    static LPPlace build(String label) {
+        return new LPPlace(expression: Expression.parse(label))
     }
 
     static Boolean compare(Place p1, Place p2) {
