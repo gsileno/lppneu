@@ -6,6 +6,7 @@ import org.leibnizcenter.lppneu.components.position.AbstractPositionRef
 
 @Log4j @EqualsAndHashCode
 class Situation {
+
     Polarity polarity
     AbstractPositionRef positionRef
     Literal rootLiteral
@@ -78,7 +79,6 @@ class Situation {
     }
 
     Situation negative() {
-
             return new Situation(
                     polarity: polarity.NEG,
                     positionRef: positionRef,

@@ -4,6 +4,7 @@ import groovy.transform.AutoClone
 import groovy.transform.EqualsAndHashCode
 import groovy.util.logging.Log4j
 import org.leibnizcenter.lppneu.components.language.Expression
+import org.leibnizcenter.lppneu.components.language.Polarity
 
 @Log4j @EqualsAndHashCode
 class FactualPositionRef extends AbstractPositionRef {
@@ -15,6 +16,9 @@ class FactualPositionRef extends AbstractPositionRef {
     }
 
     static FactualPositionRef build(Expression label) {
+        if (label.polarity() != Polarity.POS) {
+            throw new RuntimeException("Expression ${label} must have positive polarity to become target reference.")
+        }
         new FactualPositionRef(
                 label: label
         )

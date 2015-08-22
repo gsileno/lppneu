@@ -147,6 +147,10 @@ class Formula<T> {
     String toString(Operator superOperator = null) {
         String output = ""
 
+        // operator on constant
+        if (inputPorts.size() == 0 && inputFormulas.size() == 0)
+            return operator.toString()
+
         Boolean printOp = (operator != Operator.POS && (superOperator == null || operator != superOperator))
 
         if (printOp) output += operator.toString()+"("

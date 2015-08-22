@@ -158,8 +158,7 @@ public class LPPNLoaderListener extends LPPNBaseListener {
         if (ctx.body_situation() != null) {
             expression = Expression.build(situationNodes.get(ctx.body_situation()));
         } else if (ctx.body_constraint() != null) {
-            log.error("to be implemented");
-            return;
+            throw new RuntimeException("to be implemented");
         } else if (ctx.WHEN() != null) {
             log.trace("operation: "+operationNodes.get(ctx.operation()));
             log.trace("expression: "+operationNodes.get(ctx.operation()).toExpression());

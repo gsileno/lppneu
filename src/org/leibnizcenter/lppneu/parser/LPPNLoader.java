@@ -61,8 +61,17 @@ public class LPPNLoader {
         parser.removeErrorListeners();
         parser.addErrorListener(errorListener);
 
+        // PARSING
+
         // parser.setErrorHandler(new LPPNLoaderErrorStrategy());
         ParseTree tree = parser.program();
+
+        program.setParsingErrors(errorListener.errors); // record the parsing errors
+        if (program.getParsingErrors().size() > 0) {
+            return program;
+        }
+
+        // DECORATION
 
         // create a standard ANTLR parse tree walker
         ParseTreeWalker walker = new ParseTreeWalker();
@@ -71,7 +80,6 @@ public class LPPNLoader {
 
         walker.walk(loader, tree); // walk parse tree
 
-        program.setParsingErrors(errorListener.errors); // record the parsing errors
         program.setCausalRules(loader.getProgram().getCausalRules());
         program.setLogicRules(loader.getProgram().getLogicRules());
 

@@ -11,8 +11,6 @@ class Literal {
     Atom functor
     List<Parameter> parameters
 
-    Boolean grounded = false
-
     static Literal build(Atom functor, List<Parameter> parameters = []) {
         new Literal(functor: functor, parameters: parameters)
     }
