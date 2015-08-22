@@ -12,6 +12,15 @@ class Event {
     Literal rootLiteral
     AbstractPosition position
 
+    Event minimalClone() {
+        new Event(
+                operator: operator,
+                positionRef: positionRef,
+                position: position,
+                rootLiteral: rootLiteral.clone()
+        )
+    }
+
     static Event build(ExtLiteral extLiteral) {
         new Event(
                 operator: extLiteral.polarity.toOperator(),

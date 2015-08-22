@@ -11,6 +11,14 @@ class Situation {
     AbstractPositionRef positionRef
     Literal rootLiteral
 
+    Situation minimalClone() {
+        new Situation(
+                polarity: polarity,
+                positionRef: positionRef,
+                rootLiteral: rootLiteral.minimalClone()
+        )
+    }
+
     static Situation build(Literal literal, Polarity polarity = Polarity.POS) {
         new Situation(
                 polarity: polarity,

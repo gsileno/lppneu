@@ -15,6 +15,25 @@ class Formula<T> {
     Operator operator                // last operator
     List<T> inputPorts = []          // relevant, dependent factors
 
+    Formula<T> minimalClone() {
+
+        List<Formula<T>> clonedInputFormulas = []
+        for (inputFormula in inputFormulas) {
+            clonedInputFormulas << inputFormula.minimalClone()
+        }
+
+        List<Formula<T>> clonedInputPorts = []
+        for (inputPort in inputPorts) {
+            clonedInputPorts << inputPort.minimalClone()
+        }
+
+        new Formula<T>(
+                inputFormulas: clonedInputFormulas,
+                inputPorts: clonedInputPorts,
+                operator: operator
+        )
+    }
+
     //////////////////
     // Builders
     //////////////////

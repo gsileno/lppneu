@@ -1,9 +1,11 @@
 package org.leibnizcenter.lppneu.components.language
 
+import groovy.transform.AutoClone
 import groovy.transform.EqualsAndHashCode
 import groovy.util.logging.Log4j
 
-@Log4j @EqualsAndHashCode
+@Log4j
+@EqualsAndHashCode
 class Parameter {
     Literal literal
     Variable variable
@@ -14,6 +16,26 @@ class Parameter {
 
     static Parameter build(Variable variable) {
         new Parameter(variable: variable)
+    }
+
+    Parameter minimalClone() {
+        if (literal != null) {
+            return new Parameter(
+                    literal: literal.minimalClone()
+            )
+        } else if (variable != null) {
+            new Parameter(
+                    variable: variable.minimalClone()
+            )
+        }
+    }
+
+    Boolean isConstant() {
+        (literal != null)
+    }
+
+    Boolean isVariable() {
+        (variable != null)
     }
 
     //////////////////

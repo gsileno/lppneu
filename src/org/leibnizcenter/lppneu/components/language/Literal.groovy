@@ -4,12 +4,24 @@ import groovy.transform.AutoClone
 import groovy.transform.EqualsAndHashCode
 import groovy.util.logging.Log4j
 
-@Log4j @EqualsAndHashCode @AutoClone
+@Log4j @EqualsAndHashCode
 class Literal {
 
     // classic literal
     Atom functor
     List<Parameter> parameters
+
+    Literal minimalClone() {
+        List<Parameter> cloneParameters = []
+        for (parameter in parameters) {
+            cloneParameters << parameter.minimalClone()
+        }
+
+        new Literal(
+                functor: functor,
+                parameters: cloneParameters
+        )
+    }
 
     static Literal build(Atom functor, List<Parameter> parameters = []) {
         new Literal(functor: functor, parameters: parameters)

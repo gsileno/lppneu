@@ -26,7 +26,7 @@ class FactualPositionRef extends AbstractPositionRef {
 
     FactualPositionRef minimalClone() {
         new FactualPositionRef(
-                label: label
+                label: label.minimalClone()
         )
     }
 }

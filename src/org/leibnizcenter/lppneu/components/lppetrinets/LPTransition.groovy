@@ -6,6 +6,7 @@ import org.leibnizcenter.lppneu.components.language.Operation
 import org.leibnizcenter.lppneu.components.language.Operator
 import org.leibnizcenter.lppneu.components.language.Parameter
 import org.leibnizcenter.lppneu.components.language.Variable
+import org.leibnizcenter.pneu.components.basicpetrinet.BasicPlace
 import org.leibnizcenter.pneu.components.petrinet.Arc
 import org.leibnizcenter.pneu.components.petrinet.ArcType
 import org.leibnizcenter.pneu.components.petrinet.Token
@@ -71,24 +72,17 @@ class LPTransition extends Transition {
         return true
     }
 
-    Boolean isEnabledForAnalysis() {
-        if (inputs.size() == 0) {
-            return true
-        }
-
-        isEnabled()
-    }
+    //////////////////////////////
+    // Operational Semantics
+    //////////////////////////////
 
     // filter to unify tokens
     List<Variable> commonVarList
-
-    // map to anchor values satisfying the filter
-    Map<Arc, List<Token>> filteredMarkingMap = [:]
+    // all variables accounted in places
+    List<Variable> allVarList
 
     // set the filter
     void initializeUnificationFilter() {
-
-        List<Variable> allVarList = []
 
         // for each input place
         for (elem in inputs) {
@@ -108,87 +102,140 @@ class LPTransition extends Transition {
         }
     }
 
-    // Operational Semantics
-
     Boolean isEnabledIncludingEmission() {
-        isEnabled()
+        if (inputs.size() == 0 && isEmitter())
+            true
+        else
+            isEnabled()
     }
 
+    private static Boolean contains(Map<Variable, String> map1, Map<Variable, String> map2) {
+        for (item in map1) {
+            if (map2.keySet().contains(item.key)) {
+                if (map2[item.key] != item.value)
+                    return false
+            }
+        }
+        return true
+    }
+
+    private static includes(Map<Variable, String> map1, Map<Variable, String> map2) {
+        for (item in map2) {
+            if (!map1.keySet().contains(item.key)) {
+                map1[item.key] = item.value
+            }
+        }
+    }
+
+    // list to filter all the content of input tokens which satisfy the filter
+    // this is the *fireable* data
+    // TODO: to be optimized: now it is reset each time isEnabled is computed
+    List<Map<Variable, String>> varWithValuesMapList = []
+
     Boolean isEnabled() {
+
+        varWithValuesMapList = []
 
         // initialize filter to unify tokens
         if (!commonVarList) {
             initializeUnificationFilter()
         }
 
-        // map to anchor values satisfying the filter
-        filteredMarkingMap = [:]
-
-        // the first input sets the initial filters, the other inputs prune it
-        Boolean first = true
-
-        // add all possible filters
-        List<List<Parameter>> filters = []
-
         // filter tokens
-        for (elem in inputs) {
-            LPPlace pl = (LPPlace) elem.source
+        for (arc in inputs) {
+            LPPlace pl = (LPPlace) arc.source
+
+            // for optimization - there are no tokens here
+            if (arc.type == ArcType.NORMAL && pl.marking.size() == 0) {
+                return false
+            }
 
             List<Variable> localVarList = pl.expression.getVariables()
-            List<Parameter> localParamList = pl.expression.getParameters()
+            List<Variable> localCommonVarList = localVarList - (localVarList - commonVarList)
 
-            // for each variable which is part of the common variables
-            for (var in localVarList - (localVarList - commonVarList)) {
+            List<Map<Variable, String>> localVarWithValuesList = pl.getVarWithValuesList(localCommonVarList)
 
-                // find in which position it is placed
-                Integer i = localParamList.findIndexOf { (it.variable == var) }
+            // for the first elem you take that as starting filter
+            if (varWithValuesMapList.size() == 0) {
+                varWithValuesMapList = localVarWithValuesList
+            } else {
 
-                // for optimization - there are no tokens here
-                if (elem.type == ArcType.NORMAL && pl.marking.size() == 0) {
-                    return false
-                }
+                // for each local data item
+                for (localItem in localVarWithValuesList) {
+                    List<Map<Variable, String>> toBeRemoved = []
 
-                // for each token
-                for (token in pl.marking) {
+                    // for each cached data item
+                    for (globalItem in varWithValuesMapList) {
 
-                    // check its value
-                    if (!token.expression.parameters[i].literal) {
-                        throw new RuntimeException("The token has no concrete value. Error.")
+                        // if they are not compatible, prepare to remove the cache
+                        if (!contains(globalItem, localItem)) {
+                            toBeRemoved << globalItem
+
+                        // for optimization, stop the search if you already have to remove all the cache
+                        if (toBeRemoved.size() == varWithValuesMapList.size())
+                            break
+
+                        // otherwise include the parts which were not counted yet
+                        } else {
+                            includes(globalItem, localItem)
+                        }
                     }
 
-                    if (first) {
-                        token.expression.parameters[i].literal
+                    // remove the not compatible cache
+                    varWithValuesMapList -= toBeRemoved
+
+                    // there are not enough data content now
+                    if (arc.type == ArcType.NORMAL && varWithValuesMapList.size() < arc.weight) {
+                        return false
                     }
                 }
             }
-        }
 
+            // the inhibition holds
+            if (arc.type == ArcType.INHIBITOR && varWithValuesMapList.size() >= arc.weight) {
+                return false
+            }
+        }
         return true
     }
 
     void fire() {
+
+        if (varWithValuesMapList.size() == 0)
+            throw new RuntimeException("You cannot fire from "+toString())
+
         consumeInputTokens()
         produceOutputTokens()
+        varWithValuesMapList.pop()
     }
 
     void consumeInputTokens() {
-        List<LPToken> tokens = []
-        for (elem in inputs) {
-            for (int i = 0; i < elem.weight; i++) {
-                tokens << ((LPPlace) elem.source).marking.pop()
+        for (arc in inputs) {
+            List<LPToken> tokens = ((LPPlace) arc.source).marking
+            List<LPToken> toBeRemoved = []
+
+            for (token in tokens) {
+                if (token.contains(varWithValuesMapList[0])) {
+                    toBeRemoved << token
+                    if (toBeRemoved.size() == arc.weight)
+                        break
+                }
             }
+
+            if (toBeRemoved.size() < arc.weight)
+                throw new RuntimeException("Tokens satisfying the filter less than what required by the arc weight.")
+
+            ((LPPlace) arc.source).marking -= toBeRemoved
         }
     }
 
     void produceOutputTokens() {
-        for (elem in outputs) {
-            if (elem.type == ArcType.NORMAL) {
-                if (elem.weight > 1)
-                    throw new RuntimeException("Not yet implemented")
-
-                ((LPPlace) elem.target).marking.push(new LPToken())
-            } else if (elem.type == ArcType.RESET) {
-                ((LPPlace) elem.target).flush()
+        for (arc in outputs) {
+            if (arc.type == ArcType.NORMAL) {
+                if (arc.weight > 1) throw new RuntimeException("Not yet implemented")
+                ((LPPlace) arc.target).createToken(varWithValuesMapList[0])
+            } else if (arc.type == ArcType.RESET) {
+                ((LPPlace) arc.target).flush()
             }
         }
     }

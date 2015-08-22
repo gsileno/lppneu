@@ -108,6 +108,10 @@ class Expression {
         return this.positive().negate()
     }
 
+    Expression minimalClone() {
+        new Expression(formula: formula.minimalClone())
+    }
+
     Boolean isPositive() {
         !isNegative() && !isNull()
     }

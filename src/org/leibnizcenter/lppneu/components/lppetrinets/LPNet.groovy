@@ -34,7 +34,7 @@ class LPNet extends Net {
         tr
     }
 
-    Place createPlace(String label = null) {
+    LPPlace createPlace(String label = null) {
         LPPlace pl = new LPPlace()
         if (label) {
             pl.expression = Expression.parse(label)

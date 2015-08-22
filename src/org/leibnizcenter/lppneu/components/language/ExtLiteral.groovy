@@ -4,7 +4,7 @@ import groovy.transform.AutoClone
 import groovy.transform.EqualsAndHashCode
 import groovy.util.logging.Log4j
 
-@Log4j @EqualsAndHashCode @AutoClone
+@Log4j @EqualsAndHashCode
 class ExtLiteral {
     Polarity polarity
     Literal literal
