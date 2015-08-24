@@ -12,10 +12,10 @@ class LPToken extends Token {
         expression.toString()
     }
 
-    Boolean contains(Map<Variable, String> varWithValuesMap) {
+    Boolean contains(Map<String, String> varWithValuesMap) {
         for (param in expression.parameters) {
             if (param.isVariable()) {
-                if (varWithValuesMap[param.variable] != param.variable.identifier)
+                if (varWithValuesMap[param.variable.name] != param.variable.identifier)
                     return false
             }
         }

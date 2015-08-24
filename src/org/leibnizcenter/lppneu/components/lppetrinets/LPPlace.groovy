@@ -40,21 +40,20 @@ class LPPlace extends Place {
     }
 
     // get all the variables included in the input list, and map their values recorded in the tokens
-    List<Map<Variable, String>> getVarWithValuesList(List<Variable> localCommonVarList) {
-        List<Map<Variable, String>> varWithValuesMapList = []
+    List<Map<String, String>> getVarWithValuesList(List<String> localCommonVarList) {
+        List<Map<String, String>> varWithValuesMapList = []
 
         for (token in marking) {
-            Map<Variable, String> varWithValuesMap = [:]
+            Map<String, String> varWithValuesMap = [:]
             for (param in token.expression.getParameters()) {
                 if (param.isVariable()) {
-                    if (!localCommonVarList.contains(param.variable))
-                        throw new RuntimeException("The variable ${param.variable} should have been accounted.")
+                    if (localCommonVarList.contains(param.variable.name)) {
+                        // TODO: numeric constants
+                        if (param.variable.identifier == null)
+                            throw new RuntimeException("The constant identifier in the variable ${param.variable} cannot be null.")
 
-                    // TODO: numeric constants
-                    if (param.variable.identifier == null)
-                        throw new RuntimeException("The constant identifier in the variable ${param.variable} cannot be null.")
-
-                    varWithValuesMap[param.variable] = param.variable.identifier
+                        varWithValuesMap[param.variable.name] = param.variable.identifier
+                    }
                 }
             }
             varWithValuesMapList << varWithValuesMap
@@ -63,8 +62,8 @@ class LPPlace extends Place {
     }
 
     // count the anonymous content generated, in order to generate unique names
-    private Map<Variable, Integer> variableAnonymousGeneratedIdCountMap = [:]
-    private Literal generateAnonymousIdentifier(Variable variable) {
+    private Map<String, Integer> variableAnonymousGeneratedIdCountMap = [:]
+    private Literal generateAnonymousIdentifier(String variable) {
 
         if (!variableAnonymousGeneratedIdCountMap[variable])
             variableAnonymousGeneratedIdCountMap[variable] = -1
@@ -73,9 +72,9 @@ class LPPlace extends Place {
         variableAnonymousGeneratedIdCountMap[variable] = n
 
         if (id == null) {
-            Literal.build(Atom.build("_"+variable.name.toLowerCase()+n))
+            Literal.build(Atom.build("_"+variable.toLowerCase()+n))
         } else {
-            Literal.build(Atom.build("_"+variable.name.toLowerCase()+n+id))
+            Literal.build(Atom.build("_"+variable.toLowerCase()+n+id))
         }
 
     }
@@ -92,7 +91,7 @@ class LPPlace extends Place {
                     param.variable.identifier = constants[i]
                     i++
                 } else {
-                    param.variable.identifier = generateAnonymousIdentifier(param.variable)
+                    param.variable.identifier = generateAnonymousIdentifier(param.variable.name)
                 }
             }
         }
@@ -101,7 +100,12 @@ class LPPlace extends Place {
             throw new RuntimeException("Given more constants than necessary: ${constants} for ${expression}.")
         }
 
-        marking << new LPToken(expression: tokenExpression)
+        LPToken token = new LPToken(expression: tokenExpression)
+
+        if (marking.contains(token))
+            throw new RuntimeException("You cannot produce a token with the same content")
+
+        marking << token
     }
 
     void createToken(String constant) {
@@ -122,11 +126,14 @@ class LPPlace extends Place {
                 if (variableLiteralMap[param.variable])
                     param.variable.identifier = Literal.build(Atom.build(variableLiteralMap[param.variable]))
                 else
-                    param.variable.identifier = generateAnonymousIdentifier(param.variable)
+                    param.variable.identifier = generateAnonymousIdentifier(param.variable.name)
             }
         }
 
-        marking << new LPToken(expression: tokenExpression)
+        LPToken token = new LPToken(expression: tokenExpression)
+        if (marking.contains(token))
+            throw new RuntimeException("You cannot produce a token with the same content")
+        marking << token
     }
 
     LPPlace minimalClone() {
