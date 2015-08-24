@@ -26,6 +26,20 @@ class Variable {
         )
     }
 
+    String toVarString() {
+        name
+    }
+
+    static List<String> toVarStringList(List<Variable> varList) {
+        List<String> varStringList = []
+
+        for (var in varList) {
+            varStringList << var.name
+        }
+
+        varStringList
+    }
+
     // decoration with value
     String identifier
     Integer value

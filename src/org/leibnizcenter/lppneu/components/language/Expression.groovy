@@ -74,6 +74,18 @@ class Expression {
         )
     }
 
+    // for LPPN, bridge places
+    static Expression buildBridgeFromVarStringList(List<String> varStringList) {
+        List<Parameter> parameters = []
+        for (varString in varStringList) {
+            parameters << Parameter.build(Variable.build(varString))
+        }
+
+        new Expression(
+                formula: PROTOTYPE.build(Situation.build(Literal.build(Atom.build("bridge"), parameters)))
+        )
+    }
+
     Polarity polarity() {
         if (formula.operator == Operator.NEG)
             return Polarity.NEG

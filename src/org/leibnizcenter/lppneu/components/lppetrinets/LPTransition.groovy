@@ -1,13 +1,13 @@
 package org.leibnizcenter.lppneu.components.lppetrinets
 
 import groovy.util.logging.Log4j
-import org.leibnizcenter.lppneu.builders.LPPN2LPN
 import org.leibnizcenter.lppneu.components.language.Operation
 import org.leibnizcenter.lppneu.components.language.Operator
 import org.leibnizcenter.pneu.components.petrinet.ArcType
 import org.leibnizcenter.pneu.components.petrinet.Place
 import org.leibnizcenter.pneu.components.petrinet.Token
 import org.leibnizcenter.pneu.components.petrinet.Transition
+import org.leibnizcenter.pneu.components.petrinet.TransitionType
 
 @Log4j
 class LPTransition extends Transition {
@@ -22,14 +22,18 @@ class LPTransition extends Transition {
     Boolean link = false
 
     String toString() {
-        if (operation != null) {
+        if (link) {
+            "*"
+        } else if (operation != null) {
             operation.toString() // + " LTransition@"+hashCode()
         } else if (operator != null) {
-            return operator.toString() // + " LTransition@"+hashCode()
-        } else if (link) {
-            "*"
+            operator.toString() // + " LTransition@"+hashCode()
+        } else if (type == TransitionType.EMITTER) {
+            "E"
+        } else if (type == TransitionType.COLLECTOR) {
+            "C"
         } else {
-            ""
+            throw new RuntimeException("Empty place?")
         }
     }
 
@@ -86,7 +90,7 @@ class LPTransition extends Transition {
         // for each input place
         for (elem in inputs) {
             LPPlace pl = (LPPlace) elem.source
-            log.trace("input place: " + pl)
+            log.trace("input place: " + pl.id)
 
             // for each variable which is not in the filter
             for (var in (pl.expression.getVariables() - commonVarList)) {
@@ -155,7 +159,7 @@ class LPTransition extends Transition {
                 // for the variables contained take the local values
                 List<Map<String, String>> localFilterList = pl.getFilterList(localCommonVarList)
 
-                log.trace("Relevant values from this place (${pl}): " + localFilterList)
+                log.trace("Relevant values from this place (${pl.id}): " + localFilterList)
 
                 // for the first elem you take that as starting filter
                 if (filterList.size() == 0) {
@@ -170,8 +174,6 @@ class LPTransition extends Transition {
                     // for each local data item
                     for (localItem in localFilterList) {
                         log.trace("Local item: " + localItem)
-
-                        List<Map<String, String>> toBeRemoved = []
 
                         // for each cached data item
                         for (globalItem in filterList) {
@@ -215,6 +217,11 @@ class LPTransition extends Transition {
 
     Boolean isEnabled() {
 
+        log.trace("Checking transition of ${id}")
+
+        // cut out not emitters
+        if (inputs.size() == 0) return false
+
         // initialize filter to unify tokens+
         if (commonVarList == null) {
             initializeUnificationFilter()
@@ -223,7 +230,7 @@ class LPTransition extends Transition {
         // for optimization - there are no tokens here
         for (arc in inputs) {
             if (arc.type == ArcType.NORMAL && ((Place) arc.source).marking.size() == 0) {
-                log.trace("Empty place with normal arc: not enabled transition.")
+                log.trace("empty place with normal arc: {$id} not enabled transition.")
                 return false
             }
         }
@@ -240,7 +247,7 @@ class LPTransition extends Transition {
             LPPlace p = (LPPlace) elem.source
             List<Token> filteredMarking = p.getFilteredMarking(filterList)
 
-            log.trace("Filtered marking for ${p}: " + filteredMarking)
+            log.trace("filtered marking for ${p}: " + filteredMarking)
 
             // inhibitor
             if (elem.type == ArcType.INHIBITOR) {
@@ -256,11 +263,9 @@ class LPTransition extends Transition {
             }
         }
 
+        log.trace("${id} is enabled")
         return true
-
     }
-
-    List<Token> toBeProduced = []
 
     void fire() {
         log.trace("${id} fires.")
@@ -278,20 +283,20 @@ class LPTransition extends Transition {
 
         if (filterList.size() > 0) {
             filter = filterList[0]
-            log.trace("Content consumed/produced depending on filter: "+filter)
+            log.trace("Content consumed/produced depending on filter: " + filter)
         } else {
             log.trace("Content consumed/produced with no filter.")
         }
 
         for (arc in inputs) {
             LPPlace p = (LPPlace) arc.source
-            List<LPToken> tokens = p.getFilteredMarking(filter)
-            List<LPToken> toBeRemoved = []
+            List<Token> tokens = p.getFilteredMarking(filter)
+            List<Token> toBeRemoved = []
 
             if (arc.type == ArcType.NORMAL) {
                 for (int i = 0; i < arc.weight; i++) {
                     toBeRemoved << tokens[i]
-                    includes(coreContent, tokens[i].toVarWithValuesMap())
+                    includes(coreContent, ((LPToken) tokens[i]).toVarWithValuesMap())
                 }
             } else {
                 throw new RuntimeException("Not yet implemented")
@@ -313,8 +318,7 @@ class LPTransition extends Transition {
             LPPlace p = (LPPlace) arc.target
             if (arc.type == ArcType.NORMAL) {
                 if (arc.weight > 1) throw new RuntimeException("Not yet implemented")
-                LPToken token
-                token = p.createToken(coreContent)
+                Token token = p.createToken(coreContent)
                 log.trace("Producing in ${p.id} the token " + token)
             } else if (arc.type == ArcType.RESET) {
                 p.flush()

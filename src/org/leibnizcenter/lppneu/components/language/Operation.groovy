@@ -91,6 +91,18 @@ class Operation {
         )
     }
 
+    // for LPPN, bridge transitions
+    static Operation buildBridgeFromVarStringList(List<String> varStringList) {
+        List<Parameter> parameters = []
+        for (varString in varStringList) {
+            parameters << Parameter.build(Variable.build(varString))
+        }
+
+        new Operation(
+                formula: PROTOTYPE.build(Event.build(Literal.build(Atom.build("bridge"), parameters)))
+        )
+    }
+
     // get all the variables in the operation
     List<Variable> getVariables() {
         List<Variable> varList = []

@@ -168,6 +168,7 @@ class MarketModelTest extends GroovyTestCase {
 
         sale.resetIds()
         sale.exportToLog("basicSaleWithWorldAndTimeline")
+        sale.exportToDot("basicSaleWithWorldAndTimeline")
         sale
     }
 
@@ -175,7 +176,7 @@ class MarketModelTest extends GroovyTestCase {
 
     void testBasicSaleInstance1() {
         runner.load(basicSaleInstance1())
-        assert (runner.analyse() == 6)
+        assert (runner.analyse(10) == 6)
         assert (runner.analysis.storyBase.getSize() == 1)
         runner.analysis.exportToLog("BasicSaleInstance1")
     }

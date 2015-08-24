@@ -3,7 +3,6 @@ package org.leibnizcenter.lppneu.components.lppetrinets
 import groovy.transform.Immutable
 import groovy.util.logging.Log4j
 import org.leibnizcenter.lppneu.components.language.Expression
-import org.leibnizcenter.lppneu.components.language.Variable
 import org.leibnizcenter.pneu.components.petrinet.Token
 
 @Log4j
