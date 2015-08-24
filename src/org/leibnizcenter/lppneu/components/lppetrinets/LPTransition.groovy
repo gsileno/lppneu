@@ -1,14 +1,11 @@
 package org.leibnizcenter.lppneu.components.lppetrinets
 
 import groovy.util.logging.Log4j
-import org.leibnizcenter.lppneu.components.language.Expression
+import org.leibnizcenter.lppneu.builders.LPPN2LPN
 import org.leibnizcenter.lppneu.components.language.Operation
 import org.leibnizcenter.lppneu.components.language.Operator
-import org.leibnizcenter.lppneu.components.language.Parameter
-import org.leibnizcenter.lppneu.components.language.Variable
-import org.leibnizcenter.pneu.components.basicpetrinet.BasicPlace
-import org.leibnizcenter.pneu.components.petrinet.Arc
 import org.leibnizcenter.pneu.components.petrinet.ArcType
+import org.leibnizcenter.pneu.components.petrinet.Place
 import org.leibnizcenter.pneu.components.petrinet.Token
 import org.leibnizcenter.pneu.components.petrinet.Transition
 
@@ -86,33 +83,26 @@ class LPTransition extends Transition {
         commonVarList = []
         allVarList = []
 
-//        if (inputs.size() == 1) {
-//            for (var in ((LPPlace) inputs[0].source).expression.getVariables()) {
-//                commonVarList << var.name
-//            }
-//            allVarList = commonVarList
-//        } else {
         // for each input place
         for (elem in inputs) {
             LPPlace pl = (LPPlace) elem.source
-            log.debug("input place: " + pl)
+            log.trace("input place: " + pl)
 
             // for each variable which is not in the filter
             for (var in (pl.expression.getVariables() - commonVarList)) {
-                log.debug("variable: " + var)
+                log.trace("variable: " + var)
 
                 // if it is already in the list of variables, add to the filter
                 if (allVarList.contains(var.name)) {
-                    log.debug("it is a common variable")
+                    log.trace("it is a common variable")
                     commonVarList << var.name
                     // otherwise add it to the list of variables
                 } else {
-                    log.debug("add to the general list of variables")
+                    log.trace("add to the general list of variables")
                     allVarList << var.name
                 }
             }
         }
-//        }
     }
 
     Boolean isEnabledIncludingEmission() {
@@ -136,38 +126,26 @@ class LPTransition extends Transition {
         for (item in map2) {
             if (!map1.keySet().contains(item.key)) {
                 map1[item.key] = item.value
+            } else {
+                if (map1[item.key] != item.value) {
+                    throw new RuntimeException("Error: ${map1} and ${map2} are incompatible about ${item.key}")
+                }
             }
         }
     }
 
     // list to filter all the content of input tokens which satisfy the filter
     // this is the *fireable* data
-    // TODO: to be optimized: now it is reset each time isEnabled is computed
-    List<Map<String, String>> varWithValuesMapList = []
 
-    Boolean isEnabled() {
-
-        varWithValuesMapList = []
-
-        // initialize filter to unify tokens+
-        if (!commonVarList) {
-            initializeUnificationFilter()
-        }
+    List<Map<String, String>> getFilterList() {
+        List<Map<String, String>> filterList = []
 
         // filter tokens
         for (arc in inputs) {
             LPPlace pl = (LPPlace) arc.source
 
-            // for optimization - there are no tokens here
-            if (arc.type == ArcType.NORMAL && pl.marking.size() == 0) {
-                return false
-            }
-
             // these are the variables given by this place
-            List<String> localVarList = []
-            for (var in pl.expression.getVariables()) {
-                localVarList << var.name
-            }
+            List<String> localVarList = pl.getVarList()
 
             // these are the variables constrained by the other inputs
             List<String> localCommonVarList = localVarList - (localVarList - commonVarList)
@@ -175,29 +153,29 @@ class LPTransition extends Transition {
             if (localCommonVarList.size() > 0) {
 
                 // for the variables contained take the local values
-                List<Map<String, String>> localVarWithValuesList = pl.getVarWithValuesList(localCommonVarList)
+                List<Map<String, String>> localFilterList = pl.getFilterList(localCommonVarList)
 
-                log.debug("Relevant values from this place (${pl}): " + localVarWithValuesList)
+                log.trace("Relevant values from this place (${pl}): " + localFilterList)
 
                 // for the first elem you take that as starting filter
-                if (varWithValuesMapList.size() == 0) {
-                    log.debug("This is the first element, so they start setting a filter")
-                    varWithValuesMapList = localVarWithValuesList
+                if (filterList.size() == 0) {
+                    log.trace("This is the first element, so I start setting the filter")
+                    filterList = localFilterList
                 } else {
-                    log.debug("This is not the first element, so it is used for pruning")
+                    log.trace("This is not the first element, so it is used for pruning")
 
                     // this map is used to check which global item has been found or not
                     Map<Map<String, String>, Boolean> foundMap = [:]
 
                     // for each local data item
-                    for (localItem in localVarWithValuesList) {
-                        log.debug("Local item: " + localItem)
+                    for (localItem in localFilterList) {
+                        log.trace("Local item: " + localItem)
 
                         List<Map<String, String>> toBeRemoved = []
 
                         // for each cached data item
-                        for (globalItem in varWithValuesMapList) {
-                            log.debug("Global item: " + globalItem)
+                        for (globalItem in filterList) {
+                            log.trace("Global item: " + globalItem)
 
                             // initialize as not found
                             if (!foundMap[globalItem])
@@ -205,7 +183,7 @@ class LPTransition extends Transition {
 
                             // if they are compatible, include the new filter and record as found
                             if (contains(globalItem, localItem)) {
-                                log.debug("the global item can be included to the filter")
+                                log.trace("the global item can be included to the filter")
                                 foundMap[globalItem] = true
                                 includes(globalItem, localItem)
                             }
@@ -220,20 +198,61 @@ class LPTransition extends Transition {
                         }
                     }
 
-                    varWithValuesMapList -= toBeRemoved
+                    filterList -= toBeRemoved
 
-                    log.debug("Remaining global values satisfying the filter: " + varWithValuesMapList)
+                    log.trace("Remaining global values satisfying the filter: " + filterList)
+
+                    // the filter does not have any compatible value
+                    if (filterList.size() == 0)
+                        return null
                 }
             }
+        }
 
-            // there are not enough data content now
-            if (arc.type == ArcType.NORMAL && varWithValuesMapList.size() < arc.weight) {
+        log.trace("Filter list: " + filterList)
+        filterList
+    }
+
+    Boolean isEnabled() {
+
+        // initialize filter to unify tokens+
+        if (commonVarList == null) {
+            initializeUnificationFilter()
+        }
+
+        // for optimization - there are no tokens here
+        for (arc in inputs) {
+            if (arc.type == ArcType.NORMAL && ((Place) arc.source).marking.size() == 0) {
+                log.trace("Empty place with normal arc: not enabled transition.")
                 return false
             }
+        }
 
-            // the inhibition holds
-            if (arc.type == ArcType.INHIBITOR && varWithValuesMapList.size() >= arc.weight) {
-                return false
+        // TODO: to be optimized: now it is evaluated each time isEnabled is computed
+        // here you record the constraints
+        List<Map<String, String>> filterList = getFilterList()
+
+        // there is no common filter amongst existing tokens
+        if (filterList == null)
+            return false
+
+        for (elem in inputs) {
+            LPPlace p = (LPPlace) elem.source
+            List<Token> filteredMarking = p.getFilteredMarking(filterList)
+
+            log.trace("Filtered marking for ${p}: " + filteredMarking)
+
+            // inhibitor
+            if (elem.type == ArcType.INHIBITOR) {
+                if (filteredMarking.size() >= elem.weight) {
+                    return false
+                }
+            } else if (elem.type == ArcType.NORMAL) {
+                if (filteredMarking.size() < elem.weight) {
+                    return false
+                }
+            } else {
+                throw new RuntimeException("Not yet implemented.")
             }
         }
 
@@ -241,41 +260,70 @@ class LPTransition extends Transition {
 
     }
 
+    List<Token> toBeProduced = []
+
     void fire() {
-        if (varWithValuesMapList.size() == 0) throw new RuntimeException("You cannot fire from " + toString())
+        log.trace("${id} fires.")
         consumeInputTokens()
         produceOutputTokens()
     }
 
+    Map<String, String> coreContent = [:]
+
     void consumeInputTokens() {
+        log.trace("${id} consumes.")
+
+        Map<String, String> filter = [:]
+        List<Map<String, String>> filterList = getFilterList()
+
+        if (filterList.size() > 0) {
+            filter = filterList[0]
+            log.trace("Content consumed/produced depending on filter: "+filter)
+        } else {
+            log.trace("Content consumed/produced with no filter.")
+        }
+
         for (arc in inputs) {
-            List<LPToken> tokens = ((LPPlace) arc.source).marking
+            LPPlace p = (LPPlace) arc.source
+            List<LPToken> tokens = p.getFilteredMarking(filter)
             List<LPToken> toBeRemoved = []
 
-            for (token in tokens) {
-                if (token.contains(varWithValuesMapList[0])) {
-                    toBeRemoved << token
-                    if (toBeRemoved.size() == arc.weight)
-                        break
+            if (arc.type == ArcType.NORMAL) {
+                for (int i = 0; i < arc.weight; i++) {
+                    toBeRemoved << tokens[i]
+                    includes(coreContent, tokens[i].toVarWithValuesMap())
                 }
+            } else {
+                throw new RuntimeException("Not yet implemented")
+                // TODO: check for inhibitor when different weight
             }
 
-            if (toBeRemoved.size() < arc.weight)
-                throw new RuntimeException("Tokens satisfying the filter less than what required by the arc weight.")
+            log.trace("Removing from ${p.id} the tokens: " + toBeRemoved)
 
-            ((LPPlace) arc.source).marking -= toBeRemoved
+            p.marking -= toBeRemoved
         }
     }
 
     void produceOutputTokens() {
+        log.trace("${id} produces.")
+
+        log.trace("Transmitted content in consumption: ${coreContent}")
+
         for (arc in outputs) {
+            LPPlace p = (LPPlace) arc.target
             if (arc.type == ArcType.NORMAL) {
                 if (arc.weight > 1) throw new RuntimeException("Not yet implemented")
-                ((LPPlace) arc.target).createToken(varWithValuesMapList[0])
+                LPToken token
+                token = p.createToken(coreContent)
+                log.trace("Producing in ${p.id} the token " + token)
             } else if (arc.type == ArcType.RESET) {
-                ((LPPlace) arc.target).flush()
+                p.flush()
+            } else {
+                throw new RuntimeException("Not yet implemented")
             }
         }
+
+        coreContent = [:]
     }
 
 }

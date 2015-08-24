@@ -8,7 +8,7 @@ import org.leibnizcenter.lppneu.components.lppetrinets.LPPlace
 import org.leibnizcenter.lppneu.components.lppetrinets.LPTransition
 import org.leibnizcenter.pneu.components.petrinet.*
 
-class json2LPN {
+class Json2LPN {
 
     static List<Net> parseFiles(String path) {
         List<Net> netList = []

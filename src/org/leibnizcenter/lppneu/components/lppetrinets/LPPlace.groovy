@@ -6,6 +6,7 @@ import org.leibnizcenter.lppneu.components.language.Literal
 import org.leibnizcenter.lppneu.components.language.Operator
 import org.leibnizcenter.lppneu.components.language.Variable
 import org.leibnizcenter.pneu.components.petrinet.Place
+import org.leibnizcenter.pneu.components.petrinet.Token
 
 class LPPlace extends Place {
 
@@ -39,8 +40,18 @@ class LPPlace extends Place {
         return true
     }
 
-    // get all the variables included in the input list, and map their values recorded in the tokens
-    List<Map<String, String>> getVarWithValuesList(List<String> localCommonVarList) {
+    // Name of the variables given by this place
+    List<String> getVarList() {
+        List<String> localVarList = []
+        for (var in expression.getVariables()) {
+            localVarList << var.name
+        }
+        localVarList
+    }
+
+    // get the elements recorded in the tokens
+    // with the relevance given by the variables included in the input list,
+    List<Map<String, String>> getFilterList(List<String> localCommonVarList) {
         List<Map<String, String>> varWithValuesMapList = []
 
         for (token in marking) {
@@ -61,11 +72,43 @@ class LPPlace extends Place {
         varWithValuesMapList
     }
 
+    // get the markings filtered by the filters given in the list
+    List<Token> getFilteredMarking(List<Map<String, String>> filterList) {
+
+        // no filter return all the marking
+        if (filterList.size() == 0)
+            return marking
+
+        List<Token> filteredMarking = []
+        for (filter in filterList) {
+            filteredMarking += getFilteredMarking(filter)
+        }
+        filteredMarking
+    }
+
+    // get the markings filtered by the filter given in the list
+    List<Token> getFilteredMarking(Map<String, String> filter) {
+
+        // no filter return all the marking
+        if (filter.size() == 0)
+            return marking
+
+        List<Token> filteredMarking = []
+
+        for (token in marking) {
+            if (token.checkWithFilter(filter)) {
+                filteredMarking << token
+            }
+        }
+
+        filteredMarking
+    }
+
     // count the anonymous content generated, in order to generate unique names
     private Map<String, Integer> variableAnonymousGeneratedIdCountMap = [:]
     private Literal generateAnonymousIdentifier(String variable) {
 
-        if (!variableAnonymousGeneratedIdCountMap[variable])
+        if (variableAnonymousGeneratedIdCountMap[variable] == null)
             variableAnonymousGeneratedIdCountMap[variable] = -1
 
         Integer n = variableAnonymousGeneratedIdCountMap[variable] + 1
@@ -74,7 +117,7 @@ class LPPlace extends Place {
         if (id == null) {
             Literal.build(Atom.build("_"+variable.toLowerCase()+n))
         } else {
-            Literal.build(Atom.build("_"+variable.toLowerCase()+n+id))
+            Literal.build(Atom.build("_"+id+variable.toLowerCase()+n))
         }
 
     }
@@ -108,32 +151,37 @@ class LPPlace extends Place {
         marking << token
     }
 
-    void createToken(String constant) {
+    Token createToken(String constant) {
         createToken([constant])
     }
 
-    void createToken() {
+    Token createToken() {
         createToken([])
     }
 
     // creates a token with a map that associates identifiers to variables
     // the missing items are filled with anonymous identifiers
-    void createToken(Map<Variable, String> variableLiteralMap) {
+    Token createToken(Map<String, String> variableLiteralMap) {
         Expression tokenExpression = expression.minimalClone()
 
         for (param in tokenExpression.getParameters()) {
             if (param.isVariable()) {
-                if (variableLiteralMap[param.variable])
-                    param.variable.identifier = Literal.build(Atom.build(variableLiteralMap[param.variable]))
+                if (variableLiteralMap[param.variable.name])
+                    param.variable.identifier = Literal.build(Atom.build(variableLiteralMap[param.variable.name]))
                 else
                     param.variable.identifier = generateAnonymousIdentifier(param.variable.name)
             }
         }
 
-        LPToken token = new LPToken(expression: tokenExpression)
-        if (marking.contains(token))
-            throw new RuntimeException("You cannot produce a token with the same content")
-        marking << token
+        LPToken newToken = new LPToken(expression: tokenExpression)
+        for (token in marking) {
+            if (LPToken.compare(token, newToken)) {
+                throw new RuntimeException("You cannot produce a token with the same content")
+            }
+        }
+        marking << newToken
+
+        newToken
     }
 
     LPPlace minimalClone() {

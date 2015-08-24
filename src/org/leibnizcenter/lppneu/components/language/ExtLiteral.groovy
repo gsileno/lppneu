@@ -34,11 +34,18 @@ class ExtLiteral {
         this
     }
 
+    ExtLiteral minimalClone() {
+        new ExtLiteral(
+                polarity: polarity,
+                literal: literal.minimalClone()
+        )
+    }
+
     static ExtLiteral buildNegation(ExtLiteral input) {
-        input.clone().negate()
+        input.minimalClone().negate()
     }
 
     static ExtLiteral buildNull(ExtLiteral input) {
-        input.clone().nullify()
+        input.minimalClone().nullify()
     }
 }
