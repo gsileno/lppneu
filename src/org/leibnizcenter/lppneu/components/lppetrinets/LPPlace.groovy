@@ -4,9 +4,10 @@ import org.leibnizcenter.lppneu.components.language.Atom
 import org.leibnizcenter.lppneu.components.language.Expression
 import org.leibnizcenter.lppneu.components.language.Literal
 import org.leibnizcenter.lppneu.components.language.Operator
-import org.leibnizcenter.lppneu.components.language.Variable
+import org.leibnizcenter.pneu.components.petrinet.Arc
 import org.leibnizcenter.pneu.components.petrinet.Place
 import org.leibnizcenter.pneu.components.petrinet.Token
+import org.leibnizcenter.pneu.components.petrinet.Transition
 
 class LPPlace extends Place {
 
@@ -124,7 +125,7 @@ class LPPlace extends Place {
 
     // creates a token with a list of constants, filling in order the variables
     // the missing items are filled with anonymous identifiers
-    void createToken(List<String> constants) {
+    Token createToken(List<String> constants) {
         Expression tokenExpression = (Expression) expression.minimalClone()
 
         Integer i = 0
@@ -149,6 +150,7 @@ class LPPlace extends Place {
             throw new RuntimeException("You cannot produce a token with the same content")
 
         marking << token
+        token
     }
 
     Token createToken(String constant) {

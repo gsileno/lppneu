@@ -2,6 +2,7 @@ package org.leibnizcenter.lppneu.components.lppetrinets
 
 import org.leibnizcenter.lppneu.components.language.Expression
 import org.leibnizcenter.lppneu.components.language.Operation
+import org.leibnizcenter.pneu.components.petrinet.Arc
 import org.leibnizcenter.pneu.components.petrinet.Net
 import org.leibnizcenter.pneu.components.petrinet.Place
 import org.leibnizcenter.pneu.components.petrinet.Transition
@@ -24,12 +25,18 @@ class LPNet extends Net {
         outputs << tr
         tr
     }
-    
+
     Transition createTransition(String label = null) {
         LPTransition tr = new LPTransition()
         if (label) {
             tr.operation = Operation.parse(label)
         }
+        transitionList << tr
+        tr
+    }
+
+    Transition createTransition(Expression expression) {
+        LPTransition tr = new LPTransition(operation: expression.toOperation())
         transitionList << tr
         tr
     }
@@ -41,6 +48,36 @@ class LPNet extends Net {
         }
         placeList << pl
         pl
+    }
+
+    LPPlace createPlace(Operation operation) {
+        LPPlace pl = new LPPlace(expression: operation.toExpression())
+        placeList << pl
+        pl
+    }
+
+    // TODO: add checks for correct bindings
+
+    // the bridge transition is meant to produce what is in the last place
+    void createBridge(Place p1, Place p2) {
+        if (!placeList.contains(p1) || !placeList.contains(p2)) {
+            throw new RuntimeException("Error: this net does not contain the place(s) to bridge")
+        }
+        LPPlace lpp = (LPPlace) p2
+        Transition tBridge = createTransition(lpp.expression)
+        arcList += Arc.buildArcs(p1, tBridge, p2)
+    }
+
+    // the first transition is meant to produce what is in the bridge place
+    // at the same time, the second transition necessarily consumes what is in the bridge place,
+    // which has therefore to be produced somewhere, this is a context
+    void createBridge(Transition t1, Transition t2) {
+        if (!transitionList.contains(t1) || !transitionList.contains(t2)) {
+            throw new RuntimeException("Error: this net does not contain the transition(s) to bridge")
+        }
+        LPTransition lpt = (LPTransition) t1
+        Place pBridge = createPlace(lpt.operation)
+        arcList += Arc.buildArcs(t1, pBridge, t2)
     }
 
     // deep cloning done for nets

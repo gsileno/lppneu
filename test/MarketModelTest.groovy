@@ -24,6 +24,7 @@ class MarketModelTest extends GroovyTestCase {
         sale.createBridge(t3, t4)
         sale.createBridge(t4, tOut)
 
+        sale.resetIds()
         sale.exportToLog("basicSaleInstance1")
         sale
     }
@@ -46,6 +47,7 @@ class MarketModelTest extends GroovyTestCase {
         sale.createBridge(t4, t3)
         sale.createBridge(t3, tOut)
 
+        sale.resetIds()
         sale.exportToLog("basicSaleInstance2")
         sale
     }
@@ -69,6 +71,7 @@ class MarketModelTest extends GroovyTestCase {
         sale.createBridge(t2, t4)
         sale.createBridge(t4, tOut)
 
+        sale.resetIds()
         sale.exportToLog("basicSale")
         sale
     }
@@ -95,6 +98,7 @@ class MarketModelTest extends GroovyTestCase {
         sale.createBridge(t2s, t4)
         sale.createBridge(t4, tOut)
 
+        sale.resetIds()
         sale.exportToLog("basicSale2Parties")
         sale
     }
@@ -125,6 +129,7 @@ class MarketModelTest extends GroovyTestCase {
         sale.createBridge(t3, tOut)
         sale.createBridge(t4, tOut)
 
+        sale.resetIds()
         sale.exportToLog("basicSaleWithWorld")
         sale
     }
@@ -161,6 +166,7 @@ class MarketModelTest extends GroovyTestCase {
         sale.createBridge(t2, t4)
         sale.createBridge(t4, tOut)
 
+        sale.resetIds()
         sale.exportToLog("basicSaleWithWorldAndTimeline")
         sale
     }
