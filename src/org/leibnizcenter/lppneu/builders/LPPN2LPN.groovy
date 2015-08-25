@@ -808,7 +808,7 @@ class LPPN2LPN {
         net
     }
 
-    static Net buildSeqOperationNet(Formula<Event> formula) {
+    static Net buildSeqOperationNet(Formula<Event> formula, Expression thisExp = null, Expression instanceExp = null) {
         Net net = new LPNet(function: new LPTransition(operation: Operation.build(formula)))
         LPTransition t
         LPPlace p
@@ -825,7 +825,7 @@ class LPPN2LPN {
         for (input in formula.inputFormulas) {
 
             // create subnet
-            Net subNet = buildOperationNet(input)
+            Net subNet = buildOperationNet(input, thisExp, instanceExp)
             net.include(subNet)
 
             // anchoring
@@ -849,7 +849,7 @@ class LPPN2LPN {
         return net
     }
 
-    static Net buildParOperationNet(Formula<Event> formula) {
+    static Net buildParOperationNet(Formula<Event> formula, Expression thisExp = null, Expression instanceExp = null) {
         Net net = new LPNet(function: new LPTransition(operation: Operation.build(formula)))
         LPTransition tIn = new LPTransition(link: true)
         LPTransition tOut = new LPTransition(link: true)
@@ -862,7 +862,7 @@ class LPPN2LPN {
             net.placeList << pIn
 
             // create subnet
-            Net subNet = buildOperationNet(input)
+            Net subNet = buildOperationNet(input, thisExp, instanceExp)
             net.include(subNet)
 
             // synchronization place
@@ -881,7 +881,7 @@ class LPPN2LPN {
         return net
     }
 
-    static Net buildAltOperationNet(Formula<Event> formula) {
+    static Net buildAltOperationNet(Formula<Event> formula, Expression thisExp = null, Expression instanceExp = null) {
         Net net = new LPNet(function: new LPTransition(operation: Operation.build(formula)))
 
         LPTransition tIn = new LPTransition(link: true)
@@ -895,7 +895,7 @@ class LPPN2LPN {
 
         for (input in formula.inputFormulas) {
             // create subnet
-            Net subNet = buildOperationNet(input)
+            Net subNet = buildOperationNet(input, thisExp, instanceExp)
             net.include(subNet)
 
             // anchoring
@@ -911,11 +911,15 @@ class LPPN2LPN {
         return net
     }
 
-    static Net buildOperationNet(Formula<Event> formula) {
+    static Net buildOperationNet(Operation operation, Expression thisExp = null, Expression instanceExp = null) {
+        buildOperationNet(operation.formula, thisExp, instanceExp)
+    }
+
+    static Net buildOperationNet(Formula<Event> formula, Expression thisExp = null, Expression instanceExp = null) {
 
         if (formula.operator.isUnary()) {
             if (!formula.isAtomic()) {
-                return buildOperationNet(formula.inputFormulas[0])
+                return buildOperationNet(formula.inputFormulas[0], thisExp, instanceExp)
             } else {
                 if (formula.operator == Operator.POS) {
                     return buildEventNet(formula.inputPorts[0])
@@ -924,7 +928,7 @@ class LPPN2LPN {
                 } else if (formula.operator == Operator.NULL) {
                     return buildEventNet(formula.inputPorts[0].nullify())
                 } else {
-                    throw new RuntimeException()
+                    throw new RuntimeException("Not yet implemented")
                 }
             }
         } else {
@@ -933,21 +937,21 @@ class LPPN2LPN {
                 return buildEventNet(formula.inputPorts[0])
             } else {
                 if (formula.operator == Operator.SEQ) {
-                    return buildSeqOperationNet(formula)
+                    return buildSeqOperationNet(formula, thisExp, instanceExp)
                 } else if (formula.operator == Operator.PAR) {
-                    return buildParOperationNet(formula)
+                    return buildParOperationNet(formula, thisExp, instanceExp)
                 } else if (formula.operator == Operator.ALT) {
-                    return buildAltOperationNet(formula)
+                    return buildAltOperationNet(formula, thisExp, instanceExp)
                 } else {
-                    throw new RuntimeException()
+                    throw new RuntimeException("Not yet implemented")
                 }
             }
         }
     }
 
-    static Net buildEventSeriesNet(Operation action) {
+    static Net buildEventSeriesNet(Operation action, Expression thisExp = null, Expression instanceExp = null) {
 
-        return buildOperationNet(action.formula)
+        return buildOperationNet(action.formula, thisExp, instanceExp)
 
     }
 

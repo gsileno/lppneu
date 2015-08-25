@@ -1,5 +1,6 @@
 package org.leibnizcenter.lppneu.components.position
 
+import org.leibnizcenter.lppneu.components.language.Expression
 import org.leibnizcenter.lppneu.components.language.Operation
 
 abstract class AbstractPosition {
@@ -26,5 +27,6 @@ abstract class AbstractPosition {
     abstract AbstractPosition positive()
     abstract AbstractPosition negative()
     abstract Operation toOperation()
+    abstract Expression toExpression()
 
 }

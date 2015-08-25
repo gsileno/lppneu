@@ -198,7 +198,7 @@ class NetUnificationTest extends GroovyTestCase {
         LPPN2LPN convert = batchConvert("a seq b.")
         printResult(convert)
 
-        assert convert.net.getAllPlaces().size() == 10
+        assert convert.net.getAllPlaces().size() == 8
         assert convert.net.getAllTransitions().size() == 5
         assert convert.net.getAllArcs().size() == 14
         assert convert.net.getAllNets().size() == 4
@@ -209,7 +209,7 @@ class NetUnificationTest extends GroovyTestCase {
         assert convert.unifiedNet.getAllNets().size() == 7
     }
 
-        void testUnifyECARule() {
+    void testUnifyECARule() {
         LPPN2LPN convert = batchConvert("a in b -> p.")
         printResult(convert)
 

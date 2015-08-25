@@ -1,4 +1,4 @@
-package org.leibnizcenter.lppneu.components
+package org.leibnizcenter.lppneu.builders
 
 import org.leibnizcenter.lppneu.builders.LPPN2LPN
 import org.leibnizcenter.lppneu.components.language.*

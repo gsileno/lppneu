@@ -36,7 +36,7 @@ class LPTransition extends Transition {
         } else if (type == TransitionType.COLLECTOR) {
             "C"
         } else {
-            throw new RuntimeException("Empty place?")
+            throw new RuntimeException("Empty transition?")
         }
     }
 

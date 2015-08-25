@@ -52,4 +52,8 @@ class FactualPosition extends AbstractPosition {
     Operation toOperation() {
         ref.label.toOperation()
     }
+
+    Expression toExpression() {
+        ref.label
+    }
 }

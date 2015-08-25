@@ -4,7 +4,9 @@ import groovy.transform.AutoClone
 import groovy.transform.EqualsAndHashCode
 import groovy.util.logging.Log4j
 import org.leibnizcenter.lppneu.components.language.Expression
+import org.leibnizcenter.lppneu.components.language.Parameter
 import org.leibnizcenter.lppneu.components.language.Polarity
+import org.leibnizcenter.lppneu.components.language.Variable
 
 @Log4j @EqualsAndHashCode
 class FactualPositionRef extends AbstractPositionRef {
@@ -12,7 +14,11 @@ class FactualPositionRef extends AbstractPositionRef {
     Expression label
 
     String toString() {
-       return label
+       label.toString()
+    }
+
+    String toLabel() {
+        label.toString()
     }
 
     static FactualPositionRef build(Expression label) {
@@ -35,4 +41,13 @@ class FactualPositionRef extends AbstractPositionRef {
                 label: label.reify()
         )
     }
+
+    List<Variable> getVariables() {
+        label.getVariables()
+    }
+
+    List<Parameter> getParameters() {
+        label.getParameters()
+    }
+
 }

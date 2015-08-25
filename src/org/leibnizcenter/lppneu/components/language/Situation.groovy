@@ -96,11 +96,13 @@ class Situation {
 
     List<Parameter> getParameters() {
         if (rootLiteral) rootLiteral.getParameters()
+        else if (positionRef) positionRef.getParameters()
         else throw new RuntimeException("Not yet implemented.")
     }
 
     List<Variable> getVariables() {
         if (rootLiteral) rootLiteral.getVariables()
+        else if (positionRef) positionRef.getVariables()
         else throw new RuntimeException("Not yet implemented.")
     }
 
