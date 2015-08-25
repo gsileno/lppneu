@@ -3,6 +3,7 @@ package org.leibnizcenter.lppneu.components.language
 import groovy.transform.AutoClone
 import groovy.transform.EqualsAndHashCode
 import groovy.util.logging.Log4j
+import org.apache.tools.ant.taskdefs.XSLTProcess
 
 @Log4j @EqualsAndHashCode
 class Literal {
@@ -25,6 +26,21 @@ class Literal {
 
     static Literal build(Atom functor, List<Parameter> parameters = []) {
         new Literal(functor: functor, parameters: parameters)
+    }
+
+    Literal reify() {
+        List<Parameter> reifiedParameters = []
+        for (param in parameters) {
+            if (param.isVariable()) {
+                if (!param.variable.identifier) {
+                    throw new RuntimeException("Variable ${param} cannot be reified, there is no value.")
+                }
+                reifiedParameters << Parameter.build(Atom.build(param.variable.identifier))
+            } else {
+                reifiedParameters << param
+            }
+        }
+        new Literal(functor: functor, parameters: reifiedParameters)
     }
 
     List<Variable> getVariables() {
@@ -52,5 +68,6 @@ class Literal {
 
         output
     }
+
 
 }

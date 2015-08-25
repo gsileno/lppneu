@@ -117,6 +117,21 @@ class Situation {
         output
     }
 
+    Situation reify() {
+        if (positionRef) {
+            new Situation(
+                polarity: polarity,
+                positionRef: positionRef.reify()
+            )
+        } else if (rootLiteral) {
+            new Situation(
+                    polarity: polarity,
+                    rootLiteral: rootLiteral.reify()
+            )
+        }
+
+    }
+
     Event toEvent() {
         return new Event(
                 operator: polarity.toOperator(),

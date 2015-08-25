@@ -6,7 +6,7 @@ import org.leibnizcenter.pneu.components.petrinet.Net
 import org.leibnizcenter.pneu.components.petrinet.Place
 import org.leibnizcenter.pneu.components.petrinet.Transition
 
-class BasicSimulationComponentsTest extends GroovyTestCase {
+class SimulationComponentsTest extends GroovyTestCase {
 
     void testTransition1() {
         Net net = new LPNet()

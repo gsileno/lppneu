@@ -10,6 +10,10 @@ class Parameter {
     Literal literal
     Variable variable
 
+    static Parameter build(Atom atom) {
+        new Parameter(literal: Literal.build(atom))
+    }
+
     static Parameter build(Literal literal) {
         new Parameter(literal: literal)
     }

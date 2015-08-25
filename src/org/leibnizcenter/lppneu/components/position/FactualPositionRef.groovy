@@ -29,4 +29,10 @@ class FactualPositionRef extends AbstractPositionRef {
                 label: label.minimalClone()
         )
     }
+
+    FactualPositionRef reify() {
+        new FactualPositionRef(
+                label: label.reify()
+        )
+    }
 }

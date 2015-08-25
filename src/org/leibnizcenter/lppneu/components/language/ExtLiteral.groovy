@@ -48,4 +48,11 @@ class ExtLiteral {
     static ExtLiteral buildNull(ExtLiteral input) {
         input.minimalClone().nullify()
     }
+
+    ExtLiteral reify() {
+        new ExtLiteral(
+                polarity: polarity,
+                literal: literal.reify()
+        )
+    }
 }

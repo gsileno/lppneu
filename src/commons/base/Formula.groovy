@@ -4,6 +4,9 @@ import groovy.transform.EqualsAndHashCode
 import groovy.util.logging.Log4j
 import org.leibnizcenter.lppneu.components.language.Operator
 
+// TODO: refactoring to allow to statically specify
+// methods on T, as minimalClone, negate, reify, etc.
+
 @Log4j @EqualsAndHashCode
 class Formula<T> {
 
@@ -14,25 +17,6 @@ class Formula<T> {
     List<Formula<T>> inputFormulas = [] // sub-formulas in input
     Operator operator                // last operator
     List<T> inputPorts = []          // relevant, dependent factors
-
-    Formula<T> minimalClone() {
-
-        List<Formula<T>> clonedInputFormulas = []
-        for (inputFormula in inputFormulas) {
-            clonedInputFormulas << inputFormula.minimalClone()
-        }
-
-        List<Formula<T>> clonedInputPorts = []
-        for (inputPort in inputPorts) {
-            clonedInputPorts << inputPort.minimalClone()
-        }
-
-        new Formula<T>(
-                inputFormulas: clonedInputFormulas,
-                inputPorts: clonedInputPorts,
-                operator: operator
-        )
-    }
 
     //////////////////
     // Builders
@@ -194,5 +178,48 @@ class Formula<T> {
 
         output
     }
+
+    ////////////////////////
+    // Recursive functions
+    ///////////////////////
+
+
+    Formula<T> minimalClone() {
+        List<Formula<T>> clonedInputFormulas = []
+        for (inputFormula in inputFormulas) {
+            clonedInputFormulas << inputFormula.minimalClone()
+        }
+
+        List<Formula<T>> clonedInputPorts = []
+        for (inputPort in inputPorts) {
+            clonedInputPorts << inputPort.minimalClone()
+        }
+
+        new Formula<T>(
+                inputFormulas: clonedInputFormulas,
+                inputPorts: clonedInputPorts,
+                operator: operator
+        )
+    }
+
+    Formula<T> reify() {
+        List<Formula<T>> reifiedInputFormulas = []
+        for (inputFormula in inputFormulas) {
+            reifiedInputFormulas << inputFormula.reify()
+        }
+
+        List<Formula<T>> reifiedInputPorts = []
+        for (inputPort in inputPorts) {
+            reifiedInputPorts << inputPort.reify()
+        }
+
+        new Formula<T>(
+                inputFormulas: reifiedInputFormulas,
+                inputPorts: reifiedInputPorts,
+                operator: operator
+        )
+    }
+
+
 
 }

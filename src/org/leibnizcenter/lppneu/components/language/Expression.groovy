@@ -194,4 +194,10 @@ class Expression {
 
         return program.logicRules[0].head
     }
+
+    Expression reify() {
+        new Expression(
+                formula: formula.reify()
+        )
+    }
 }
