@@ -30,7 +30,7 @@ class BasicSimulationComponentsTest extends GroovyTestCase {
         assert p2.expression.getParameters().size() == 1
 
         LPTransition lpt = (LPTransition) t
-        lpt.initializeUnificationFilter()
+        lpt.initializeInputUnificationFilter()
         assert lpt.commonVarList.size() == 0
 
         assert !t.isEnabled()
@@ -67,7 +67,7 @@ class BasicSimulationComponentsTest extends GroovyTestCase {
         net.resetIds()
 
         LPTransition lpt = (LPTransition) t
-        lpt.initializeUnificationFilter()
+        lpt.initializeInputUnificationFilter()
         assert lpt.commonVarList.size() == 0
 
         assert !t.isEnabled()
@@ -105,7 +105,7 @@ class BasicSimulationComponentsTest extends GroovyTestCase {
         assert p3.expression.getParameters().size() == 2
 
         LPTransition lpt = (LPTransition) t
-        lpt.initializeUnificationFilter()
+        lpt.initializeInputUnificationFilter()
         assert lpt.commonVarList.size() == 1
         assert lpt.commonVarList[0] == "A"
 
@@ -164,7 +164,7 @@ class BasicSimulationComponentsTest extends GroovyTestCase {
         assert p3.expression.getParameters().size() == 2
 
         LPTransition lpt = (LPTransition) t
-        lpt.initializeUnificationFilter()
+        lpt.initializeInputUnificationFilter()
         assert lpt.commonVarList.size() == 1
         assert lpt.commonVarList[0] == "A"
 
@@ -212,7 +212,7 @@ class BasicSimulationComponentsTest extends GroovyTestCase {
         net.resetIds()
 
         LPTransition lpt = (LPTransition) t
-        lpt.initializeUnificationFilter()
+        lpt.initializeInputUnificationFilter()
         assert lpt.commonVarList.size() == 1 // A is a common variable
 
         assert !t.isEnabled()

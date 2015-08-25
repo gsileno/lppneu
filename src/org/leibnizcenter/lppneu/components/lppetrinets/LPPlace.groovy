@@ -21,13 +21,15 @@ class LPPlace extends Place {
     Boolean link = false
 
     String toString() {
-        if (link) "*"
-        else if (expression != null) expression.toString() // + " LPlace@"+hashCode()
+        if (link) "*" + " ("+marking.size()+")"
+        else if (expression != null) expression.toString() + " ("+marking.size()+")" // + " LPlace@"+hashCode()
         else throw new RuntimeException("Empty place?")
     }
 
     String label() {
-       toString()
+        if (link) "*"
+        else if (expression != null) expression.toString() // + " LPlace@"+hashCode()
+        else throw new RuntimeException("Empty place?")
     }
 
     Boolean isLink() {

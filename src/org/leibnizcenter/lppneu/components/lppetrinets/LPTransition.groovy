@@ -1,10 +1,13 @@
 package org.leibnizcenter.lppneu.components.lppetrinets
 
 import groovy.util.logging.Log4j
+import org.leibnizcenter.lppneu.components.language.Atom
+import org.leibnizcenter.lppneu.components.language.Literal
 import org.leibnizcenter.lppneu.components.language.Operation
 import org.leibnizcenter.lppneu.components.language.Operator
 import org.leibnizcenter.pneu.components.petrinet.ArcType
 import org.leibnizcenter.pneu.components.petrinet.Place
+import org.leibnizcenter.pneu.components.petrinet.Node
 import org.leibnizcenter.pneu.components.petrinet.Token
 import org.leibnizcenter.pneu.components.petrinet.Transition
 import org.leibnizcenter.pneu.components.petrinet.TransitionType
@@ -82,15 +85,12 @@ class LPTransition extends Transition {
     // all variables accounted in places
     List<String> allVarList
 
-    // set the filter
-    void initializeUnificationFilter() {
-        commonVarList = []
-        allVarList = []
 
+    private static void computePlaceUnificationFilter(List<Node> inputs, List<String> commonVarList, List<String> allVarList) {
         // for each input place
         for (elem in inputs) {
-            LPPlace pl = (LPPlace) elem.source
-            log.trace("input place: " + pl.id)
+            LPPlace pl = ((LPPlace) ((Place) elem))
+            log.trace("place to be unified: " + pl.id)
 
             // for each variable which is not in the filter
             for (var in (pl.expression.getVariables() - commonVarList)) {
@@ -108,6 +108,36 @@ class LPTransition extends Transition {
             }
         }
     }
+
+
+    // set the filter for the input to the transition
+    void initializeInputUnificationFilter() {
+        commonVarList = []
+        allVarList = []
+
+        List<Node> nodeInputs = []
+        for (arc in inputs) {
+            nodeInputs << arc.source
+        }
+
+        computePlaceUnificationFilter(nodeInputs, commonVarList, allVarList)
+    }
+
+    // set the filter for the input to the transition
+    List<String> getCommonVarOutputUnificationFilter() {
+        List<String> outCommonVarList = []
+        List<String> outAllVarList = []
+
+        List<Node> nodeOutputs = []
+        for (arc in outputs) {
+            nodeOutputs << arc.target
+        }
+
+        computePlaceUnificationFilter(nodeOutputs, outCommonVarList, outAllVarList)
+        outCommonVarList
+    }
+
+
 
     Boolean isEnabledIncludingEmission() {
         if (inputs.size() == 0 && isEmitter())
@@ -224,7 +254,7 @@ class LPTransition extends Transition {
 
         // initialize filter to unify tokens+
         if (commonVarList == null) {
-            initializeUnificationFilter()
+            initializeInputUnificationFilter()
         }
 
         // for optimization - there are no tokens here
@@ -312,7 +342,16 @@ class LPTransition extends Transition {
     void produceOutputTokens() {
         log.trace("${id} produces.")
 
-        log.trace("Transmitted content in consumption: ${coreContent}")
+        log.trace("Transmitted content in consumption (without anonymous variables): ${coreContent}")
+
+        List<String> outCommonVarList = getCommonVarOutputUnificationFilter()
+
+        for (var in outCommonVarList) {
+            if (!coreContent.keySet().contains(var))
+                coreContent[var] = generateAnonymousIdentifier(var)
+        }
+
+        log.trace("Transmitted content in consumption (with anonymous variables): ${coreContent}")
 
         for (arc in outputs) {
             LPPlace p = (LPPlace) arc.target
@@ -330,4 +369,20 @@ class LPTransition extends Transition {
         coreContent = [:]
     }
 
+    // count the anonymous content generated, in order to generate unique names
+    private Map<String, Integer> variableAnonymousGeneratedIdCountMap = [:]
+    private String generateAnonymousIdentifier(String variable) {
+
+        if (variableAnonymousGeneratedIdCountMap[variable] == null)
+            variableAnonymousGeneratedIdCountMap[variable] = -1
+
+        Integer n = variableAnonymousGeneratedIdCountMap[variable] + 1
+        variableAnonymousGeneratedIdCountMap[variable] = n
+
+        if (id == null) {
+            "_"+variable.toLowerCase()+n
+        } else {
+            "_"+id+variable.toLowerCase()+n
+        }
+    }
 }
