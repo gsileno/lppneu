@@ -1,5 +1,6 @@
 package org.leibnizcenter.lppneu.components.language
 
+import com.sun.xml.internal.ws.api.model.wsdl.WSDLBoundOperation
 import groovy.transform.AutoClone
 import groovy.transform.EqualsAndHashCode
 import groovy.util.logging.Log4j
@@ -22,6 +23,11 @@ class Literal {
                 functor: functor,
                 parameters: cloneParameters
         )
+    }
+
+    // special case: literal with anonymous predicate
+    static Literal buildAnonymous(List<Parameter> parameters = []) {
+        new Literal(parameters: parameters)
     }
 
     static Literal build(Atom functor, List<Parameter> parameters = []) {
@@ -54,7 +60,11 @@ class Literal {
     }
 
     String toString() {
-        String output = functor.name
+        String output = ""
+        if (functor)
+            output += functor.name
+        else
+            output += "*"
         if (parameters) {
             output += "("
             for (parameter in parameters) {

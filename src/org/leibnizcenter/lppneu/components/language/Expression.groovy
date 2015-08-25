@@ -82,7 +82,7 @@ class Expression {
         }
 
         new Expression(
-                formula: PROTOTYPE.build(Situation.build(Literal.build(Atom.build("bridge"), parameters)))
+                formula: PROTOTYPE.build(Situation.build(Literal.buildAnonymous(parameters)))
         )
     }
 

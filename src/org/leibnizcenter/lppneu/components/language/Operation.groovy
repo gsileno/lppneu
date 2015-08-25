@@ -99,7 +99,7 @@ class Operation {
         }
 
         new Operation(
-                formula: PROTOTYPE.build(Event.build(Literal.build(Atom.build("bridge"), parameters)))
+                formula: PROTOTYPE.build(Event.build(Literal.buildAnonymous(parameters)))
         )
     }
 
