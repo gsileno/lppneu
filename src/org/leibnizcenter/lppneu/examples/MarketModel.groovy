@@ -1,11 +1,11 @@
+package org.leibnizcenter.lppneu.examples
+
 import org.leibnizcenter.lppneu.components.lppetrinets.LPNet
 import org.leibnizcenter.lppneu.components.lppetrinets.LPTransition
-import org.leibnizcenter.pneu.animation.monolithic.NetRunner
 import org.leibnizcenter.pneu.components.petrinet.Net
 import org.leibnizcenter.pneu.components.petrinet.Transition
 
-class MarketModelTest extends GroovyTestCase {
-
+class MarketModel {
     static Net basicSaleInstance1() {
         Net sale = new LPNet()
 
@@ -25,7 +25,6 @@ class MarketModelTest extends GroovyTestCase {
         sale.createBridge(t4, tOut)
 
         sale.resetIds()
-        sale.exportToLog("basicSaleInstance1")
         sale
     }
 
@@ -48,7 +47,6 @@ class MarketModelTest extends GroovyTestCase {
         sale.createBridge(t3, tOut)
 
         sale.resetIds()
-        sale.exportToLog("basicSaleInstance2")
         sale
     }
 
@@ -72,7 +70,6 @@ class MarketModelTest extends GroovyTestCase {
         sale.createBridge(t4, tOut)
 
         sale.resetIds()
-        sale.exportToLog("basicSale")
         sale
     }
 
@@ -99,7 +96,6 @@ class MarketModelTest extends GroovyTestCase {
         sale.createBridge(t4, tOut)
 
         sale.resetIds()
-        sale.exportToLog("basicSale2Parties")
         sale
     }
 
@@ -130,7 +126,6 @@ class MarketModelTest extends GroovyTestCase {
         sale.createBridge(t4, tOut)
 
         sale.resetIds()
-        sale.exportToLog("basicSaleWithWorld")
         sale
     }
 
@@ -167,46 +162,6 @@ class MarketModelTest extends GroovyTestCase {
         sale.createBridge(t4, tOut)
 
         sale.resetIds()
-        sale.exportToLog("basicSaleWithWorldAndTimeline")
-        sale.exportToDot("basicSaleWithWorldAndTimeline")
         sale
     }
-
-    NetRunner runner = new NetRunner()
-
-    void testBasicSaleInstance1() {
-        runner.load(basicSaleInstance1())
-        assert (runner.analyse(10) == 6)
-        assert (runner.analysis.storyBase.getSize() == 1)
-        runner.analysis.exportToLog("BasicSaleInstance1")
-    }
-
-    void testBasicSaleModel() {
-        runner.load(basicSaleModel())
-        runner.analyse()
-        assert (runner.analysis.storyBase.getSize() == 2)
-        runner.analysis.exportToLog("BasicSaleModel")
-    }
-
-    void testbasicSaleWith2Parties() {
-        runner.load(basicSaleWith2Parties())
-        runner.analyse()
-        assert (runner.analysis.storyBase.getSize() == 3)
-        runner.analysis.exportToLog("BasicSaleWith2Parties")
-    }
-
-    void testBasicSaleWithWorld() {
-        runner.load(basicSaleWithWorld())
-        runner.analyse()
-        assert (runner.analysis.storyBase.getSize() == 9)
-        runner.analysis.exportToLog("BasicSaleWithWorld")
-    }
-
-    void testBasicSaleWithWorldAndTimeline() {
-        runner.load(basicSaleWithWorldAndTimeline())
-        runner.analyse()
-        assert (runner.analysis.storyBase.getSize() == 8)
-        runner.analysis.exportToLog("BasicSaleWithWorldAndTimeline")
-    }
-
 }

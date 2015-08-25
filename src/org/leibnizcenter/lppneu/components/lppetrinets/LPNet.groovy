@@ -105,6 +105,8 @@ class LPNet extends Net {
             varStringList = Variable.toVarStringList(lpp1.expression.getVariables())
         } else if (lpp2.expression != null) {
             varStringList = Variable.toVarStringList(lpp2.expression.getVariables())
+        } else {
+            throw new RuntimeException("Both places in the bridge cannot be underspecified")
         }
 
         Transition tBridge
@@ -138,6 +140,8 @@ class LPNet extends Net {
             varStringList = Variable.toVarStringList(lpt1.operation.getVariables())
         } else if (lpt2.operation != null) {
             varStringList = Variable.toVarStringList(lpt2.operation.getVariables())
+        } else {
+            throw new RuntimeException("Both transitions in the bridge cannot be underspecified")
         }
 
         Place pBridge

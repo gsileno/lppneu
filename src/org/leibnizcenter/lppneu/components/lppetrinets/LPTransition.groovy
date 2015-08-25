@@ -137,7 +137,19 @@ class LPTransition extends Transition {
         outCommonVarList
     }
 
+    // useful for emitter transitions, to know what they will generate
+    List<String> getAllVarOutputUnificationFilter() {
+        List<String> outCommonVarList = []
+        List<String> outAllVarList = []
 
+        List<Node> nodeOutputs = []
+        for (arc in outputs) {
+            nodeOutputs << arc.target
+        }
+
+        computePlaceUnificationFilter(nodeOutputs, outCommonVarList, outAllVarList)
+        outAllVarList
+    }
 
     Boolean isEnabledIncludingEmission() {
         if (inputs.size() == 0 && isEmitter())
