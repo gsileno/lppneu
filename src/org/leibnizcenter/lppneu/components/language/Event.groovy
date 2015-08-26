@@ -5,11 +5,13 @@ import groovy.util.logging.Log4j
 import org.leibnizcenter.lppneu.components.position.AbstractPosition
 import org.leibnizcenter.lppneu.components.position.AbstractPositionRef
 
-@Log4j @EqualsAndHashCode
+@Log4j
+@EqualsAndHashCode
 class Event {
     Operator operator
     AbstractPositionRef positionRef
-    Literal rootLiteral
+    Literal factLiteral
+    Literal rootLiteral // root literal are for primitive actions
     AbstractPosition position
 
     Event minimalClone() {
@@ -17,11 +19,19 @@ class Event {
                 operator: operator,
                 positionRef: positionRef,
                 position: position,
-                rootLiteral: rootLiteral.clone()
+                factLiteral: rootLiteral.minimalClone(),
+                rootLiteral: rootLiteral.minimalClone()
         )
     }
 
     static Event build(ExtLiteral extLiteral) {
+        new Event(
+                operator: extLiteral.polarity.toOperator(),
+                factLiteral: extLiteral.literal
+        )
+    }
+
+    static Event buildFromRootLiteral(ExtLiteral extLiteral) {
         new Event(
                 operator: extLiteral.polarity.toOperator(),
                 rootLiteral: extLiteral.literal
@@ -31,7 +41,7 @@ class Event {
     static Event build(Literal literal, Operator operator = Operator.POS) {
         new Event(
                 operator: operator,
-                rootLiteral: literal
+                factLiteral: literal
         )
     }
 
@@ -54,6 +64,7 @@ class Event {
                 operator: operator.negate(),
                 positionRef: positionRef,
                 rootLiteral: rootLiteral,
+                factLiteral: factLiteral,
                 position: position
         )
     }
@@ -63,6 +74,7 @@ class Event {
                 operator: operator.NULL,
                 positionRef: positionRef,
                 rootLiteral: rootLiteral,
+                factLiteral: factLiteral,
                 position: position
         )
     }
@@ -72,6 +84,7 @@ class Event {
                 operator: operator.POS,
                 positionRef: positionRef,
                 rootLiteral: rootLiteral,
+                factLiteral: factLiteral,
                 position: position
         )
     }
@@ -81,20 +94,27 @@ class Event {
                 operator: operator.NEG,
                 positionRef: positionRef,
                 rootLiteral: rootLiteral,
+                factLiteral: factLiteral,
                 position: position
         )
     }
 
     Situation toSituation() {
+
+        if (position)
+            throw new RuntimeException("This event cannot be converted to a situation.")
+
         return new Situation(
                 polarity: operator.toPolarity(),
                 positionRef: positionRef,
-                rootLiteral: rootLiteral
+                rootLiteral: rootLiteral,
+                factLiteral: factLiteral,
         )
     }
 
     List<Variable> getVariables() {
         if (rootLiteral) rootLiteral.getVariables()
+        else if (factLiteral) factLiteral.getVariables()
         else throw new RuntimeException("Not yet implemented.")
     }
 
@@ -104,7 +124,8 @@ class Event {
         Boolean printOp = (operator != Operator.POS)
 
         if (printOp) output += operator.toString() + "("
-        if (rootLiteral) output += rootLiteral.toString()
+        if (factLiteral) output += factLiteral.toString()
+        if (rootLiteral) output += "."+rootLiteral.toString()
         else output += positionRef.toString()
         if (printOp) output += ")"
 

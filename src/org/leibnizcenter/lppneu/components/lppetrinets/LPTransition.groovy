@@ -26,15 +26,15 @@ class LPTransition extends Transition {
 
     String toString() {
         if (link) {
-            "*"
+            "* (${id})"
         } else if (operation != null) {
             operation.toString() // + " LTransition@"+hashCode()
         } else if (operator != null) {
             operator.toString() // + " LTransition@"+hashCode()
         } else if (type == TransitionType.EMITTER) {
-            "E"
+            "E (${id})"
         } else if (type == TransitionType.COLLECTOR) {
-            "C"
+            "C (${id})"
         } else {
             throw new RuntimeException("Empty transition?")
         }
@@ -259,7 +259,7 @@ class LPTransition extends Transition {
 
     Boolean isEnabled() {
 
-        log.trace("Checking transition of ${id}")
+        log.trace("Checking enabled condition for transition ${id}")
 
         // cut out not emitters
         if (inputs.size() == 0) return false
@@ -340,10 +340,9 @@ class LPTransition extends Transition {
                     toBeRemoved << tokens[i]
                     includes(coreContent, ((LPToken) tokens[i]).toVarWithValuesMap())
                 }
-            } else {
-                throw new RuntimeException("Not yet implemented")
-                // TODO: check for inhibitor when different weight
             }
+
+            // TODO: check for inhibitor when different weight
 
             log.trace("Removing from ${p.id} the tokens: " + toBeRemoved)
 

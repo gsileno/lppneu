@@ -955,7 +955,6 @@ class LPPN2LPN {
 
     }
 
-
     static Net buildMechanismNet(Expression condition, Operation action) {
 
         Expression antecedent

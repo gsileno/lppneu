@@ -30,12 +30,18 @@ enum Operator {
     IMPLIES, INHIBITS, DEFINES,      // logical dependencies on situations
     OCCURS_IN, OCCURS, CAUSES,       // event definition and causal dependency
 
-    TRIPLE, ASSOCIATION,             // just for labeling purposes (TODO: refactoring)
+    TRIPLE, ASSOCIATION,                         // just for labeling purposes (TODO: refactoring)
     IS_IMPLIED_BY, IS_CAUSED_BY, IS_DEFINED_BY,  // for operation reconstruction when associating the transitions to the triples
 
-    // TOCHECK not formally correct:
-    POS_INSTANCE, NEG_INSTANCE, NOT_INSTANCE,  // specific operators
-    POS_THIS, NEG_THIS, NOT_THIS
+    // specific operators for positional programming, to be reconverted
+    POS_INSTANCE, NEG_INSTANCE, NOT_INSTANCE,
+    POS_THIS, NEG_THIS, NOT_THIS,
+
+    // specific operators for positional programming
+    SUCCESS, FAILURE, ISTANTIATION, EXPIRATION, INHIBITION
+
+    // TODO: to consider SUSPENSION for commitments?
+    // could it be considered as a kind of inhibition?
 
     Operator negate() {
         if (this == POS) return NEG

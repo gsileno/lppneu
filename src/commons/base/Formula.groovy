@@ -67,7 +67,9 @@ class Formula<T> {
                      op == Operator.PAR || op == Operator.ALT || op == Operator.SEQ || op == Operator.OPT)
                 formula = build(terms[0])
             else if (op == Operator.OCCURS || op == Operator.TRIPLE || op == Operator.ASSOCIATION ||
-                     op == Operator.IS_IMPLIED_BY || op == Operator.IS_CAUSED_BY) {
+                     op == Operator.IS_IMPLIED_BY || op == Operator.IS_CAUSED_BY ||
+                     op == Operator.SUCCESS || op == Operator.FAILURE || op == Operator.INHIBITION ||
+                     op == Operator.ISTANTIATION || op == Operator.EXPIRATION) {
                 formula.operator = op
                 Formula f = build(terms[0])
                 formula.inputFormulas << f

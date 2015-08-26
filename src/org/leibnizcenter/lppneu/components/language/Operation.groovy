@@ -131,6 +131,11 @@ class Operation {
 
     }
 
+    Operation minimalClone() {
+        new Operation
+                (formula: formula.minimalClone())
+    }
+
     // create an expression from string
     static Operation parse(String code) {
         // first create the expression and then transform it in a operation

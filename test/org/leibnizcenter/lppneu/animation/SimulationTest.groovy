@@ -111,4 +111,5 @@ class SimulationTest extends GroovyTestCase {
         assert(runner.execution.nTokenEmitted == runner.execution.nTokenCollected + 1)
     }
 
+
 }

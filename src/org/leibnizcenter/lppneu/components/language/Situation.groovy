@@ -4,32 +4,45 @@ import groovy.transform.EqualsAndHashCode
 import groovy.util.logging.Log4j
 import org.leibnizcenter.lppneu.components.position.AbstractPositionRef
 
-@Log4j @EqualsAndHashCode
+@Log4j
+@EqualsAndHashCode
 class Situation {
 
     Polarity polarity
     AbstractPositionRef positionRef
-    Literal rootLiteral
+    Literal rootLiteral // root literal are for primitive perceptions
+    Literal factLiteral
 
     Situation minimalClone() {
-        new Situation(
-                polarity: polarity,
-                positionRef: positionRef,
-                rootLiteral: rootLiteral.minimalClone()
-        )
+        if (rootLiteral) {
+            new Situation(
+                    polarity: polarity,
+                    rootLiteral: rootLiteral.minimalClone(),
+            )
+        } else if (factLiteral) {
+            new Situation(
+                    polarity: polarity,
+                    factLiteral: factLiteral.minimalClone()
+            )
+        } else {
+            new Situation(
+                    polarity: polarity,
+                    positionRef: positionRef
+            )
+        }
     }
 
     static Situation build(Literal literal, Polarity polarity = Polarity.POS) {
         new Situation(
                 polarity: polarity,
-                rootLiteral: literal
+                factLiteral: literal
         )
     }
 
     static Situation build(ExtLiteral extLiteral) {
         new Situation(
                 polarity: extLiteral.polarity,
-                rootLiteral: extLiteral.literal
+                factLiteral: extLiteral.literal
         )
     }
 
@@ -49,10 +62,17 @@ class Situation {
             } else {
                 return new Situation(
                         polarity: polarity,
-                        rootLiteral: content.formula.inputPorts[0].rootLiteral
+                        factLiteral: content.formula.inputPorts[0].factLiteral
                 )
             }
         }
+    }
+
+    static Situation buildFromRootLiteral(ExtLiteral extLiteral) {
+        new Situation(
+                polarity: extLiteral.polarity,
+                rootLiteral: extLiteral.literal
+        )
     }
 
     static Situation build(AbstractPositionRef positionRef, Polarity polarity = Polarity.POS) {
@@ -63,45 +83,51 @@ class Situation {
     }
 
     Situation negate() {
-            new Situation(
-                    polarity: polarity.negate(),
-                    positionRef: positionRef,
-                    rootLiteral: rootLiteral
-            )
+        new Situation(
+                polarity: polarity.negate(),
+                positionRef: positionRef,
+                rootLiteral: rootLiteral,
+                factLiteral: factLiteral
+        )
     }
 
     Situation nullify() {
-            new Situation(
-                    polarity: polarity.NULL,
-                    positionRef: positionRef,
-                    rootLiteral: rootLiteral
-            )
+        new Situation(
+                polarity: polarity.NULL,
+                positionRef: positionRef,
+                rootLiteral: rootLiteral,
+                factLiteral: factLiteral
+        )
     }
 
     Situation positive() {
-            new Situation(
-                    polarity: polarity.POS,
-                    positionRef: positionRef,
-                    rootLiteral: rootLiteral
-            )
+        new Situation(
+                polarity: polarity.POS,
+                positionRef: positionRef,
+                rootLiteral: rootLiteral,
+                factLiteral: factLiteral
+        )
     }
 
     Situation negative() {
-            return new Situation(
-                    polarity: polarity.NEG,
-                    positionRef: positionRef,
-                    rootLiteral: rootLiteral
-            )
+        return new Situation(
+                polarity: polarity.NEG,
+                positionRef: positionRef,
+                rootLiteral: rootLiteral,
+                factLiteral: factLiteral
+        )
     }
 
     List<Parameter> getParameters() {
         if (rootLiteral) rootLiteral.getParameters()
+        else if (factLiteral) factLiteral.getParameters()
         else if (positionRef) positionRef.getParameters()
         else throw new RuntimeException("Not yet implemented.")
     }
 
     List<Variable> getVariables() {
         if (rootLiteral) rootLiteral.getVariables()
+        else if (factLiteral) factLiteral.getVariables()
         else if (positionRef) positionRef.getVariables()
         else throw new RuntimeException("Not yet implemented.")
     }
@@ -112,7 +138,8 @@ class Situation {
         Boolean printOp = (polarity != Polarity.POS)
 
         if (printOp) output += polarity.toString() + "("
-        if (rootLiteral) output += rootLiteral.toString()
+        if (factLiteral) output += factLiteral.toString()
+        else if (rootLiteral) output += "." + rootLiteral.toString()
         else output += positionRef.toString()
         if (printOp) output += ")"
 
@@ -122,14 +149,21 @@ class Situation {
     Situation reify() {
         if (positionRef) {
             new Situation(
-                polarity: polarity,
-                positionRef: positionRef.reify()
+                    polarity: polarity,
+                    positionRef: positionRef.reify()
             )
         } else if (rootLiteral) {
             new Situation(
                     polarity: polarity,
                     rootLiteral: rootLiteral.reify()
             )
+        } else if (factLiteral) {
+            new Situation(
+                    polarity: polarity,
+                    factLiteral: factLiteral.reify()
+            )
+        } else {
+            throw new RuntimeException("You shouldn't be here")
         }
 
     }
@@ -138,7 +172,8 @@ class Situation {
         return new Event(
                 operator: polarity.toOperator(),
                 positionRef: positionRef,
-                rootLiteral: rootLiteral
+                rootLiteral: rootLiteral,
+                factLiteral: factLiteral
         )
     }
 

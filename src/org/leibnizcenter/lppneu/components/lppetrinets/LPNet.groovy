@@ -89,7 +89,7 @@ class LPNet extends Net {
     // the bridge transition is meant to produce what is in the last place
     // what is already described in the first transition will be transmitted,
     // the rest will be lost
-    void createBridge(Place p1, Place p2) {
+    Transition createBridge(Place p1, Place p2) {
         if (!getAllPlaces().contains(p1) || !getAllPlaces().contains(p2)) {
             throw new RuntimeException("Error: this net does not contain the place(s) to bridge")
         }
@@ -119,9 +119,10 @@ class LPNet extends Net {
         transitionList << tBridge
         arcList += Arc.buildArcs(p1, tBridge, p2)
 
+        tBridge
     }
 
-    void createNexus(List<Place> inputs, List<Place> outputs, List<Place> biflows, List<Place> diode, List<Place> inhibitors) {
+    Transition createNexus(List<Place> inputs, List<Place> outputs, List<Place> biflows, List<Place> diode, List<Place> inhibitors) {
 
         Transition tBridge = createLinkTransition()
 
@@ -146,12 +147,13 @@ class LPNet extends Net {
             createInhibitorArc(p, tBridge)
         }
 
+        tBridge
     }
 
     // the first transition is meant to produce what is in the bridge place
     // at the same time, the second transition necessarily consumes what is in the bridge place,
     // which has therefore to be produced somewhere, this can be seen "context" information
-    void createBridge(Transition t1, Transition t2) {
+    Place createBridge(Transition t1, Transition t2) {
         if (!getAllTransitions().contains(t1) || !getAllTransitions().contains(t2)) {
             throw new RuntimeException("Error: this net does not contain the transition(s) to bridge")
         }
@@ -179,6 +181,8 @@ class LPNet extends Net {
         }
         placeList << pBridge
         arcList += Arc.buildArcs(t1, pBridge, t2)
+
+        pBridge
     }
 
     // deep cloning done for nets

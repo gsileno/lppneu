@@ -1,8 +1,10 @@
 package org.leibnizcenter.lppneu.builders
 
 import org.leibnizcenter.lppneu.components.language.LPPNProgram
+import org.leibnizcenter.lppneu.components.lppetrinets.LPNet
 import org.leibnizcenter.lppneu.parsers.LPPNLoader
 import org.leibnizcenter.pneu.components.petrinet.Net
+import org.leibnizcenter.pneu.components.petrinet.Place
 
 class DotBuilderTest extends GroovyTestCase {
 
@@ -26,6 +28,7 @@ class DotBuilderTest extends GroovyTestCase {
         conversion.convert(program)
         return conversion
     }
+
 //
 //    void testSimpleFact() {
 //        LPPN2LPN convert = batchConvert("a.")

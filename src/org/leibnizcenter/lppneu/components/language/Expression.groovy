@@ -2,6 +2,7 @@ package org.leibnizcenter.lppneu.components.language
 
 import commons.base.Formula
 import groovy.transform.EqualsAndHashCode
+import org.leibnizcenter.lppneu.components.position.AbstractPositionRef
 import org.leibnizcenter.lppneu.parsers.LPPNLoader
 
 @EqualsAndHashCode
@@ -40,6 +41,10 @@ class Expression {
         new Expression(
                 formula: PROTOTYPE.build(formula, op)
         )
+    }
+
+    static Expression build(AbstractPositionRef ref) {
+        build(Situation.build(ref))
     }
 
     static Expression build(Expression expression, Operator op) {
@@ -108,8 +113,14 @@ class Expression {
         if (!isPositive()) {
             if (!this.formula.isAtomic())
                 return build(this.formula.inputFormulas[0])
-            else
-                return build(this.formula.inputPorts[0].rootLiteral)
+            else {
+                if (this.formula.inputPorts[0].rootLiteral)
+                    return build(this.formula.inputPorts[0].rootLiteral)
+                else if (this.formula.inputPorts[0].factLiteral)
+                    return build(this.formula.inputPorts[0].factLiteral)
+                else
+                    throw new RuntimeException("You shouldn't be here.")
+            }
         } else {
             return build(this.formula)
         }

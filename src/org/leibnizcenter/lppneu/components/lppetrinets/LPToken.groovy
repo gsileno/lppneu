@@ -25,7 +25,7 @@ class LPToken extends Token {
 
     // check if it respects the unification filter
     Boolean checkWithFilter(Map<String, String> varWithValuesMap) {
-        log.trace("cheking token with filter")
+        log.trace("checking token with filter")
         for (param in expression.parameters) {
             log.trace("parameter: " + param)
             if (param.isVariable()) {
