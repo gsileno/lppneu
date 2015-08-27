@@ -115,6 +115,7 @@ class Event {
     List<Variable> getVariables() {
         if (rootLiteral) rootLiteral.getVariables()
         else if (factLiteral) factLiteral.getVariables()
+        else if (positionRef) positionRef.getVariables()
         else throw new RuntimeException("Not yet implemented.")
     }
 

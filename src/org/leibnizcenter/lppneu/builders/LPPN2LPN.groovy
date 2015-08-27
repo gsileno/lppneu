@@ -7,6 +7,7 @@ import org.leibnizcenter.lppneu.components.lppetrinets.LPNet
 import org.leibnizcenter.lppneu.components.lppetrinets.LPPlace
 import org.leibnizcenter.lppneu.components.lppetrinets.LPTransition
 import org.leibnizcenter.lppneu.components.mapper.Mapper
+import org.leibnizcenter.lppneu.components.position.AbstractPositionRef
 import org.leibnizcenter.lppneu.components.position.AbstractTriple
 import org.leibnizcenter.lppneu.components.position.FactualTriple
 import org.leibnizcenter.pneu.components.petrinet.Arc
@@ -808,7 +809,7 @@ class LPPN2LPN {
         net
     }
 
-    static Net buildSeqOperationNet(Formula<Event> formula, Expression thisExp = null, Expression instanceExp = null) {
+    static Net buildSeqOperationNet(Formula<Event> formula, AbstractPositionRef thisRef = null, AbstractPositionRef instanceRef = null) {
         Net net = new LPNet(function: new LPTransition(operation: Operation.build(formula)))
         LPTransition t
         LPPlace p
@@ -825,7 +826,7 @@ class LPPN2LPN {
         for (input in formula.inputFormulas) {
 
             // create subnet
-            Net subNet = buildOperationNet(input, thisExp, instanceExp)
+            Net subNet = buildOperationNet(input, thisRef, instanceRef)
             net.include(subNet)
 
             // anchoring
@@ -849,7 +850,7 @@ class LPPN2LPN {
         return net
     }
 
-    static Net buildParOperationNet(Formula<Event> formula, Expression thisExp = null, Expression instanceExp = null) {
+    static Net buildParOperationNet(Formula<Event> formula, AbstractPositionRef thisRef = null, AbstractPositionRef instanceRef = null) {
         Net net = new LPNet(function: new LPTransition(operation: Operation.build(formula)))
         LPTransition tIn = new LPTransition(link: true)
         LPTransition tOut = new LPTransition(link: true)
@@ -862,7 +863,7 @@ class LPPN2LPN {
             net.placeList << pIn
 
             // create subnet
-            Net subNet = buildOperationNet(input, thisExp, instanceExp)
+            Net subNet = buildOperationNet(input, thisRef, instanceRef)
             net.include(subNet)
 
             // synchronization place
@@ -881,7 +882,7 @@ class LPPN2LPN {
         return net
     }
 
-    static Net buildAltOperationNet(Formula<Event> formula, Expression thisExp = null, Expression instanceExp = null) {
+    static Net buildAltOperationNet(Formula<Event> formula, AbstractPositionRef thisRef = null, AbstractPositionRef instanceRef = null) {
         Net net = new LPNet(function: new LPTransition(operation: Operation.build(formula)))
 
         LPTransition tIn = new LPTransition(link: true)
@@ -895,7 +896,7 @@ class LPPN2LPN {
 
         for (input in formula.inputFormulas) {
             // create subnet
-            Net subNet = buildOperationNet(input, thisExp, instanceExp)
+            Net subNet = buildOperationNet(input, thisRef, instanceRef)
             net.include(subNet)
 
             // anchoring
@@ -911,15 +912,15 @@ class LPPN2LPN {
         return net
     }
 
-    static Net buildOperationNet(Operation operation, Expression thisExp = null, Expression instanceExp = null) {
-        buildOperationNet(operation.formula, thisExp, instanceExp)
+    static Net buildOperationNet(Operation operation, AbstractPositionRef thisRef = null, AbstractPositionRef instanceRef = null) {
+        buildOperationNet(operation.formula, thisRef, instanceRef)
     }
 
-    static Net buildOperationNet(Formula<Event> formula, Expression thisExp = null, Expression instanceExp = null) {
+    static Net buildOperationNet(Formula<Event> formula, AbstractPositionRef thisRef = null, AbstractPositionRef instanceRef = null) {
 
         if (formula.operator.isUnary()) {
             if (!formula.isAtomic()) {
-                return buildOperationNet(formula.inputFormulas[0], thisExp, instanceExp)
+                return buildOperationNet(formula.inputFormulas[0], thisRef, instanceRef)
             } else {
                 if (formula.operator == Operator.POS) {
                     return buildEventNet(formula.inputPorts[0])
@@ -927,21 +928,33 @@ class LPPN2LPN {
                     return buildEventNet(formula.inputPorts[0].negate())
                 } else if (formula.operator == Operator.NULL) {
                     return buildEventNet(formula.inputPorts[0].nullify())
+                } else if (formula.operator == Operator.POS_THIS) {
+                    return buildEventNet(Event.build(thisRef, Operator.POS))
+                } else if (formula.operator == Operator.NEG_THIS) {
+                    return buildEventNet(Event.build(thisRef, Operator.NEG))
+                } else if (formula.operator == Operator.NOT_THIS) {
+                    return buildEventNet(Event.build(thisRef, Operator.NULL))
+                } else if (formula.operator == Operator.NOT_INSTANCE) {
+                    return buildEventNet(Event.build(instanceRef, Operator.POS))
+                } else if (formula.operator == Operator.NEG_INSTANCE) {
+                    return buildEventNet(Event.build(instanceRef, Operator.NEG))
+                } else if (formula.operator == Operator.NOT_INSTANCE) {
+                    return buildEventNet(Event.build(instanceRef, Operator.NULL))
                 } else {
                     throw new RuntimeException("Not yet implemented")
                 }
             }
         } else {
             if (formula.isAtomic()) {
-                // TOCHECK: it is wrong I think
+                // TODO: check properly, it may be wrong I think
                 return buildEventNet(formula.inputPorts[0])
             } else {
                 if (formula.operator == Operator.SEQ) {
-                    return buildSeqOperationNet(formula, thisExp, instanceExp)
+                    return buildSeqOperationNet(formula, thisRef, instanceRef)
                 } else if (formula.operator == Operator.PAR) {
-                    return buildParOperationNet(formula, thisExp, instanceExp)
+                    return buildParOperationNet(formula, thisRef, instanceRef)
                 } else if (formula.operator == Operator.ALT) {
-                    return buildAltOperationNet(formula, thisExp, instanceExp)
+                    return buildAltOperationNet(formula, thisRef, instanceRef)
                 } else {
                     throw new RuntimeException("Not yet implemented")
                 }
@@ -949,9 +962,9 @@ class LPPN2LPN {
         }
     }
 
-    static Net buildEventSeriesNet(Operation action, Expression thisExp = null, Expression instanceExp = null) {
+    static Net buildEventSeriesNet(Operation action, AbstractPositionRef thisRef = null, AbstractPositionRef instanceRef = null) {
 
-        return buildOperationNet(action.formula, thisExp, instanceExp)
+        return buildOperationNet(action.formula, thisRef, instanceRef)
 
     }
 

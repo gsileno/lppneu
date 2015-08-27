@@ -48,11 +48,17 @@ class LPTransition extends Transition {
         return link
     }
 
-    Transition clone() {
+    Transition minimalClone() {
+        Map<String, Integer> newVariableAnonymousGeneratedIdCountMap = [:]
+        for (item in variableAnonymousGeneratedIdCountMap) {
+            newVariableAnonymousGeneratedIdCountMap[item.key] = item.value
+        }
+
         return new LPTransition(
-                operation: operation,
+                operation: operation.minimalClone(),
                 operator: operator,
-                link: link
+                link: link,
+                variableAnonymousGeneratedIdCountMap: newVariableAnonymousGeneratedIdCountMap
         )
     }
 
@@ -186,6 +192,8 @@ class LPTransition extends Transition {
     List<Map<String, String>> getFilterList() {
         List<Map<String, String>> filterList = []
 
+        // TODO: to add the case of link nodes
+
         // filter tokens
         for (arc in inputs) {
             LPPlace pl = (LPPlace) arc.source
@@ -284,6 +292,8 @@ class LPTransition extends Transition {
         // there is no common filter amongst existing tokens
         if (filterList == null)
             return false
+
+        // TODO: to add the case of link nodes
 
         for (elem in inputs) {
             LPPlace p = (LPPlace) elem.source

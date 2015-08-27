@@ -21,7 +21,7 @@ class LPPlace extends Place {
     Boolean link = false
 
     String toString() {
-        if (link) "*" + " ("+marking.size()+")"
+        if (link) "*" + " ${id} ("+marking.size()+")"
         else if (expression != null) expression.toString() + " ("+marking.size()+")" // + " LPlace@"+hashCode()
         else throw new RuntimeException("Empty place?")
     }
@@ -40,6 +40,8 @@ class LPPlace extends Place {
         if (expression.formula.operator == Operator.ASSOCIATION) return false
         return true
     }
+
+    // TODO: to add the case of link nodes
 
     // Name of the variables given by this place
     List<String> getVarList() {
@@ -187,10 +189,16 @@ class LPPlace extends Place {
     }
 
     LPPlace minimalClone() {
+        Map<String, Integer> newVariableAnonymousGeneratedIdCountMap = [:]
+        for (item in variableAnonymousGeneratedIdCountMap) {
+            newVariableAnonymousGeneratedIdCountMap[item.key] = item.value
+        }
+
         return new LPPlace(
                 marking: marking.collect(),
-                expression: expression,
-                link: link
+                expression: expression.minimalClone(),
+                link: link,
+                variableAnonymousGeneratedIdCountMap: newVariableAnonymousGeneratedIdCountMap
         )
     }
 

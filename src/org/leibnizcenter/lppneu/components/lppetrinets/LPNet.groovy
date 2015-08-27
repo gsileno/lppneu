@@ -116,15 +116,27 @@ class LPNet extends Net {
             tBridge = createLinkTransition()
         }
 
-        transitionList << tBridge
-        arcList += Arc.buildArcs(p1, tBridge, p2)
+        createArc(p1, tBridge)
+        createArc(tBridge, p2)
 
         tBridge
     }
 
     Transition createNexus(List<Place> inputs, List<Place> outputs, List<Place> biflows, List<Place> diode, List<Place> inhibitors) {
 
-        Transition tBridge = createLinkTransition()
+        List<String> varStringList = []
+
+        for (p in inputs+outputs+biflows+diode+inhibitors) {
+            LPPlace lpp = (LPPlace) p
+            varStringList = combineVarList(varStringList, Variable.toVarStringList(lpp.expression.getVariables()))
+        }
+
+        Transition tBridge
+        if (varStringList) {
+            tBridge = createLinkTransition(Operation.buildBridgeFromVarStringList(varStringList))
+        } else {
+            tBridge = createLinkTransition()
+        }
 
         for (p in inputs + biflows) {
             if (!getAllPlaces().contains(p)) {
@@ -179,11 +191,44 @@ class LPNet extends Net {
         } else {
             pBridge = createLinkPlace()
         }
-        placeList << pBridge
-        arcList += Arc.buildArcs(t1, pBridge, t2)
+        createArc(t1, pBridge)
+        createArc(pBridge, t2)
 
         pBridge
     }
+
+    Place createDiodeBridge(Transition t1, Transition t2) {
+        if (!getAllTransitions().contains(t1) || !getAllTransitions().contains(t2)) {
+            throw new RuntimeException("Error: this net does not contain the transition(s) to bridge")
+        }
+
+        LPTransition lpt1 = (LPTransition) t1
+        LPTransition lpt2 = (LPTransition) t2
+
+        List<String> varStringList
+
+        if (lpt1.operation != null && lpt2.operation != null) {
+            varStringList = combineVarList(Variable.toVarStringList(lpt1.operation.getVariables()),
+                    Variable.toVarStringList(lpt2.operation.getVariables()))
+        } else if (lpt1.operation != null) {
+            varStringList = Variable.toVarStringList(lpt1.operation.getVariables())
+        } else if (lpt2.operation != null) {
+            varStringList = Variable.toVarStringList(lpt2.operation.getVariables())
+        } else {
+            throw new RuntimeException("Both transitions in the bridge cannot be underspecified")
+        }
+
+        Place pBridge
+        if (varStringList) {
+            pBridge = createLinkPlace(Expression.buildBridgeFromVarStringList(varStringList))
+        } else {
+            pBridge = createLinkPlace()
+        }
+        createDiodeArc(t1, pBridge)
+        createArc(pBridge, t2)
+        pBridge
+    }
+
 
     // deep cloning done for nets
     // only the net structure is cloned, all the elements remains the same (e.g. places, transitions, etc.)

@@ -42,4 +42,36 @@ class AnalysisTest extends GroovyTestCase {
 
     }
 
+    void testNexusStructure2() {
+        Net net = new LPNet()
+
+        Transition tInput = net.createEmitterTransition()
+        Place pInput = net.createPlace("input(A)")
+        net.createArc(tInput, pInput)
+
+        Transition tOutput = net.createCollectorTransition()
+        Place pOutput = net.createPlace("output(A)")
+        net.createArc(pOutput, tOutput)
+
+        Transition tInhibitor = net.createEmitterTransition()
+        Place pInhibitor = net.createPlace("inhibitor(A)")
+        net.createArc(tInhibitor, pInhibitor)
+
+        Transition tBiflow = net.createEmitterTransition()
+        Place pBiflow = net.createPlace("biflow(A)")
+        net.createArc(tBiflow, pBiflow)
+
+        Transition tDiode = net.createEmitterTransition()
+        Place pDiode = net.createPlace("diode(A)")
+        net.createArc(tDiode, pDiode)
+
+        net.createNexus([pInput], [pOutput], [pBiflow], [pDiode], [pInhibitor])
+
+        net.resetIds()
+
+        NetRunner runner = new NetRunner()
+        runner.load(net)
+        runner.analyse()
+        runner.analysis.exportToLog("NexusStructure2")
+    }
 }

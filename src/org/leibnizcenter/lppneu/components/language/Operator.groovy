@@ -51,7 +51,9 @@ enum Operator {
     }
 
     Boolean isUnary() {
-        this == POS || this == NEG || this == NULL
+        this == POS || this == NEG || this == NULL ||
+                this == POS_INSTANCE || this == NEG_INSTANCE || this ==  NOT_INSTANCE ||
+                this == POS_THIS || this == NEG_THIS || this == NOT_THIS
     }
 
     Boolean isBinaryProcessOperator() {
