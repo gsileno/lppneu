@@ -3,19 +3,19 @@ package org.leibnizcenter.lppneu.components
 import org.leibnizcenter.lppneu.components.language.Atom
 import org.leibnizcenter.lppneu.components.language.Event
 import org.leibnizcenter.lppneu.components.language.Expression
-import org.leibnizcenter.lppneu.components.language.ExtLiteral
 import org.leibnizcenter.lppneu.components.language.Literal
+import org.leibnizcenter.lppneu.components.language.PosLiteral
 import org.leibnizcenter.lppneu.components.language.Operation
 import org.leibnizcenter.lppneu.components.language.Operator
 import org.leibnizcenter.lppneu.components.language.Situation
 
 class NegationTest extends GroovyTestCase {
 
-    Literal literalP = Literal.build(Atom.build("p"))
-    Literal literalQ = Literal.build(Atom.build("q"))
-    Literal literalR = Literal.build(Atom.build("r"))
-    ExtLiteral extLiteralNEGP = ExtLiteral.buildNegation(ExtLiteral.build(literalP))
-    ExtLiteral extLiteralNOTR = ExtLiteral.buildNull(ExtLiteral.build(literalR))
+    PosLiteral literalP = PosLiteral.build(Atom.build("p"))
+    PosLiteral literalQ = PosLiteral.build(Atom.build("q"))
+    PosLiteral literalR = PosLiteral.build(Atom.build("r"))
+    Literal extLiteralNEGP = Literal.buildNegation(Literal.build(literalP))
+    Literal extLiteralNOTR = Literal.buildNull(Literal.build(literalR))
 
     Event eventP = Event.build(literalP)
     Event eventQ = Event.build(literalQ)

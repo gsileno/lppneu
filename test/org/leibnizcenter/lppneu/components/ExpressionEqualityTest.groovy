@@ -4,32 +4,32 @@ import org.leibnizcenter.lppneu.components.language.*
 
 class ExpressionEqualityTest extends GroovyTestCase {
 
-    Literal literalP = Literal.build(Atom.build("p"))
-    Literal literalQ = Literal.build(Atom.build("q"))
-    Literal literalR = Literal.build(Atom.build("r"))
-    ExtLiteral extLiteralNEGP = ExtLiteral.buildNegation(ExtLiteral.build(literalP))
-    ExtLiteral extLiteralNOTR = ExtLiteral.buildNull(ExtLiteral.build(literalR))
+    PosLiteral posLiteralP = PosLiteral.build(Atom.build("p"))
+    PosLiteral posLiteralQ = PosLiteral.build(Atom.build("q"))
+    PosLiteral posLiteralR = PosLiteral.build(Atom.build("r"))
+    Literal literalNEGP = Literal.buildNegation(Literal.build(posLiteralP))
+    Literal literalNULLR = Literal.buildNull(Literal.build(posLiteralR))
 
-    Event eventP = Event.build(literalP)
-    Event eventQ = Event.build(literalQ)
-    Event eventR = Event.build(literalR)
-    Event eventNEGP = Event.build(extLiteralNEGP)
-    Event eventNOTR = Event.build(extLiteralNOTR)
+    Event eventP = Event.build(posLiteralP)
+    Event eventQ = Event.build(posLiteralQ)
+    Event eventR = Event.build(posLiteralR)
+    Event eventNEGP = Event.build(literalNEGP)
+    Event eventNULLR = Event.build(literalNULLR)
 
-    Situation situationP = Situation.build(literalP)
-    Situation situationQ = Situation.build(literalQ)
-    Situation situationR = Situation.build(literalR)
-    Situation situationNEGP = Situation.build(extLiteralNEGP)
-    Situation situationNOTR = Situation.build(extLiteralNOTR)
+    Situation situationP = Situation.build(posLiteralP)
+    Situation situationQ = Situation.build(posLiteralQ)
+    Situation situationR = Situation.build(posLiteralR)
+    Situation situationNEGP = Situation.build(literalNEGP)
+    Situation situationNULLR = Situation.build(literalNULLR)
 
-    Expression expressionNEGP = Expression.build(extLiteralNEGP)
+    Expression expressionNEGP = Expression.build(literalNEGP)
     Expression expressionP = Expression.build(situationP)
     Expression expressionQ = Expression.build(situationQ)
     Expression expressionR = Expression.build(situationR)
     Expression expressionNEGNEGP = Expression.build(expressionNEGP, Operator.NEG)
     Expression expressionPANDQ = Expression.buildFromExpressions([expressionP, expressionQ], Operator.AND)
     Expression expressionQANDR = Expression.buildFromExpressions([expressionQ, expressionR], Operator.AND)
-    Expression expressionNEGPORNOTR = Expression.buildFromSituations([situationNEGP, situationNOTR], Operator.OR)
+    Expression expressionNEGPORNULLR = Expression.buildFromSituations([situationNEGP, situationNULLR], Operator.OR)
     Expression expressionPANDQXORQ = Expression.buildFromExpressions([expressionPANDQ, expressionQ], Operator.XOR)
     Expression expressionPSEQQ = Expression.buildFromExpressions([expressionP, expressionQ], Operator.SEQ)
     Expression expressionPPARQ = Expression.buildFromSituations([situationP, situationQ], Operator.PAR)
@@ -49,12 +49,12 @@ class ExpressionEqualityTest extends GroovyTestCase {
                  ], Operator.OR)
             ], Operator.AND)
 
-    Operation operationNEGP = Operation.build(extLiteralNEGP)
+    Operation operationNEGP = Operation.build(literalNEGP)
     Operation operationP = Operation.build(eventP)
     Operation operationQ = Operation.build(eventQ)
     Operation operationNEGNEGP = Operation.build(operationNEGP, Operator.NEG)
     Operation operationPANDQ = Operation.buildFromOperations([operationP, operationQ], Operator.AND)
-    Operation operationNEGPORNOTR = Operation.buildFromEvents([eventNEGP, eventNOTR], Operator.OR)
+    Operation operationNEGPORNULLR = Operation.buildFromEvents([eventNEGP, eventNULLR], Operator.OR)
     Operation operationPANDQXORQ = Operation.buildFromOperations([operationPANDQ, operationQ], Operator.XOR)
     Operation operationPSEQQ = Operation.buildFromOperations([operationP, operationQ], Operator.SEQ)
     Operation operationQSEQPANDQ = Operation.buildFromOperations([operationQ, operationPANDQ], Operator.SEQ)
@@ -66,22 +66,22 @@ class ExpressionEqualityTest extends GroovyTestCase {
 
     void testEquality() {
 
-        assert (expressionP == Expression.build(literalP))
-        assert (expressionP != Expression.build(extLiteralNEGP))
+        assert (expressionP == Expression.build(posLiteralP))
+        assert (expressionP != Expression.build(literalNEGP))
 
-        assert (expressionP.formula.inputPorts[0].rootLiteral.functor.name != expressionQ.formula.inputPorts[0].rootLiteral.functor.name)
-        assert (expressionP.formula.inputPorts[0].rootLiteral.functor != expressionQ.formula.inputPorts[0].rootLiteral.functor)
-        assert (expressionP.formula.inputPorts[0].rootLiteral != expressionQ.formula.inputPorts[0].rootLiteral)
+        assert (expressionP.formula.inputPorts[0].factLiteral.functor.name != expressionQ.formula.inputPorts[0].factLiteral.functor.name)
+        assert (expressionP.formula.inputPorts[0].factLiteral.functor != expressionQ.formula.inputPorts[0].factLiteral.functor)
+        assert (expressionP.formula.inputPorts[0].factLiteral != expressionQ.formula.inputPorts[0].factLiteral)
         assert (expressionP.formula.inputPorts[0] != expressionQ.formula.inputPorts[0])
         assert (expressionP.formula != expressionQ.formula)
         assert (expressionP != expressionQ)
 
-        assert (expressionP.formula == Expression.build(literalP).formula)
-        assert (expressionP.formula != Expression.build(extLiteralNEGP).formula)
+        assert (expressionP.formula == Expression.build(posLiteralP).formula)
+        assert (expressionP.formula != Expression.build(literalNEGP).formula)
 
-        assert (literalP == ExtLiteral.build(Literal.build(Atom.build("p")), Polarity.POS).literal)
-        assert (extLiteralNEGP == ExtLiteral.build(literalP, Polarity.NEG))
-        assert (literalP != Expression.build(extLiteralNEGP))
+        assert (posLiteralP == Literal.build(PosLiteral.build(Atom.build("p")), Polarity.POS).literal)
+        assert (literalNEGP == Literal.build(posLiteralP, Polarity.NEG))
+        assert (posLiteralP != Expression.build(literalNEGP))
 
     }
 
@@ -93,7 +93,7 @@ class ExpressionEqualityTest extends GroovyTestCase {
         testMap.put(expressionQ, expressionQ)
         testMap.put(expressionNEGP, expressionP)
         testMap.put(expressionP, expressionNEGP)
-        testMap.put(Expression.build(literalP), expressionP)
+        testMap.put(Expression.build(posLiteralP), expressionP)
 
         assert (testMap.size() == 3)
     }

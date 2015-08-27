@@ -15,13 +15,13 @@ class Operation {
     // a not elegant way to solve problem with non-static types of Formula
     private static Formula<Event> PROTOTYPE = new Formula<>()
 
-    static Operation build(Literal literal) {
+    static Operation build(PosLiteral literal) {
         new Operation(
                 formula: PROTOTYPE.build(Event.build(literal))
         )
     }
 
-    static Operation build(ExtLiteral extLiteral) {
+    static Operation build(Literal extLiteral) {
         new Operation(
                 formula: PROTOTYPE.build(Event.build(extLiteral))
         )
@@ -99,7 +99,7 @@ class Operation {
         }
 
         new Operation(
-                formula: PROTOTYPE.build(Event.build(Literal.buildAnonymous(parameters)))
+                formula: PROTOTYPE.build(Event.build(PosLiteral.buildAnonymous(parameters)))
         )
     }
 

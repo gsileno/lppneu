@@ -2,12 +2,10 @@ package org.leibnizcenter.lppneu.components.lppetrinets
 
 import org.leibnizcenter.lppneu.components.language.Atom
 import org.leibnizcenter.lppneu.components.language.Expression
-import org.leibnizcenter.lppneu.components.language.Literal
+import org.leibnizcenter.lppneu.components.language.PosLiteral
 import org.leibnizcenter.lppneu.components.language.Operator
-import org.leibnizcenter.pneu.components.petrinet.Arc
 import org.leibnizcenter.pneu.components.petrinet.Place
 import org.leibnizcenter.pneu.components.petrinet.Token
-import org.leibnizcenter.pneu.components.petrinet.Transition
 
 class LPPlace extends Place {
 
@@ -109,7 +107,7 @@ class LPPlace extends Place {
 
     // count the anonymous content generated, in order to generate unique names
     private Map<String, Integer> variableAnonymousGeneratedIdCountMap = [:]
-    private Literal generateAnonymousIdentifier(String variable) {
+    private PosLiteral generateAnonymousIdentifier(String variable) {
 
         if (variableAnonymousGeneratedIdCountMap[variable] == null)
             variableAnonymousGeneratedIdCountMap[variable] = -1
@@ -118,9 +116,9 @@ class LPPlace extends Place {
         variableAnonymousGeneratedIdCountMap[variable] = n
 
         if (id == null) {
-            Literal.build(Atom.build("_"+variable.toLowerCase()+n))
+            PosLiteral.build(Atom.build("_"+variable.toLowerCase()+n))
         } else {
-            Literal.build(Atom.build("_"+id+variable.toLowerCase()+n))
+            PosLiteral.build(Atom.build("_"+id+variable.toLowerCase()+n))
         }
 
     }
@@ -171,7 +169,7 @@ class LPPlace extends Place {
         for (param in tokenExpression.getParameters()) {
             if (param.isVariable()) {
                 if (variableLiteralMap[param.variable.name])
-                    param.variable.identifier = Literal.build(Atom.build(variableLiteralMap[param.variable.name]))
+                    param.variable.identifier = PosLiteral.build(Atom.build(variableLiteralMap[param.variable.name]))
                 else
                     param.variable.identifier = generateAnonymousIdentifier(param.variable.name)
             }

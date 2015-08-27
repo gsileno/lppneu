@@ -10,35 +10,47 @@ import org.leibnizcenter.lppneu.components.position.AbstractPositionRef
 class Event {
     Operator operator
     AbstractPositionRef positionRef
-    Literal factLiteral
-    Literal rootLiteral // root literal are for primitive actions
+    PosLiteral factLiteral
+    PosLiteral rootLiteral // root literal are for primitive actions
     AbstractPosition position
 
     Event minimalClone() {
-        new Event(
-                operator: operator,
-                positionRef: positionRef,
-                position: position,
-                factLiteral: rootLiteral.minimalClone(),
-                rootLiteral: rootLiteral.minimalClone()
-        )
+        if (rootLiteral) {
+            new Event(
+                    operator: operator,
+                    rootLiteral: rootLiteral.minimalClone(),
+            )
+        } else if (factLiteral) {
+            new Event(
+                    operator: operator,
+                    factLiteral: factLiteral.minimalClone()
+            )
+        } else {
+            new Event(
+                    operator: operator,
+                    positionRef: positionRef,
+                    position: position,
+                    factLiteral: factLiteral.minimalClone(),
+                    rootLiteral: rootLiteral.minimalClone()
+            )
+        }
     }
 
-    static Event build(ExtLiteral extLiteral) {
+    static Event build(Literal extLiteral) {
         new Event(
                 operator: extLiteral.polarity.toOperator(),
                 factLiteral: extLiteral.literal
         )
     }
 
-    static Event buildFromRootLiteral(ExtLiteral extLiteral) {
+    static Event buildFromRootLiteral(Literal extLiteral) {
         new Event(
                 operator: extLiteral.polarity.toOperator(),
                 rootLiteral: extLiteral.literal
         )
     }
 
-    static Event build(Literal literal, Operator operator = Operator.POS) {
+    static Event build(PosLiteral literal, Operator operator = Operator.POS) {
         new Event(
                 operator: operator,
                 factLiteral: literal

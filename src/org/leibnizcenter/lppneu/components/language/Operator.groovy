@@ -8,13 +8,17 @@ import groovy.util.logging.Log4j
 // NEG: negative polarity (-), correspondent to strong negation
 // NULL: null polarity (0), equivalent to default negation (NAF), unknown, undecidable, etc.
 
+// NOT = NEG or NULL
+
 // isUnary operators for events
 
 // POS: charge positively (+)
 // NEG: charge negatively (-)
 // NULL: remove polarity (0)
 
-// NOT: it is a
+// NOT (POS) = NEG | NULL
+// NOT (NEG) = POS | NULL
+// NOT (NULL) = POS | NEG
 
 // binary operators for events
 
@@ -24,7 +28,7 @@ import groovy.util.logging.Log4j
 
 @Log4j
 enum Operator {
-    POS, NEG, NULL,                  // unary operators  (situations and events)
+    POS, NEG, NULL, NOT,             // unary operators  (situations and events)
     AND, OR, XOR,                    // binary operators (situations)
     SEQ, PAR, OPT, ALT,              // binary operators (events and situations)
     IMPLIES, INHIBITS, DEFINES,      // logical dependencies on situations
@@ -34,8 +38,8 @@ enum Operator {
     IS_IMPLIED_BY, IS_CAUSED_BY, IS_DEFINED_BY,  // for operation reconstruction when associating the transitions to the triples
 
     // specific operators for positional programming, to be reconverted
-    POS_INSTANCE, NEG_INSTANCE, NOT_INSTANCE,
-    POS_THIS, NEG_THIS, NOT_THIS,
+    POS_INSTANCE, NEG_INSTANCE, NULL_INSTANCE,
+    POS_THIS, NEG_THIS, NULL_THIS,
 
     // specific operators for positional programming
     SUCCESS, FAILURE, ISTANTIATION, EXPIRATION, INHIBITION
@@ -51,9 +55,9 @@ enum Operator {
     }
 
     Boolean isUnary() {
-        this == POS || this == NEG || this == NULL ||
-                this == POS_INSTANCE || this == NEG_INSTANCE || this ==  NOT_INSTANCE ||
-                this == POS_THIS || this == NEG_THIS || this == NOT_THIS
+        this == POS || this == NEG || this == NULL || this == NOT
+                this == POS_INSTANCE || this == NEG_INSTANCE || this ==  NULL_INSTANCE ||
+                this == POS_THIS || this == NEG_THIS || this == NULL_THIS
     }
 
     Boolean isBinaryProcessOperator() {

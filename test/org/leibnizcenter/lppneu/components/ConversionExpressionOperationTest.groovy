@@ -4,11 +4,11 @@ import org.leibnizcenter.lppneu.components.language.*
 
 class ConversionExpressionOperationTest extends GroovyTestCase {
 
-    Literal literalP = Literal.build(Atom.build("p"))
-    Literal literalQ = Literal.build(Atom.build("q"))
-    Literal literalR = Literal.build(Atom.build("r"))
-    ExtLiteral extLiteralNEGP = ExtLiteral.buildNegation(ExtLiteral.build(literalP))
-    ExtLiteral extLiteralNOTR = ExtLiteral.buildNull(ExtLiteral.build(literalR))
+    PosLiteral literalP = PosLiteral.build(Atom.build("p"))
+    PosLiteral literalQ = PosLiteral.build(Atom.build("q"))
+    PosLiteral literalR = PosLiteral.build(Atom.build("r"))
+    Literal extLiteralNEGP = Literal.buildNegation(Literal.build(literalP))
+    Literal extLiteralNOTR = Literal.buildNull(Literal.build(literalR))
 
     Event eventP = Event.build(literalP)
     Event eventQ = Event.build(literalQ)

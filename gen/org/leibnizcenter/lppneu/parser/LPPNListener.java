@@ -1,5 +1,5 @@
 // Generated from /home/giovanni/dev/lppneu/antlr4/LPPN.g4 by ANTLR 4.5.1
-package org.leibnizcenter.lppneu.parsers;
+package org.leibnizcenter.lppneu.parser;
 import org.antlr.v4.runtime.tree.ParseTreeListener;
 
 /**
@@ -108,15 +108,15 @@ public interface LPPNListener extends ParseTreeListener {
 	 */
 	void exitList_literals(LPPNParser.List_literalsContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link LPPNParser#head_situation}.
+	 * Enter a parse tree produced by {@link LPPNParser#situation}.
 	 * @param ctx the parse tree
 	 */
-	void enterHead_situation(LPPNParser.Head_situationContext ctx);
+	void enterSituation(LPPNParser.SituationContext ctx);
 	/**
-	 * Exit a parse tree produced by {@link LPPNParser#head_situation}.
+	 * Exit a parse tree produced by {@link LPPNParser#situation}.
 	 * @param ctx the parse tree
 	 */
-	void exitHead_situation(LPPNParser.Head_situationContext ctx);
+	void exitSituation(LPPNParser.SituationContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link LPPNParser#head_expression}.
 	 * @param ctx the parse tree
@@ -147,16 +147,6 @@ public interface LPPNListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitOperation(LPPNParser.OperationContext ctx);
-	/**
-	 * Enter a parse tree produced by {@link LPPNParser#body_situation}.
-	 * @param ctx the parse tree
-	 */
-	void enterBody_situation(LPPNParser.Body_situationContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link LPPNParser#body_situation}.
-	 * @param ctx the parse tree
-	 */
-	void exitBody_situation(LPPNParser.Body_situationContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link LPPNParser#body_expression}.
 	 * @param ctx the parse tree

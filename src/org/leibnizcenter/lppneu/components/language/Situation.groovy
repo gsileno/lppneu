@@ -10,8 +10,8 @@ class Situation {
 
     Polarity polarity
     AbstractPositionRef positionRef
-    Literal rootLiteral // root literal are for primitive perceptions
-    Literal factLiteral
+    PosLiteral rootLiteral // root literal are for primitive perceptions
+    PosLiteral factLiteral
 
     Situation minimalClone() {
         if (rootLiteral) {
@@ -32,14 +32,14 @@ class Situation {
         }
     }
 
-    static Situation build(Literal literal, Polarity polarity = Polarity.POS) {
+    static Situation build(PosLiteral literal, Polarity polarity = Polarity.POS) {
         new Situation(
                 polarity: polarity,
                 factLiteral: literal
         )
     }
 
-    static Situation build(ExtLiteral extLiteral) {
+    static Situation build(Literal extLiteral) {
         new Situation(
                 polarity: extLiteral.polarity,
                 factLiteral: extLiteral.literal
@@ -68,7 +68,7 @@ class Situation {
         }
     }
 
-    static Situation buildFromRootLiteral(ExtLiteral extLiteral) {
+    static Situation buildFromRootLiteral(Literal extLiteral) {
         new Situation(
                 polarity: extLiteral.polarity,
                 rootLiteral: extLiteral.literal

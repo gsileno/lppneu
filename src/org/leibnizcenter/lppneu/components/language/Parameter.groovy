@@ -1,20 +1,19 @@
 package org.leibnizcenter.lppneu.components.language
 
-import groovy.transform.AutoClone
 import groovy.transform.EqualsAndHashCode
 import groovy.util.logging.Log4j
 
 @Log4j
 @EqualsAndHashCode
 class Parameter {
-    Literal literal
+    PosLiteral literal
     Variable variable
 
     static Parameter build(Atom atom) {
-        new Parameter(literal: Literal.build(atom))
+        new Parameter(literal: PosLiteral.build(atom))
     }
 
-    static Parameter build(Literal literal) {
+    static Parameter build(PosLiteral literal) {
         new Parameter(literal: literal)
     }
 

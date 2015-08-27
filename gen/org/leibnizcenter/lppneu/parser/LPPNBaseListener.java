@@ -1,5 +1,5 @@
 // Generated from /home/giovanni/dev/lppneu/antlr4/LPPN.g4 by ANTLR 4.5.1
-package org.leibnizcenter.lppneu.parsers;
+package org.leibnizcenter.lppneu.parser;
 
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.ErrorNode;
@@ -136,13 +136,13 @@ public class LPPNBaseListener implements LPPNListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterHead_situation(LPPNParser.Head_situationContext ctx) { }
+	@Override public void enterSituation(LPPNParser.SituationContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitHead_situation(LPPNParser.Head_situationContext ctx) { }
+	@Override public void exitSituation(LPPNParser.SituationContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
@@ -179,18 +179,6 @@ public class LPPNBaseListener implements LPPNListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitOperation(LPPNParser.OperationContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void enterBody_situation(LPPNParser.Body_situationContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void exitBody_situation(LPPNParser.Body_situationContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *

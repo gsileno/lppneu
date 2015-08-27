@@ -5,9 +5,9 @@ import org.leibnizcenter.lppneu.parsers.LPPNLoader
 
 class LPPNProgramReductionTest extends GroovyTestCase {
 
-    Literal literalP = Literal.build(Atom.build("p"))
-    Literal literalQ = Literal.build(Atom.build("q"))
-    Literal literalR = Literal.build(Atom.build("r"))
+    PosLiteral literalP = PosLiteral.build(Atom.build("p"))
+    PosLiteral literalQ = PosLiteral.build(Atom.build("q"))
+    PosLiteral literalR = PosLiteral.build(Atom.build("r"))
 
     Situation situationP = Situation.build(literalP)
     Situation situationQ = Situation.build(literalQ)

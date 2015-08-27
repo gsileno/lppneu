@@ -1,8 +1,6 @@
 package org.leibnizcenter.lppneu.components.lppetrinets
 
 import groovy.util.logging.Log4j
-import org.leibnizcenter.lppneu.components.language.Atom
-import org.leibnizcenter.lppneu.components.language.Literal
 import org.leibnizcenter.lppneu.components.language.Operation
 import org.leibnizcenter.lppneu.components.language.Operator
 import org.leibnizcenter.pneu.components.petrinet.ArcType
@@ -49,16 +47,20 @@ class LPTransition extends Transition {
     }
 
     Transition minimalClone() {
-        Map<String, Integer> newVariableAnonymousGeneratedIdCountMap = [:]
+        Map<String, Integer> clonedVariableAnonymousGeneratedIdCountMap = [:]
         for (item in variableAnonymousGeneratedIdCountMap) {
-            newVariableAnonymousGeneratedIdCountMap[item.key] = item.value
+            clonedVariableAnonymousGeneratedIdCountMap[item.key] = item.value
         }
 
+        Operation clonedOperation = null
+        if (operation)
+            clonedOperation = operation.minimalClone()
+
         return new LPTransition(
-                operation: operation.minimalClone(),
+                operation: clonedOperation,
                 operator: operator,
                 link: link,
-                variableAnonymousGeneratedIdCountMap: newVariableAnonymousGeneratedIdCountMap
+                variableAnonymousGeneratedIdCountMap: clonedVariableAnonymousGeneratedIdCountMap
         )
     }
 

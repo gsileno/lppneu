@@ -1,82 +1,57 @@
 package org.leibnizcenter.lppneu.components.language
 
-import com.sun.xml.internal.ws.api.model.wsdl.WSDLBoundOperation
-import groovy.transform.AutoClone
 import groovy.transform.EqualsAndHashCode
 import groovy.util.logging.Log4j
-import org.apache.tools.ant.taskdefs.XSLTProcess
 
 @Log4j @EqualsAndHashCode
 class Literal {
+    Polarity polarity
+    PosLiteral literal
 
-    // classic literal
-    Atom functor
-    List<Parameter> parameters
+    static Literal build(PosLiteral classicLiteral, Polarity polarity = Polarity.POS) {
+        Literal extLiteral = new Literal()
+        extLiteral.literal = classicLiteral
+        extLiteral.polarity = polarity
+        extLiteral
+    }
+
+    Literal negate() {
+        if (polarity == Polarity.POS)
+            polarity = Polarity.NEG
+        else if (polarity == Polarity.NEG)
+            polarity = Polarity.POS
+        else
+            log.warn("Negation of a null polarity is a null polarity ($this)")
+        this
+    }
+
+    Literal nullify() {
+        if (polarity == Polarity.POS | polarity == Polarity.NEG)
+            polarity = Polarity.NULL
+        else
+            log.warn("Nullification of a null polarity is a null polarity ($this)")
+        this
+    }
 
     Literal minimalClone() {
-        List<Parameter> cloneParameters = []
-        for (parameter in parameters) {
-            cloneParameters << parameter.minimalClone()
-        }
-
         new Literal(
-                functor: functor,
-                parameters: cloneParameters
+                polarity: polarity,
+                literal: literal.minimalClone()
         )
     }
 
-    // special case: literal with anonymous predicate
-    static Literal buildAnonymous(List<Parameter> parameters = []) {
-        new Literal(parameters: parameters)
+    static Literal buildNegation(Literal input) {
+        input.minimalClone().negate()
     }
 
-    static Literal build(Atom functor, List<Parameter> parameters = []) {
-        new Literal(functor: functor, parameters: parameters)
+    static Literal buildNull(Literal input) {
+        input.minimalClone().nullify()
     }
 
     Literal reify() {
-        List<Parameter> reifiedParameters = []
-        for (param in parameters) {
-            if (param.isVariable()) {
-                if (!param.variable.identifier) {
-                    throw new RuntimeException("Variable ${param} cannot be reified, there is no value.")
-                }
-                reifiedParameters << Parameter.build(Atom.build(param.variable.identifier))
-            } else {
-                reifiedParameters << param
-            }
-        }
-        new Literal(functor: functor, parameters: reifiedParameters)
+        new Literal(
+                polarity: polarity,
+                literal: literal.reify()
+        )
     }
-
-    List<Variable> getVariables() {
-        List<Variable> variableList = []
-
-        for (parameter in parameters) {
-            if (parameter.variable)
-                variableList << parameter.variable
-        }
-        variableList
-    }
-
-    String toString() {
-        String output = ""
-        if (functor)
-            output += functor.name
-        else
-            output += "*"
-        if (parameters) {
-            output += "("
-            for (parameter in parameters) {
-                if (parameter.literal) output += parameter.literal.toString()
-                else if (parameter.variable) output += parameter.variable.toString()
-                output += ", "
-            }
-            output = output[0..-3]
-            output += ")"
-        }
-
-        output
-    }
-
 }

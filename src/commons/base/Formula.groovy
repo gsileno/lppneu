@@ -49,8 +49,8 @@ class Formula<T> {
         Formula<T> formula = new Formula<T>()
 
         if (terms.size() > 1) {
-            if (op == Operator.POS || op == Operator.NEG || op == Operator.NULL)
-                throw new RuntimeException("Binary operator cannot have more than one term")
+            if (op == Operator.POS || op == Operator.NEG || op == Operator.NULL || op == Operator.NOT)
+                throw new RuntimeException("Unary operator cannot have more than one term")
 
             formula.operator = op
             for (T term in terms) {
@@ -58,15 +58,21 @@ class Formula<T> {
                 formula.inputFormulas << f
                 formula.inputPorts << term
             }
-        } else { // with only one input, the formula becomes identity, unless it is negation
+        } else {
+            // perform the operation on the term itself
             if (op == Operator.NEG)
                 formula = build(terms[0].negate())
             else if (op == Operator.NULL)
                 formula = build(terms[0].nullify())
+
+            // for usual operators, with only one input, the formula becomes identity
             else if (op == Operator.OR || op == Operator.XOR || op == Operator.AND ||
                      op == Operator.PAR || op == Operator.ALT || op == Operator.SEQ || op == Operator.OPT)
                 formula = build(terms[0])
-            else if (op == Operator.OCCURS || op == Operator.TRIPLE || op == Operator.ASSOCIATION ||
+
+            // for these operators, you have to maintain the information about the operator
+            else if (op == Operator.NOT ||
+                     op == Operator.OCCURS || op == Operator.TRIPLE || op == Operator.ASSOCIATION ||
                      op == Operator.IS_IMPLIED_BY || op == Operator.IS_CAUSED_BY ||
                      op == Operator.SUCCESS || op == Operator.FAILURE || op == Operator.INHIBITION ||
                      op == Operator.ISTANTIATION || op == Operator.EXPIRATION) {

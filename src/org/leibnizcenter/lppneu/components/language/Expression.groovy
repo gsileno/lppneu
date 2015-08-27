@@ -13,16 +13,20 @@ class Expression {
     // a not elegant way to solve problem with non-static types of Formula
     private static Formula<Situation> PROTOTYPE = new Formula<>()
 
+    static Expression build(PosLiteral posLiteral) {
+        new Expression(
+                formula: PROTOTYPE.build(Situation.build(posLiteral))
+        )
+    }
+
     static Expression build(Literal literal) {
         new Expression(
                 formula: PROTOTYPE.build(Situation.build(literal))
         )
     }
 
-    static Expression build(ExtLiteral extLiteral) {
-        new Expression(
-                formula: PROTOTYPE.build(Situation.build(extLiteral))
-        )
+    static Expression build(Literal literal, Operator op) {
+        build(build(literal), op)
     }
 
     static Expression build(Situation situation) {
@@ -46,6 +50,7 @@ class Expression {
     static Expression build(AbstractPositionRef ref) {
         build(Situation.build(ref))
     }
+
 
     static Expression build(Expression expression, Operator op) {
         new Expression(
@@ -87,7 +92,7 @@ class Expression {
         }
 
         new Expression(
-                formula: PROTOTYPE.build(Situation.build(Literal.buildAnonymous(parameters)))
+                formula: PROTOTYPE.build(Situation.build(PosLiteral.buildAnonymous(parameters)))
         )
     }
 

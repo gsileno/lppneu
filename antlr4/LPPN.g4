@@ -38,9 +38,9 @@ list_literals : literal ( COMMA list_literals )? ;
 
 /** A literal expression is a literal or compositions of it */
 
-head_situation : literal ;
+situation : literal ;
 
-head_expression : head_situation
+head_expression : situation
 | operation WHEN head_expression
 | LPAR head_expression RPAR
 | head_expression SEQ head_expression
@@ -57,14 +57,12 @@ operation : event
 | operation (PAR | ALT) operation
 ;
 
-/** An extended literal expression is an extended literal situation or compositions of it */
-body_situation : ext_literal ;
-
-body_expression : body_situation | body_constraint
+body_expression : situation | body_constraint
 | operation WHEN body_expression
 | LPAR body_expression RPAR
 | body_expression SEQ body_expression
 | body_expression (PAR | ALT) body_expression
+| NOT body_expression
 | body_expression AND body_expression
 | body_expression (OR | XOR) body_expression
 ;
@@ -76,10 +74,10 @@ body_constraint : ( identifier | variable | INTEGER | num_expression ) ( EQ | NE
 num_expression : (variable | INTEGER) (PLUS | MINUS) (variable | INTEGER) ;
 
 /** An extended literal adds the default negation to the classic literal */
-ext_literal : ( NOT | TILDE )? literal ;
+ext_literal : ( NOT )? literal ;
 
-/** A literal can be positive or negative. */
-literal : ( NEG | MINUS )? pos_literal ;
+/** A literal can be positive, negative or null. */
+literal : ( NULL | NEG )? pos_literal ;
 
 /** A positive literal consists of symbols (no predicates) or symbols and terms (predicate literal). */
 pos_literal : predicate ( LPAR list_parameters RPAR )? ;
@@ -110,8 +108,11 @@ XOR : 'XOR' | 'xor' ;
 SEQ : 'SEQ' | 'seq' ;
 PAR : 'PAR' | 'par' ;
 ALT : 'ALT' | 'alt' ;
-NOT : 'not' | 'NOT' ; // default negation
-NEG : 'neg' | 'NEG' ; // strong negation
+NEG : 'neg' | 'NEG' | MINUS ; // strong negation
+NOT : 'not' | TILDE ; // default negation
+NULL : 'null' | 'NULL' ;
+
+// NOT = NULL OR NEG
 
 CAUSES : '->' |  '=>';
 IS_IMPLIED_BY : ':-' ;

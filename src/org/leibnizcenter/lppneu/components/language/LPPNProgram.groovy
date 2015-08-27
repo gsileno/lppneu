@@ -115,7 +115,7 @@ class LPPNProgram {
             // 2. create a new functor
             Atom functor = newPredicate()
             // 3. create such reduced expression
-            reducedExpression = Expression.build(Literal.build(functor, parameters))
+            reducedExpression = Expression.build(PosLiteral.build(functor, parameters))
 
             log.trace("reduced expression: " + reducedExpression + " (for " + expression + ")")
 

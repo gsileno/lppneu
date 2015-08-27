@@ -932,13 +932,13 @@ class LPPN2LPN {
                     return buildEventNet(Event.build(thisRef, Operator.POS))
                 } else if (formula.operator == Operator.NEG_THIS) {
                     return buildEventNet(Event.build(thisRef, Operator.NEG))
-                } else if (formula.operator == Operator.NOT_THIS) {
+                } else if (formula.operator == Operator.NULL_THIS) {
                     return buildEventNet(Event.build(thisRef, Operator.NULL))
-                } else if (formula.operator == Operator.NOT_INSTANCE) {
+                } else if (formula.operator == Operator.NULL_INSTANCE) {
                     return buildEventNet(Event.build(instanceRef, Operator.POS))
                 } else if (formula.operator == Operator.NEG_INSTANCE) {
                     return buildEventNet(Event.build(instanceRef, Operator.NEG))
-                } else if (formula.operator == Operator.NOT_INSTANCE) {
+                } else if (formula.operator == Operator.NULL_INSTANCE) {
                     return buildEventNet(Event.build(instanceRef, Operator.NULL))
                 } else {
                     throw new RuntimeException("Not yet implemented")
