@@ -75,7 +75,7 @@ class Formula<T> {
                      op == Operator.OCCURS || op == Operator.TRIPLE || op == Operator.ASSOCIATION ||
                      op == Operator.IS_IMPLIED_BY || op == Operator.IS_CAUSED_BY ||
                      op == Operator.SUCCESS || op == Operator.FAILURE || op == Operator.INHIBITION ||
-                     op == Operator.ISTANTIATION || op == Operator.EXPIRATION) {
+                     op == Operator.ISTANTIATION || op == Operator.EXPIRATION || op == Operator.CATALYST) {
                 formula.operator = op
                 Formula f = build(terms[0])
                 formula.inputFormulas << f

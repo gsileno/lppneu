@@ -19,8 +19,8 @@ class LPPlace extends Place {
     Boolean link = false
 
     String toString() {
-        if (link) "*" + " ${id} ("+marking.size()+")"
-        else if (expression != null) expression.toString() + " ("+marking.size()+")" // + " LPlace@"+hashCode()
+        if (link) "*" + " ${id} (" + marking.size() + ")"
+        else if (expression != null) expression.toString() + " (" + marking.size() + ")" // + " LPlace@"+hashCode()
         else throw new RuntimeException("Empty place?")
     }
 
@@ -107,6 +107,7 @@ class LPPlace extends Place {
 
     // count the anonymous content generated, in order to generate unique names
     private Map<String, Integer> variableAnonymousGeneratedIdCountMap = [:]
+
     private PosLiteral generateAnonymousIdentifier(String variable) {
 
         if (variableAnonymousGeneratedIdCountMap[variable] == null)
@@ -116,9 +117,9 @@ class LPPlace extends Place {
         variableAnonymousGeneratedIdCountMap[variable] = n
 
         if (id == null) {
-            PosLiteral.build(Atom.build("_"+variable.toLowerCase()+n))
+            PosLiteral.build(Atom.build("_" + variable.toLowerCase() + n))
         } else {
-            PosLiteral.build(Atom.build("_"+id+variable.toLowerCase()+n))
+            PosLiteral.build(Atom.build("_" + id + variable.toLowerCase() + n))
         }
 
     }
@@ -176,11 +177,16 @@ class LPPlace extends Place {
         }
 
         LPToken newToken = new LPToken(expression: tokenExpression)
-        for (token in marking) {
-            if (LPToken.compare(token, newToken)) {
-                throw new RuntimeException("You cannot produce a token with the same content")
+
+        // only when the place is labeled with a predicate, check that you are not creating the same content
+        if (tokenExpression.getVariables().size() > 0) {
+            for (token in marking) {
+                if (LPToken.compare(token, newToken)) {
+                    throw new RuntimeException("You cannot produce a predicate token with the same content.")
+                }
             }
         }
+
         marking << newToken
 
         newToken

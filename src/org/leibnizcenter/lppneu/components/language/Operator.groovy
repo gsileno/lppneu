@@ -42,7 +42,7 @@ enum Operator {
     POS_THIS, NEG_THIS, NULL_THIS,
 
     // specific operators for positional programming
-    SUCCESS, FAILURE, ISTANTIATION, EXPIRATION, INHIBITION
+    SUCCESS, FAILURE, ISTANTIATION, EXPIRATION, INHIBITION, CATALYST
 
     // TODO: to consider SUSPENSION for commitments?
     // could it be considered as a kind of inhibition?
