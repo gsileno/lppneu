@@ -3,6 +3,7 @@ package org.leibnizcenter.lppneu.components.lppetrinets
 import groovy.util.logging.Log4j
 import org.leibnizcenter.lppneu.components.language.Operation
 import org.leibnizcenter.lppneu.components.language.Operator
+import org.leibnizcenter.lppneu.components.language.Variable
 import org.leibnizcenter.pneu.components.petrinet.ArcType
 import org.leibnizcenter.pneu.components.petrinet.Place
 import org.leibnizcenter.pneu.components.petrinet.Node
@@ -89,12 +90,12 @@ class LPTransition extends Transition {
     //////////////////////////////
 
     // filter to unify tokens
-    List<String> commonVarList
+    List<Variable> commonVarList
     // all variables accounted in places
-    List<String> allVarList
+    List<Variable> allVarList
 
 
-    private static void computePlaceUnificationFilter(List<Node> inputs, List<String> commonVarList, List<String> allVarList) {
+    private static void computePlaceUnificationFilter(List<Node> inputs, List<Variable> commonVarList, List<Variable> allVarList) {
         // for each input place
         for (elem in inputs) {
             LPPlace pl = ((LPPlace) ((Place) elem))
@@ -105,13 +106,13 @@ class LPTransition extends Transition {
                 log.trace("variable: " + var)
 
                 // if it is already in the list of variables, add to the filter
-                if (allVarList.contains(var.name)) {
+                if (allVarList.contains(var)) {
                     log.trace("it is a common variable")
-                    commonVarList << var.name
+                    commonVarList << var
                     // otherwise add it to the list of variables
                 } else {
                     log.trace("add to the general list of variables")
-                    allVarList << var.name
+                    allVarList << var
                 }
             }
         }
@@ -131,10 +132,10 @@ class LPTransition extends Transition {
         computePlaceUnificationFilter(nodeInputs, commonVarList, allVarList)
     }
 
-    // set the filter for the input to the transition
-    List<String> getCommonVarOutputUnificationFilter() {
-        List<String> outCommonVarList = []
-        List<String> outAllVarList = []
+    // set the filter for the output to the transition
+    List<Variable> getCommonVarOutputUnificationFilter() {
+        List<Variable> outCommonVarList = []
+        List<Variable> outAllVarList = []
 
         List<Node> nodeOutputs = []
         for (arc in outputs) {
@@ -146,9 +147,9 @@ class LPTransition extends Transition {
     }
 
     // useful for emitter transitions, to know what they will generate
-    List<String> getAllVarOutputUnificationFilter() {
-        List<String> outCommonVarList = []
-        List<String> outAllVarList = []
+    List<Variable> getAllVarOutputUnificationFilter() {
+        List<Variable> outCommonVarList = []
+        List<Variable> outAllVarList = []
 
         List<Node> nodeOutputs = []
         for (arc in outputs) {
@@ -201,17 +202,17 @@ class LPTransition extends Transition {
             LPPlace pl = (LPPlace) arc.source
 
             // these are the variables given by this place
-            List<String> localVarList = pl.getVarList()
+            List<Variable> localVarList = pl.getVarList()
 
             // these are the variables constrained by the other inputs
-            List<String> localCommonVarList = localVarList - (localVarList - commonVarList)
+            List<Variable> localCommonVarList = localVarList - (localVarList - commonVarList)
 
             if (localCommonVarList.size() > 0) {
 
                 // for the variables contained take the local values
                 List<Map<String, String>> localFilterList = pl.getFilterList(localCommonVarList)
 
-                log.trace("Relevant values from this place (${pl.id}): " + localFilterList)
+                log.trace("Relevant item from this place (${pl.id}): " + localFilterList)
 
                 // for the first elem you take that as starting filter
                 if (filterList.size() == 0) {
@@ -367,9 +368,14 @@ class LPTransition extends Transition {
 
         log.trace("Transmitted content in consumption (without anonymous variables): ${coreContent}")
 
-        List<String> outCommonVarList = getCommonVarOutputUnificationFilter()
+        List<Variable> outCommonVarList = getCommonVarOutputUnificationFilter()
+        List<String> outCommonVarStringList = []
 
         for (var in outCommonVarList) {
+            outCommonVarStringList << var.name
+        }
+
+        for (var in outCommonVarStringList) {
             if (!coreContent.keySet().contains(var))
                 coreContent[var] = generateAnonymousIdentifier(var)
         }

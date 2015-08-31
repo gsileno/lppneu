@@ -1,5 +1,6 @@
 package org.leibnizcenter.lppneu.animation
 
+import org.leibnizcenter.lppneu.components.language.Variable
 import org.leibnizcenter.lppneu.components.lppetrinets.LPNet
 import org.leibnizcenter.lppneu.components.lppetrinets.LPTransition
 import org.leibnizcenter.pneu.components.petrinet.Net
@@ -107,7 +108,7 @@ class SimulationComponentsTest extends GroovyTestCase {
         LPTransition lpt = (LPTransition) t
         lpt.initializeInputUnificationFilter()
         assert lpt.commonVarList.size() == 1
-        assert lpt.commonVarList[0] == "A"
+        assert lpt.commonVarList[0] == Variable.build("A")
 
         assert !t.isEnabled()
         p1.createToken("a")
@@ -120,13 +121,10 @@ class SimulationComponentsTest extends GroovyTestCase {
         assert p2.marking.size() == 2
 
         // these are the variables given by this place
-        List<String> localVarList = []
-        for (var in p2.expression.getVariables()) {
-            localVarList << var.name
-        }
+        List<Variable> localVarList = p2.expression.getVariables()
         assert localVarList.size() == 1
 
-        List<String> localCommonVarList = localVarList - (localVarList - lpt.commonVarList)
+        List<Variable> localCommonVarList = localVarList - (localVarList - lpt.commonVarList)
         assert localCommonVarList.size() == 1
 
         // for the variables contained take the local values
@@ -166,7 +164,7 @@ class SimulationComponentsTest extends GroovyTestCase {
         LPTransition lpt = (LPTransition) t
         lpt.initializeInputUnificationFilter()
         assert lpt.commonVarList.size() == 1
-        assert lpt.commonVarList[0] == "A"
+        assert lpt.commonVarList[0] == Variable.build("A")
 
         assert !t.isEnabled()
         p1.createToken("a")
@@ -178,14 +176,12 @@ class SimulationComponentsTest extends GroovyTestCase {
         p2.createToken("a")
         assert p2.marking.size() == 2
 
+
         // these are the variables given by this place
-        List<String> localVarList = []
-        for (var in p2.expression.getVariables()) {
-            localVarList << var.name
-        }
+        List<Variable> localVarList = p2.expression.getVariables()
         assert localVarList.size() == 1
 
-        List<String> localCommonVarList = localVarList - (localVarList - lpt.commonVarList)
+        List<Variable> localCommonVarList = localVarList - (localVarList - lpt.commonVarList)
         assert localCommonVarList.size() == 1
 
         // for the variables contained take the local values

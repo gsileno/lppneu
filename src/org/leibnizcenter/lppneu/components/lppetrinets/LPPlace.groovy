@@ -4,6 +4,7 @@ import org.leibnizcenter.lppneu.components.language.Atom
 import org.leibnizcenter.lppneu.components.language.Expression
 import org.leibnizcenter.lppneu.components.language.PosLiteral
 import org.leibnizcenter.lppneu.components.language.Operator
+import org.leibnizcenter.lppneu.components.language.Variable
 import org.leibnizcenter.pneu.components.petrinet.Place
 import org.leibnizcenter.pneu.components.petrinet.Token
 
@@ -42,29 +43,28 @@ class LPPlace extends Place {
     // TODO: to add the case of link nodes
 
     // Name of the variables given by this place
-    List<String> getVarList() {
-        List<String> localVarList = []
-        for (var in expression.getVariables()) {
-            localVarList << var.name
-        }
-        localVarList
+    List<Variable> getVarList() {
+        expression.getVariables()
     }
 
     // get the elements recorded in the tokens
     // with the relevance given by the variables included in the input list,
-    List<Map<String, String>> getFilterList(List<String> localCommonVarList) {
+    List<Map<String, String>> getFilterList(List<Variable> localCommonVarList) {
         List<Map<String, String>> varWithValuesMapList = []
 
         for (token in marking) {
             Map<String, String> varWithValuesMap = [:]
             for (param in token.expression.getParameters()) {
                 if (param.isVariable()) {
-                    if (localCommonVarList.contains(param.variable.name)) {
-                        // TODO: numeric constants
-                        if (param.variable.identifier == null)
-                            throw new RuntimeException("The constant identifier in the variable ${param.variable} cannot be null.")
+                    for (var in localCommonVarList) {
+                        if (var.name == param.variable.name) {
+                            // TODO: numeric constants and variables
+                            if (param.variable.identifier == null)
+                                throw new RuntimeException("The constant identifier in the variable ${param.variable} cannot be null.")
 
-                        varWithValuesMap[param.variable.name] = param.variable.identifier
+                            varWithValuesMap[param.variable.name] = param.variable.identifier
+                            break;
+                        }
                     }
                 }
             }
@@ -107,7 +107,6 @@ class LPPlace extends Place {
 
     // count the anonymous content generated, in order to generate unique names
     private Map<String, Integer> variableAnonymousGeneratedIdCountMap = [:]
-
     private PosLiteral generateAnonymousIdentifier(String variable) {
 
         if (variableAnonymousGeneratedIdCountMap[variable] == null)
