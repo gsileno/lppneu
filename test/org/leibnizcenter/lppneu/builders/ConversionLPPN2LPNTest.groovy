@@ -1,16 +1,15 @@
 package org.leibnizcenter.lppneu.builders
 
-import org.leibnizcenter.lppneu.builders.LPPN2LPN
-import org.leibnizcenter.lppneu.components.language.*
+import org.leibnizcenter.lppneu.components.language.LPPNProgram
 import org.leibnizcenter.lppneu.parsers.LPPNLoader
-import org.leibnizcenter.pneu.builders.PN2dot
 import org.leibnizcenter.pneu.components.petrinet.Net
+
 
 class ConversionLPPN2LPNTest extends GroovyTestCase {
 
     static Net batchConvert(String code) {
         LPPNProgram program = LPPNLoader.parseString(code)
-        LPPN2LPN conversion = new LPPN2LPN()
+        LPPN2LPN conversion = new org.leibnizcenter.lppneu.builders.LPPN2LPN()
         conversion.convert(program)
         return conversion.net
     }
