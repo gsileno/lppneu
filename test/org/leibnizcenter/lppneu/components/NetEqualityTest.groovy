@@ -47,6 +47,14 @@ class NetEqualityTest extends GroovyTestCase {
     }
 
     void testNetUnEquality5() {
+        Net net1 = batchConvert("a :- b.")
+        Net net2 = batchConvert("b :- a.")
+
+        net1.exportToDot("test1")
+        net1.exportToLog("test1")
+        net2.exportToDot("test2")
+        net2.exportToLog("test2")
+
         assert !Net.compare(batchConvert("a :- b."), batchConvert("b :- a."))
     }
 

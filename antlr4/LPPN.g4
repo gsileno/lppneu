@@ -114,8 +114,8 @@ SEQ : 'SEQ' | 'seq' ;
 PAR : 'PAR' | 'par' ;
 ALT : 'ALT' | 'alt' ;
 NEG : 'neg' | 'NEG' | MINUS ; // strong negation
-NOT : 'not' | TILDE ; // default negation
-NULL : 'null' | 'NULL' ;
+NOT : 'not' | TILDE ;
+NULL : 'null' | 'NULL' ; // default negation
 
 // NOT = NULL OR NEG
 

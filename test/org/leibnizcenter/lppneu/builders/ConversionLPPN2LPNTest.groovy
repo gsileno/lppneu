@@ -8,19 +8,6 @@ import org.leibnizcenter.pneu.components.petrinet.Net
 
 class ConversionLPPN2LPNTest extends GroovyTestCase {
 
-    static void batchExport(Net net, String filename) {
-
-        def folder = new File('examples/out/dot/')
-        if (!folder.exists()) folder.mkdirs()
-
-        String outputFile = "examples/out/dot/" + filename + ".dot"
-
-        new File(outputFile).withWriter {
-            out -> out.println(PN2dot.convert(net))
-        }
-        println "lpetri net exported to " + outputFile
-    }
-
     static Net batchConvert(String code) {
         LPPNProgram program = LPPNLoader.parseString(code)
         LPPN2LPN conversion = new LPPN2LPN()
@@ -97,6 +84,7 @@ class ConversionLPPN2LPNTest extends GroovyTestCase {
 
     void testConversionSimpleCausalRule() {
         Net net = batchConvert("a -> b.")
+        net.exportToDot("simpleCausalRule")
         assert net.subNets.size() == 1
         assert net.placeList.size() == 0
         assert net.transitionList.size() == 0

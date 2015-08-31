@@ -31,7 +31,7 @@ enum Operator {
     POS, NEG, NULL, NOT,             // unary operators  (situations and events)
     AND, OR, XOR,                    // binary operators (situations)
     SEQ, PAR, OPT, ALT,              // binary operators (events and situations)
-    IMPLIES, INHIBITS, DEFINES,      // logical dependencies on situations
+    IMPLIES, FORBIDS, DEFINES,      // logical dependencies on situations
     OCCURS_IN, OCCURS, CAUSES,       // event definition and causal dependency
 
     TRIPLE, ASSOCIATION,                         // just for labeling purposes (TODO: refactoring)
@@ -55,7 +55,7 @@ enum Operator {
     }
 
     Boolean isUnary() {
-        this == POS || this == NEG || this == NULL || this == NOT
+        this == POS || this == NEG || this == NULL || this == NOT ||
                 this == POS_INSTANCE || this == NEG_INSTANCE || this ==  NULL_INSTANCE ||
                 this == POS_THIS || this == NEG_THIS || this == NULL_THIS
     }

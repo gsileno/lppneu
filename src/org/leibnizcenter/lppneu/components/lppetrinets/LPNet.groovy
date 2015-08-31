@@ -2,6 +2,7 @@ package org.leibnizcenter.lppneu.components.lppetrinets
 
 import org.leibnizcenter.lppneu.components.language.Expression
 import org.leibnizcenter.lppneu.components.language.Operation
+import org.leibnizcenter.lppneu.components.language.Operator
 import org.leibnizcenter.lppneu.components.language.Variable
 import org.leibnizcenter.pneu.components.petrinet.Arc
 import org.leibnizcenter.pneu.components.petrinet.Net
@@ -38,6 +39,12 @@ class LPNet extends Net {
 
     Transition createTransition(Operation operation) {
         LPTransition tr = new LPTransition(operation: operation)
+        transitionList << tr
+        tr
+    }
+
+    Transition createTransition(Operator operator) {
+        LPTransition tr = new LPTransition(operator: operator)
         transitionList << tr
         tr
     }
@@ -122,11 +129,52 @@ class LPNet extends Net {
         tBridge
     }
 
-    Transition createNexus(List<Place> inputs, List<Place> outputs, List<Place> biflows, List<Place> diode, List<Place> inhibitors) {
+    Place createPlaceNexus(List<Transition> inputs, List<Transition> outputs, List<Transition> biflows, List<Transition> diode, List<Transition> inhibited) {
 
         List<String> varStringList = []
 
-        for (p in inputs+outputs+biflows+diode+inhibitors) {
+        for (t in inputs + outputs + biflows + diode + inhibited) {
+            LPTransition lpt = (LPTransition) t
+            varStringList = combineVarList(varStringList, Variable.toVarStringList(lpt.operation.getVariables()))
+        }
+
+        Place pBridge
+        if (varStringList) {
+            pBridge = createLinkPlace(Expression.buildBridgeFromVarStringList(varStringList))
+        } else {
+            pBridge = createLinkPlace()
+        }
+
+        // note the inhibitor, diode position is inverted in respect to transition nexus
+        for (t in inputs + biflows + diode) {
+            if (!getAllTransitions().contains(t)) {
+                throw new RuntimeException("Error: this net does not contain the given input transition (${t})")
+            }
+            createArc(t, pBridge)
+        }
+
+        for (t in outputs + biflows) {
+            if (!getAllTransitions().contains(t)) {
+                throw new RuntimeException("Error: this net does not contain the given output transition (${t})")
+            }
+            createArc(pBridge, t)
+        }
+
+        for (t in inhibited + diode) {
+            if (!getAllTransitions().contains(t)) {
+                throw new RuntimeException("Error: this net does not contain the given inhibited transition (${t})")
+            }
+            createInhibitorArc(pBridge, t)
+        }
+
+        pBridge
+    }
+
+    Transition createTransitionNexus(List<Place> inputs, List<Place> outputs, List<Place> biflows, List<Place> diode, List<Place> inhibitors) {
+
+        List<String> varStringList = []
+
+        for (p in inputs + outputs + biflows + diode + inhibitors) {
             LPPlace lpp = (LPPlace) p
             varStringList = combineVarList(varStringList, Variable.toVarStringList(lpp.expression.getVariables()))
         }
@@ -229,7 +277,6 @@ class LPNet extends Net {
         pBridge
     }
 
-
     // deep cloning done for nets
     // only the net structure is cloned, all the elements remains the same (e.g. places, transitions, etc.)
     Net minimalClone(Map<Net, Net> sourceCloneMap = [:]) {
@@ -262,36 +309,52 @@ class LPNet extends Net {
         clone
     }
 
-    static reifyLinks(Net net, alreadyReifiedNets = []) {
-        List<Place> placeList = net.placeList
-        List<Transition> transitionList = net.transitionList
-        List<Arc> arcList = net.arcList
-        List<Net> subNets = net.subNets
+    NetInterface includeWithInterface(Net subNet) {
 
-        if (placeList.size() > 0) {
+        NetInterface netInterface = new NetInterface()
 
+        include(subNet)
+
+        // atomic net - no interface needed
+        if (subNet.placeList.size() == 1 && subNet.transitionList.size() == 0 && subNet.subNets.size() == 0) {
+            for (node in subNet.inputs) netInterface.placeInputs << (Place) node
+            for (node in subNet.outputs) netInterface.placeOutputs << (Place) node
+            return netInterface
+        } else if (subNet.transitionList.size() == 1 && subNet.placeList.size() == 0 && subNet.subNets.size() == 0) {
+            for (node in subNet.inputs) netInterface.transitionInputs << (Transition) node
+            for (node in subNet.outputs) netInterface.transitionOutputs << (Transition) node
+            return netInterface
         }
 
-        if (transitionList.size() > 0) {
-
-        }
-
-        if (subNets.size() > 0) {
-            for (subNet in subNets) {
-                if (!alreadyReifiedNets.contains(subNet)) {
-                    reifyLinks(subNet, alreadyReifiedNets)
-                }
+        for (input in subNet.inputs) {
+            if (input.isPlaceLike()) {
+                Place pInnerIn = (LPPlace) input
+                Place pIn = createPlace(pInnerIn.expression)
+                createBridge(pIn, pInnerIn)
+                netInterface.placeInputs << pIn
+            } else {
+                Transition tInnerIn = (LPTransition) input
+                Transition tIn = createTransition(tInnerIn.operation)
+                createBridge(tIn, tInnerIn)
+                netInterface.transitionInputs << tIn
             }
         }
 
-        if (arcList.size() > 0) {
-
+        for (output in subNet.outputs) {
+            if (output.isPlaceLike()) {
+                Place pInnerOut = (LPPlace) output
+                Place pOut = createPlace(pInnerOut.expression)
+                createBridge(pInnerOut, pOut)
+                netInterface.placeOutputs << pOut
+            } else {
+                Transition tInnerOut = (LPTransition) output
+                Transition tOut = createTransition(tInnerOut.operation)
+                createBridge(tInnerOut, tOut)
+                netInterface.transitionOutputs << tOut
+            }
         }
 
-    }
-
-    void reifyLinks() {
-        reifyLinks(this)
+        netInterface
     }
 
 }

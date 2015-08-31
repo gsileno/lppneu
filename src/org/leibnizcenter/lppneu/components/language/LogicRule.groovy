@@ -57,7 +57,7 @@ class LogicRule {
         else if (isFact())
             head
         else if (isConstraint())
-            Expression.build(body, Operator.INHIBITS)
+            Expression.build(body, Operator.FORBIDS)
     }
 
 }

@@ -12,6 +12,7 @@ optimization: simplification can occurs at construction, i.e. avoiding to create
 ERRORS
 // "=>" in parsing does something against '->' 
 correct the operator priority for (a in b and c).. should be a in (b and c) rather than (a in b) and c
+error in net comparison with link transitions!!!
 
 INFO
 

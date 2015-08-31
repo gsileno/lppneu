@@ -137,8 +137,8 @@ class Event {
         Boolean printOp = (operator != Operator.POS)
 
         if (printOp) output += operator.toString() + "("
-        if (factLiteral) output += factLiteral.toString()
-        if (rootLiteral) output += "."+rootLiteral.toString()
+        if (factLiteral != null) output += factLiteral.toString()
+        else if (rootLiteral != null) output += "."+rootLiteral.toString()
         else output += positionRef.toString()
         if (printOp) output += ")"
 

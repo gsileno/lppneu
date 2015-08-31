@@ -31,7 +31,7 @@ class AnalysisTest extends GroovyTestCase {
         Place pDiode = net.createPlace("diode")
         net.createArc(tDiode, pDiode)
 
-        net.createNexus([pInput], [pOutput], [pBiflow], [pDiode], [pInhibitor])
+        net.createTransitionNexus([pInput], [pOutput], [pBiflow], [pDiode], [pInhibitor])
 
         net.resetIds()
 
@@ -67,7 +67,7 @@ class AnalysisTest extends GroovyTestCase {
         Place pDiode = net.createPlace("diode(E)")
         net.createArc(tDiode, pDiode)
 
-        net.createNexus([pInput], [pOutput], [pBiflow], [pDiode], [pInhibitor])
+        net.createTransitionNexus([pInput], [pOutput], [pBiflow], [pDiode], [pInhibitor])
 
         net.resetIds()
 
@@ -101,7 +101,7 @@ class AnalysisTest extends GroovyTestCase {
         Place pDiode = net.createPlace("diode(A)")
         net.createArc(tDiode, pDiode)
 
-        net.createNexus([pInput], [pOutput], [pBiflow], [pDiode], [pInhibitor])
+        net.createTransitionNexus([pInput], [pOutput], [pBiflow], [pDiode], [pInhibitor])
 
         net.resetIds()
 
@@ -136,7 +136,7 @@ class AnalysisTest extends GroovyTestCase {
         Place pDiode = net.createPlace("diode(A)")
         net.createArc(tDiode, pDiode)
 
-        net.createNexus([pInput], [pOutput], [pBiflow], [pDiode], [pInhibitor])
+        net.createTransitionNexus([pInput], [pOutput], [pBiflow], [pDiode], [pInhibitor])
 
         // to feed all transitions with the same token
         // I centralize the emitted token in a place
