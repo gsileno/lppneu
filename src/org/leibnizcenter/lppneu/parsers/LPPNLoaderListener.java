@@ -72,12 +72,33 @@ public class LPPNLoaderListener extends LPPNBaseListener {
         log.trace("attaching variable " + variable + " to node.");
     }
 
+    public void exitVariable_structure(LPPNParser.Variable_structureContext ctx) {
+
+        // example: A
+        Variable variable = variableNodes.get(ctx.variable(0));
+
+        if (ctx.COLON() != null) {
+
+            // example: A: a
+            if (ctx.constant() != null) {
+                variable.setIdentifier(ctx.constant().getText());
+            } else if (ctx.variable(1) != null) {
+                variable.setVariable(variableNodes.get(ctx.variable(1)));
+            } else {
+                throw new RuntimeException("Not valid structure.");
+            }
+        }
+
+        variableNodes.put(ctx, variable);
+        log.trace("attaching variable " + variable + " to node.");
+    }
+
     public void exitParameter(LPPNParser.ParameterContext ctx) {
         Parameter parameter;
         if (ctx.pos_literal() != null) {
             parameter = Parameter.build(posLiteralNodes.get(ctx.pos_literal()));
-        } else if (ctx.variable() != null) {
-            parameter = Parameter.build(variableNodes.get(ctx.variable()));
+        } else if (ctx.variable_structure() != null) {
+            parameter = Parameter.build(variableNodes.get(ctx.variable_structure()));
         } else if (ctx.constant() != null) {
             throw new RuntimeException("to be implemented");
         } else if (ctx.num_expression() != null) {

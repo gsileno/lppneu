@@ -12,17 +12,17 @@ import org.leibnizcenter.pneu.components.petrinet.TransitionType
 class LPNet extends Net {
 
     // an emitter transition is a natural input
-    Transition createEmitterTransition() {
-        LPTransition tr = new LPTransition(type: TransitionType.EMITTER)
-        transitionList << tr
+    Transition createEmitterTransition(String label = null) {
+        LPTransition tr = createTransition(label)
+        tr.type = TransitionType.EMITTER
         inputs << tr
         tr
     }
 
     // a collector transition is a natural output
-    Transition createCollectorTransition() {
-        LPTransition tr = new LPTransition(type: TransitionType.COLLECTOR)
-        transitionList << tr
+    Transition createCollectorTransition(String label = null) {
+        LPTransition tr = createTransition(label)
+        tr.type = TransitionType.COLLECTOR
         outputs << tr
         tr
     }
@@ -260,6 +260,38 @@ class LPNet extends Net {
         }
 
         clone
+    }
+
+    static reifyLinks(Net net, alreadyReifiedNets = []) {
+        List<Place> placeList = net.placeList
+        List<Transition> transitionList = net.transitionList
+        List<Arc> arcList = net.arcList
+        List<Net> subNets = net.subNets
+
+        if (placeList.size() > 0) {
+
+        }
+
+        if (transitionList.size() > 0) {
+
+        }
+
+        if (subNets.size() > 0) {
+            for (subNet in subNets) {
+                if (!alreadyReifiedNets.contains(subNet)) {
+                    reifyLinks(subNet, alreadyReifiedNets)
+                }
+            }
+        }
+
+        if (arcList.size() > 0) {
+
+        }
+
+    }
+
+    void reifyLinks() {
+        reifyLinks(this)
     }
 
 }

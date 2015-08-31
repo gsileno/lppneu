@@ -85,12 +85,17 @@ pos_literal : predicate ( LPAR list_parameters RPAR )? ;
 /** Parameters are separated by comma. */
 list_parameters :  parameter (COMMA list_parameters)? ;
 
-/** Parameters are variables, constants (e.g. numbers), numeric expressions of those or positive literals  */
-parameter : variable | constant | pos_literal | num_expression ;
+/** Parameters are variable structures, constants (e.g. numbers), numeric expressions of those or positive literals  */
+parameter : variable_structure | constant | pos_literal | num_expression ;
 
 predicate : IDENTIFIER ;
 identifier : IDENTIFIER ;
 constant : INTEGER ;
+
+variable_structure : variable
+| variable COLON variable
+| variable COLON constant ;
+
 variable : VARIABLE ;
 
 /*----------------
@@ -114,17 +119,18 @@ NULL : 'null' | 'NULL' ;
 
 // NOT = NULL OR NEG
 
+WHEN : COLON | 'in' ;
 CAUSES : '->' |  '=>';
 IS_IMPLIED_BY : ':-' ;
 IS_EQUIVALENT_TO : '::-' | ':=' | '::=' ;
 
-WHEN : ':' | 'in' ;
 PLUS : '+' ;
 MINUS : '-' ; // both for strong negation and arithmetic deletion
 TILDE : '~' ; // used for the union between default and strong
 
 DOT : '.' ;
 COMMA : ',' ;
+COLON : ':' ;
 
 LPAR : '(' ;
 RPAR : ')' ;

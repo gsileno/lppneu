@@ -11,6 +11,7 @@ class Variable {
         String output = name
         if (identifier) output += ":"+identifier
         else if (value) output += ":"+value.toString()
+        else if (variable) output += ":"+variable.toString()
         output
     }
 
@@ -43,5 +44,6 @@ class Variable {
     // decoration with value
     String identifier
     Integer value
+    Variable variable
 
 }

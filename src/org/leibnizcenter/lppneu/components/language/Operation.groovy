@@ -103,6 +103,17 @@ class Operation {
         )
     }
 
+    static Operation buildBridgeFromVarList(List<Variable> varList) {
+        List<Parameter> parameters = []
+        for (var in varList) {
+            parameters << Parameter.build(var)
+        }
+
+        new Operation(
+                formula: PROTOTYPE.build(Event.build(PosLiteral.buildAnonymous(parameters)))
+        )
+    }
+
     // get all the variables in the operation
     List<Variable> getVariables() {
         List<Variable> varList = []

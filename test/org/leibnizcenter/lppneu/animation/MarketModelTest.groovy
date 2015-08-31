@@ -42,4 +42,12 @@ class MarketModelTest extends GroovyTestCase {
         runner.analysis.exportToLog("BasicSaleWithWorldAndTimeline")
     }
 
+    void testBasicSwapSale() {
+        runner.load(MarketModel.basicSwapSale())
+        runner.execution.net.exportToLog("BasicSwapSale")
+        runner.execution.net.exportToDot("BasicSwapSale")
+        runner.analyse()
+        runner.analysis.exportToLog("BasicSwapSale")
+        assert (runner.analysis.storyBase.getSize() == 1)
+    }
 }
