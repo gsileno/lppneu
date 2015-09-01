@@ -92,21 +92,10 @@ class Operation {
     }
 
     // for LPPN, bridge transitions
-    static Operation buildBridgeFromVarStringList(List<String> varStringList) {
-        List<Parameter> parameters = []
-        for (varString in varStringList) {
-            parameters << Parameter.build(Variable.build(varString))
-        }
-
-        new Operation(
-                formula: PROTOTYPE.build(Event.build(PosLiteral.buildAnonymous(parameters)))
-        )
-    }
-
-    static Operation buildBridgeFromVarList(List<Variable> varList) {
+    static Operation buildAnonymousFromVarList(List<Variable> varList) {
         List<Parameter> parameters = []
         for (var in varList) {
-            parameters << Parameter.build(var)
+            parameters << Parameter.build(var.minimalClone())
         }
 
         new Operation(

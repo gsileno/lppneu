@@ -85,10 +85,10 @@ class Expression {
     }
 
     // for LPPN, bridge places
-    static Expression buildBridgeFromVarStringList(List<String> varStringList) {
+    static Expression buildAnonymousFromVarList(List<Variable> varList) {
         List<Parameter> parameters = []
-        for (varString in varStringList) {
-            parameters << Parameter.build(Variable.build(varString))
+        for (var in varList) {
+            parameters << Parameter.build(var.minimalClone())
         }
 
         new Expression(

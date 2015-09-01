@@ -2,6 +2,7 @@ package org.leibnizcenter.lppneu.components.lppetrinets
 
 import org.leibnizcenter.lppneu.components.language.Atom
 import org.leibnizcenter.lppneu.components.language.Expression
+import org.leibnizcenter.lppneu.components.language.Operation
 import org.leibnizcenter.lppneu.components.language.PosLiteral
 import org.leibnizcenter.lppneu.components.language.Operator
 import org.leibnizcenter.lppneu.components.language.Variable
@@ -40,11 +41,21 @@ class LPPlace extends Place {
         return true
     }
 
-    // TODO: to add the case of link nodes
+    // here you store the actual variables of the place
+    List<Variable> varList
 
-    // Name of the variables given by this place
+    // how to compute the actual variables, using the label or reifying the connected nodes
     List<Variable> getVarList() {
-        expression.getVariables()
+        if (varList == null) {
+            if (!link)
+                varList = expression.getVariables()
+            else {
+                varList = reifyTransitions()
+            }
+            varList
+        } else {
+            varList
+        }
     }
 
     // get the elements recorded in the tokens
@@ -107,6 +118,7 @@ class LPPlace extends Place {
 
     // count the anonymous content generated, in order to generate unique names
     private Map<String, Integer> variableAnonymousGeneratedIdCountMap = [:]
+
     private PosLiteral generateAnonymousIdentifier(String variable) {
 
         if (variableAnonymousGeneratedIdCountMap[variable] == null)
@@ -164,7 +176,13 @@ class LPPlace extends Place {
     // creates a token with a map that associates identifiers to variables
     // the missing items are filled with anonymous identifiers
     Token createToken(Map<String, String> variableLiteralMap) {
-        Expression tokenExpression = expression.minimalClone()
+
+        Expression tokenExpression
+        if (!link) { // normal places
+            tokenExpression = expression.minimalClone()
+        } else {
+            tokenExpression = Expression.buildAnonymousFromVarList(getVarList())
+        }
 
         for (param in tokenExpression.getParameters()) {
             if (param.isVariable()) {
@@ -197,9 +215,12 @@ class LPPlace extends Place {
             newVariableAnonymousGeneratedIdCountMap[item.key] = item.value
         }
 
+        Expression clonedExpression = null
+        if (expression) clonedExpression = expression.minimalClone()
+
         return new LPPlace(
                 marking: marking.collect(),
-                expression: expression.minimalClone(),
+                expression: clonedExpression,
                 link: link,
                 variableAnonymousGeneratedIdCountMap: newVariableAnonymousGeneratedIdCountMap
         )
@@ -223,6 +244,35 @@ class LPPlace extends Place {
         if (p1.link != p2.link) return false
         return true
     }
+
+    // remove redundant elements
+    private static List<Variable> combineVarList(List<Variable> varList1, List<Variable> varList2) {
+        return varList1 - varList2 + varList2
+    }
+
+    // semaphor to avoid recursion
+    private Boolean inReification = false
+
+    // combine all the variables of the connected transitions (for link places)
+    List<Variable> reifyTransitions() {
+        if (inReification) return []
+        else inReification = true
+
+        List<Variable> varList = []
+        List<LPTransition> connectedTransitions = []
+        for (arc in inputs) {
+            connectedTransitions << (LPTransition) arc.source
+        }
+        for (arc in outputs) {
+            connectedTransitions << (LPTransition) arc.target
+        }
+
+        for (transition in connectedTransitions) {
+            varList = combineVarList(varList, transition.getVarList())
+        }
+        varList
+    }
+
 
 }
 

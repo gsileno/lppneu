@@ -257,7 +257,7 @@ class SimulationComponentsTest extends GroovyTestCase {
         Transition tIn = net.createEmitterTransition()
         Place p1 = net.createPlace("a(A, C)")
         Place p2 = net.createPlace("b(B, A)")
-        Transition t = net.createTransition()
+        Transition t = net.createLinkTransition()
         Place p3 = net.createPlace("c(A, B, C)")
         Transition tOut = net.createCollectorTransition()
 

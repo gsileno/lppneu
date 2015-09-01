@@ -47,6 +47,22 @@ class LPTransition extends Transition {
         return link
     }
 
+    List<Variable> varList
+
+    // Name of the variables given by this place
+    List<Variable> getVarList() {
+        if (varList == null) {
+            if (!link)
+                varList = operation.getVariables()
+            else {
+                varList = reifyPlaces()
+            }
+            varList
+        } else {
+            varList
+        }
+    }
+
     Transition minimalClone() {
         Map<String, Integer> clonedVariableAnonymousGeneratedIdCountMap = [:]
         for (item in variableAnonymousGeneratedIdCountMap) {
@@ -54,8 +70,7 @@ class LPTransition extends Transition {
         }
 
         Operation clonedOperation = null
-        if (operation)
-            clonedOperation = operation.minimalClone()
+        if (operation) clonedOperation = operation.minimalClone()
 
         return new LPTransition(
                 operation: clonedOperation,
@@ -94,7 +109,6 @@ class LPTransition extends Transition {
     // all variables accounted in places
     List<Variable> allVarList
 
-
     private static void computePlaceUnificationFilter(List<Node> inputs, List<Variable> commonVarList, List<Variable> allVarList) {
         // for each input place
         for (elem in inputs) {
@@ -102,7 +116,7 @@ class LPTransition extends Transition {
             log.trace("place to be unified: " + pl.id)
 
             // for each variable which is not in the filter
-            for (var in (pl.expression.getVariables() - commonVarList)) {
+            for (var in (pl.getVarList() - commonVarList)) {
                 log.trace("variable: " + var)
 
                 // if it is already in the list of variables, add to the filter
@@ -117,7 +131,6 @@ class LPTransition extends Transition {
             }
         }
     }
-
 
     // set the filter for the input to the transition
     void initializeInputUnificationFilter() {
@@ -414,4 +427,29 @@ class LPTransition extends Transition {
             "_"+id+variable.toLowerCase()+n
         }
     }
+
+    // remove redundant elements
+    private static List<Variable> combineVarList(List<Variable> varList1, List<Variable> varList2) {
+        return varList1 - varList2 + varList2
+    }
+
+    // semaphor to avoid recursion
+    private Boolean inReification = false
+
+    // combine all the variables of the connected places (for link transitions)
+    List<Variable> reifyPlaces() {
+        if (inReification) return []
+        else inReification = true
+
+        List<Variable> varList = []
+        List<LPPlace> connectedPlaces = []
+        for (arc in inputs) { connectedPlaces << (LPPlace) arc.source }
+        for (arc in outputs) { connectedPlaces << (LPPlace) arc.target }
+
+        for (transition in connectedPlaces) {
+            varList = combineVarList(varList, transition.getVarList())
+        }
+        varList
+    }
+
 }

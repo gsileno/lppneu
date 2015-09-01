@@ -4,7 +4,6 @@ import org.leibnizcenter.lppneu.components.language.Expression
 import org.leibnizcenter.lppneu.components.language.Operation
 import org.leibnizcenter.lppneu.components.language.Operator
 import org.leibnizcenter.lppneu.components.language.Variable
-import org.leibnizcenter.pneu.components.petrinet.Arc
 import org.leibnizcenter.pneu.components.petrinet.Net
 import org.leibnizcenter.pneu.components.petrinet.Place
 import org.leibnizcenter.pneu.components.petrinet.Transition
@@ -13,23 +12,23 @@ import org.leibnizcenter.pneu.components.petrinet.TransitionType
 class LPNet extends Net {
 
     // an emitter transition is a natural input
-    Transition createEmitterTransition(String label = null) {
-        LPTransition tr = createTransition(label)
+    Transition createEmitterTransition() {
+        Transition tr = createLinkTransition()
         tr.type = TransitionType.EMITTER
         inputs << tr
         tr
     }
 
     // a collector transition is a natural output
-    Transition createCollectorTransition(String label = null) {
-        LPTransition tr = createTransition(label)
+    Transition createCollectorTransition() {
+        Transition tr = createLinkTransition()
         tr.type = TransitionType.COLLECTOR
         outputs << tr
         tr
     }
 
-    Transition createTransition(String label = null) {
-        LPTransition tr = new LPTransition()
+    Transition createTransition(String label) {
+        Transition tr = new LPTransition()
         if (label) {
             tr.operation = Operation.parse(label)
         }
@@ -38,22 +37,20 @@ class LPNet extends Net {
     }
 
     Transition createTransition(Operation operation) {
-        LPTransition tr = new LPTransition(operation: operation)
+        Transition tr = new LPTransition(operation: operation)
         transitionList << tr
         tr
     }
 
     Transition createTransition(Operator operator) {
-        LPTransition tr = new LPTransition(operator: operator)
+        Transition tr = new LPTransition(operator: operator)
         transitionList << tr
         tr
     }
 
-    LPPlace createPlace(String label = null) {
-        LPPlace pl = new LPPlace()
-        if (label) {
-            pl.expression = Expression.parse(label)
-        }
+    LPPlace createPlace(String label) {
+        Place pl = new LPPlace()
+        pl.expression = Expression.parse(label)
         placeList << pl
         pl
     }
@@ -64,34 +61,42 @@ class LPNet extends Net {
         pl
     }
 
-    ////////// Special case: link elements, which propagate data without explicit declaration
-
-    // remove redundant elements
-    private static List<String> combineVarList(List<String> varList1, List<String> varList2) {
-        return varList1 - varList2 + varList2
-    }
-
-    private static List<String> combineVarList(List<List<String>> varLists) {
-        List<String> combinedVarList = []
-        for (varList in varLists) {
-            combinedVarList = combinedVarList - varList + varList
-        }
-        combinedVarList
-    }
-
-    Transition createLinkTransition(Operation operation = null) {
-        LPTransition tr = new LPTransition(link: true, operation: operation)
+    Transition createLinkTransition() {
+        Transition tr = new LPTransition(link: true)
         transitionList << tr
         tr
     }
 
-    LPPlace createLinkPlace(Expression expression = null) {
-        LPPlace pl = new LPPlace(link: true, expression: expression)
+    LPPlace createLinkPlace() {
+        Place pl = new LPPlace(link: true)
         placeList << pl
         pl
     }
 
-    // TODO: add checks for correct bindings
+    // the first transition is meant to produce what is in the bridge place
+    // at the same time, the second transition necessarily consumes what is in the bridge place,
+    // which has therefore to be produced somewhere, this can be seen "context" information
+    Place createBridge(Transition t1, Transition t2) {
+        if (!getAllTransitions().contains(t1) || !getAllTransitions().contains(t2)) {
+            throw new RuntimeException("Error: this net does not contain the transition(s) to bridge")
+        }
+
+        Place pBridge = createLinkPlace()
+        createArc(t1, pBridge)
+        createArc(pBridge, t2)
+        pBridge
+    }
+
+    Place createDiodeBridge(Transition t1, Transition t2) {
+        if (!getAllTransitions().contains(t1) || !getAllTransitions().contains(t2)) {
+            throw new RuntimeException("Error: this net does not contain the transition(s) to bridge")
+        }
+
+        Place pBridge = createLinkPlace()
+        createDiodeArc(t1, pBridge)
+        createArc(pBridge, t2)
+        pBridge
+    }
 
     // the bridge transition is meant to produce what is in the last place
     // what is already described in the first transition will be transmitted,
@@ -100,28 +105,7 @@ class LPNet extends Net {
         if (!getAllPlaces().contains(p1) || !getAllPlaces().contains(p2)) {
             throw new RuntimeException("Error: this net does not contain the place(s) to bridge")
         }
-        LPPlace lpp1 = (LPPlace) p1
-        LPPlace lpp2 = (LPPlace) p2
-
-        List<String> varStringList
-
-        if (lpp1.expression != null && lpp2.expression != null) {
-            varStringList = combineVarList(Variable.toVarStringList(lpp1.expression.getVariables()),
-                    Variable.toVarStringList(lpp2.expression.getVariables()))
-        } else if (lpp1.expression != null) {
-            varStringList = Variable.toVarStringList(lpp1.expression.getVariables())
-        } else if (lpp2.expression != null) {
-            varStringList = Variable.toVarStringList(lpp2.expression.getVariables())
-        } else {
-            throw new RuntimeException("Both places in the bridge cannot be underspecified")
-        }
-
-        Transition tBridge
-        if (varStringList) {
-            tBridge = createLinkTransition(Operation.buildBridgeFromVarStringList(varStringList))
-        } else {
-            tBridge = createLinkTransition()
-        }
+        Transition tBridge = createLinkTransition()
 
         createArc(p1, tBridge)
         createArc(tBridge, p2)
@@ -129,22 +113,11 @@ class LPNet extends Net {
         tBridge
     }
 
+    // TODO: add checks for correct bindings
+
     Place createPlaceNexus(List<Transition> inputs, List<Transition> outputs, List<Transition> biflows, List<Transition> diode, List<Transition> inhibited) {
 
-        List<String> varStringList = []
-
-        for (t in inputs + outputs + biflows + diode + inhibited) {
-            LPTransition lpt = (LPTransition) t
-            if (lpt.operation != null)
-                varStringList = combineVarList(varStringList, Variable.toVarStringList(lpt.operation.getVariables()))
-        }
-
-        Place pBridge
-        if (varStringList) {
-            pBridge = createLinkPlace(Expression.buildBridgeFromVarStringList(varStringList))
-        } else {
-            pBridge = createLinkPlace()
-        }
+        Place pBridge = createLinkPlace()
 
         // note the inhibitor, diode position is inverted in respect to transition nexus
         for (t in inputs + biflows + diode) {
@@ -173,20 +146,7 @@ class LPNet extends Net {
 
     Transition createTransitionNexus(List<Place> inputs, List<Place> outputs, List<Place> biflows, List<Place> diode, List<Place> inhibitors) {
 
-        List<String> varStringList = []
-
-        for (p in inputs + outputs + biflows + diode + inhibitors) {
-            LPPlace lpp = (LPPlace) p
-            if (lpp.expression != null)
-                varStringList = combineVarList(varStringList, Variable.toVarStringList(lpp.expression.getVariables()))
-        }
-
-        Transition tBridge
-        if (varStringList) {
-            tBridge = createLinkTransition(Operation.buildBridgeFromVarStringList(varStringList))
-        } else {
-            tBridge = createLinkTransition()
-        }
+        Transition tBridge = createLinkTransition()
 
         for (p in inputs + biflows) {
             if (!getAllPlaces().contains(p)) {
@@ -210,73 +170,6 @@ class LPNet extends Net {
         }
 
         tBridge
-    }
-
-    // the first transition is meant to produce what is in the bridge place
-    // at the same time, the second transition necessarily consumes what is in the bridge place,
-    // which has therefore to be produced somewhere, this can be seen "context" information
-    Place createBridge(Transition t1, Transition t2) {
-        if (!getAllTransitions().contains(t1) || !getAllTransitions().contains(t2)) {
-            throw new RuntimeException("Error: this net does not contain the transition(s) to bridge")
-        }
-        LPTransition lpt1 = (LPTransition) t1
-        LPTransition lpt2 = (LPTransition) t2
-
-        List<String> varStringList
-
-        if (lpt1.operation != null && lpt2.operation != null) {
-            varStringList = combineVarList(Variable.toVarStringList(lpt1.operation.getVariables()),
-                    Variable.toVarStringList(lpt2.operation.getVariables()))
-        } else if (lpt1.operation != null) {
-            varStringList = Variable.toVarStringList(lpt1.operation.getVariables())
-        } else if (lpt2.operation != null) {
-            varStringList = Variable.toVarStringList(lpt2.operation.getVariables())
-        } else {
-            throw new RuntimeException("Both transitions in the bridge cannot be underspecified")
-        }
-
-        Place pBridge
-        if (varStringList) {
-            pBridge = createLinkPlace(Expression.buildBridgeFromVarStringList(varStringList))
-        } else {
-            pBridge = createLinkPlace()
-        }
-        createArc(t1, pBridge)
-        createArc(pBridge, t2)
-
-        pBridge
-    }
-
-    Place createDiodeBridge(Transition t1, Transition t2) {
-        if (!getAllTransitions().contains(t1) || !getAllTransitions().contains(t2)) {
-            throw new RuntimeException("Error: this net does not contain the transition(s) to bridge")
-        }
-
-        LPTransition lpt1 = (LPTransition) t1
-        LPTransition lpt2 = (LPTransition) t2
-
-        List<String> varStringList
-
-        if (lpt1.operation != null && lpt2.operation != null) {
-            varStringList = combineVarList(Variable.toVarStringList(lpt1.operation.getVariables()),
-                    Variable.toVarStringList(lpt2.operation.getVariables()))
-        } else if (lpt1.operation != null) {
-            varStringList = Variable.toVarStringList(lpt1.operation.getVariables())
-        } else if (lpt2.operation != null) {
-            varStringList = Variable.toVarStringList(lpt2.operation.getVariables())
-        } else {
-            throw new RuntimeException("Both transitions in the bridge cannot be underspecified")
-        }
-
-        Place pBridge
-        if (varStringList) {
-            pBridge = createLinkPlace(Expression.buildBridgeFromVarStringList(varStringList))
-        } else {
-            pBridge = createLinkPlace()
-        }
-        createDiodeArc(t1, pBridge)
-        createArc(pBridge, t2)
-        pBridge
     }
 
     // deep cloning done for nets
@@ -372,5 +265,8 @@ class LPNet extends Net {
 //
 //        netInterface
     }
+
+
+    ////////// Special case: link elements, which propagate data without explicit declaration
 
 }
