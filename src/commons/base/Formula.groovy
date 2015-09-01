@@ -60,11 +60,13 @@ class Formula<T> {
             }
         } else {
             // perform the operation on the term itself
-            if (op == Operator.NEG)
+            if (op == Operator.POS) {
+                formula = build(terms[0])
+            } else if (op == Operator.NEG) {
                 formula = build(terms[0].negate())
-            else if (op == Operator.NULL)
+            } else if (op == Operator.NULL) {
                 formula = build(terms[0].nullify())
-
+            }
             // for usual operators, with only one input, the formula becomes identity
             else if (op == Operator.OR || op == Operator.XOR || op == Operator.AND ||
                      op == Operator.PAR || op == Operator.ALT || op == Operator.SEQ || op == Operator.OPT)

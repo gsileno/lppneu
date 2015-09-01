@@ -190,6 +190,10 @@ public class LPPNLoaderListener extends LPPNBaseListener {
             expression = Expression.build(operationNodes.get(ctx.operation()).toExpression(), expressionNodes.get(ctx.body_expression(0)), Operator.OCCURS_IN);
         } else if (ctx.LPAR() != null) {
             expression = expressionNodes.get(ctx.body_expression(0));
+        } else if (ctx.NEG() != null) {
+            expression = Expression.build(
+                    expressionNodes.get(ctx.body_expression(0)), Operator.NEG
+            );
         } else if (ctx.NOT() != null) {
             expression = Expression.build(
                     expressionNodes.get(ctx.body_expression(0)), Operator.NOT
@@ -224,6 +228,10 @@ public class LPPNLoaderListener extends LPPNBaseListener {
             expression = Expression.build(operationNodes.get(ctx.operation()).toExpression(), expressionNodes.get(ctx.head_expression(0)), Operator.OCCURS_IN);
         } else if (ctx.LPAR() != null) {
             expression = expressionNodes.get(ctx.head_expression(0));
+        } else if (ctx.NEG() != null) {
+            expression = Expression.build(
+                    expressionNodes.get(ctx.head_expression(0)), Operator.NEG
+            );
         } else {
             Operator op;
             if (ctx.AND() != null) op = Operator.AND;

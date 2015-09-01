@@ -62,7 +62,7 @@ class LPNHandler {
 
         // for each triple reconstructed create a subNet
         for (coupling in mapper.expressionTripleMap) {
-            tripleAnchoredNet.include(buildTripleNet(coupling.key))
+            tripleAnchoredNet.include(LPPN2LPN.buildTripleNet(coupling.key))
         }
 
         logPostConversion("tripleAnchoring", net, tripleAnchoredNet)

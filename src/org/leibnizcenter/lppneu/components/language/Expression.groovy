@@ -117,7 +117,7 @@ class Expression {
     Expression positive() {
         if (!isPositive()) {
             if (!this.formula.isAtomic())
-                return build(this.formula.inputFormulas[0])
+                return build(this.formula.inputFormulas[0]).positive()  // nest if there are multiple negations
             else {
                 if (this.formula.inputPorts[0].rootLiteral)
                     return build(this.formula.inputPorts[0].rootLiteral)

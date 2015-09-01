@@ -41,6 +41,7 @@ list_literals : literal ( COMMA list_literals )? ;
 situation : literal ;
 
 head_expression : situation
+| NEG head_expression
 | operation WHEN head_expression
 | LPAR head_expression RPAR
 | head_expression SEQ head_expression
@@ -63,6 +64,7 @@ body_expression : situation | body_constraint
 | body_expression SEQ body_expression
 | body_expression (PAR | ALT) body_expression
 | NOT body_expression
+| NEG body_expression
 | body_expression AND body_expression
 | body_expression (OR | XOR) body_expression
 ;

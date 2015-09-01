@@ -135,7 +135,8 @@ class LPNet extends Net {
 
         for (t in inputs + outputs + biflows + diode + inhibited) {
             LPTransition lpt = (LPTransition) t
-            varStringList = combineVarList(varStringList, Variable.toVarStringList(lpt.operation.getVariables()))
+            if (lpt.operation != null)
+                varStringList = combineVarList(varStringList, Variable.toVarStringList(lpt.operation.getVariables()))
         }
 
         Place pBridge
@@ -176,7 +177,8 @@ class LPNet extends Net {
 
         for (p in inputs + outputs + biflows + diode + inhibitors) {
             LPPlace lpp = (LPPlace) p
-            varStringList = combineVarList(varStringList, Variable.toVarStringList(lpp.expression.getVariables()))
+            if (lpp.expression != null)
+                varStringList = combineVarList(varStringList, Variable.toVarStringList(lpp.expression.getVariables()))
         }
 
         Transition tBridge
@@ -315,46 +317,60 @@ class LPNet extends Net {
 
         include(subNet)
 
-        // atomic net - no interface needed
-        if (subNet.placeList.size() == 1 && subNet.transitionList.size() == 0 && subNet.subNets.size() == 0) {
+        if (subNet.inputs[0].isPlaceLike()) {
             for (node in subNet.inputs) netInterface.placeInputs << (Place) node
-            for (node in subNet.outputs) netInterface.placeOutputs << (Place) node
-            return netInterface
-        } else if (subNet.transitionList.size() == 1 && subNet.placeList.size() == 0 && subNet.subNets.size() == 0) {
+        } else if (subNet.inputs[0].isTransitionLike()) {
             for (node in subNet.inputs) netInterface.transitionInputs << (Transition) node
+        }
+
+        if (subNet.outputs[0].isPlaceLike()) {
+            for (node in subNet.outputs) netInterface.placeOutputs << (Place) node
+        } else if (subNet.outputs[0].isTransitionLike()) {
             for (node in subNet.outputs) netInterface.transitionOutputs << (Transition) node
-            return netInterface
         }
 
-        for (input in subNet.inputs) {
-            if (input.isPlaceLike()) {
-                Place pInnerIn = (LPPlace) input
-                Place pIn = createPlace(pInnerIn.expression)
-                createBridge(pIn, pInnerIn)
-                netInterface.placeInputs << pIn
-            } else {
-                Transition tInnerIn = (LPTransition) input
-                Transition tIn = createTransition(tInnerIn.operation)
-                createBridge(tIn, tInnerIn)
-                netInterface.transitionInputs << tIn
-            }
-        }
+        return netInterface
 
-        for (output in subNet.outputs) {
-            if (output.isPlaceLike()) {
-                Place pInnerOut = (LPPlace) output
-                Place pOut = createPlace(pInnerOut.expression)
-                createBridge(pInnerOut, pOut)
-                netInterface.placeOutputs << pOut
-            } else {
-                Transition tInnerOut = (LPTransition) output
-                Transition tOut = createTransition(tInnerOut.operation)
-                createBridge(tInnerOut, tOut)
-                netInterface.transitionOutputs << tOut
-            }
-        }
-
-        netInterface
+//        // atomic net - no interface needed
+//        if (subNet.placeList.size() == 1 && subNet.transitionList.size() == 0 && subNet.subNets.size() == 0) {
+//            for (node in subNet.inputs) netInterface.placeInputs << (Place) node
+//            for (node in subNet.outputs) netInterface.placeOutputs << (Place) node
+//            return netInterface
+//        } else if (subNet.transitionList.size() == 1 && subNet.placeList.size() == 0 && subNet.subNets.size() == 0) {
+//            for (node in subNet.inputs) netInterface.transitionInputs << (Transition) node
+//            for (node in subNet.outputs) netInterface.transitionOutputs << (Transition) node
+//            return netInterface
+//        }
+//
+//        for (input in subNet.inputs) {
+//            if (input.isPlaceLike()) {
+//                Place pInnerIn = (LPPlace) input
+//                Place pIn = createPlace(pInnerIn.expression)
+//                createBridge(pIn, pInnerIn)
+//                netInterface.placeInputs << pIn
+//            } else {
+//                Transition tInnerIn = (LPTransition) input
+//                Transition tIn = createTransition(tInnerIn.operation)
+//                createBridge(tIn, tInnerIn)
+//                netInterface.transitionInputs << tIn
+//            }
+//        }
+//
+//        for (output in subNet.outputs) {
+//            if (output.isPlaceLike()) {
+//                Place pInnerOut = (LPPlace) output
+//                Place pOut = createPlace(pInnerOut.expression)
+//                createBridge(pInnerOut, pOut)
+//                netInterface.placeOutputs << pOut
+//            } else {
+//                Transition tInnerOut = (LPTransition) output
+//                Transition tOut = createTransition(tInnerOut.operation)
+//                createBridge(tInnerOut, tOut)
+//                netInterface.transitionOutputs << tOut
+//            }
+//        }
+//
+//        netInterface
     }
 
 }

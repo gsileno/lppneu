@@ -1,6 +1,5 @@
-// Generated from /home/giovanni/dev/lppneu/antlr4/LPPN.g4 by ANTLR 4.5
+// Generated from /home/giovanni/dev/lppneu/antlr4/LPPN.g4 by ANTLR 4.5.1
 package org.leibnizcenter.lppneu.parser;
-import org.antlr.v4.runtime.misc.NotNull;
 import org.antlr.v4.runtime.tree.ParseTreeListener;
 
 /**
@@ -12,270 +11,270 @@ public interface LPPNListener extends ParseTreeListener {
 	 * Enter a parse tree produced by {@link LPPNParser#program}.
 	 * @param ctx the parse tree
 	 */
-	void enterProgram(@NotNull LPPNParser.ProgramContext ctx);
+	void enterProgram(LPPNParser.ProgramContext ctx);
 	/**
 	 * Exit a parse tree produced by {@link LPPNParser#program}.
 	 * @param ctx the parse tree
 	 */
-	void exitProgram(@NotNull LPPNParser.ProgramContext ctx);
+	void exitProgram(LPPNParser.ProgramContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link LPPNParser#situationfact}.
 	 * @param ctx the parse tree
 	 */
-	void enterSituationfact(@NotNull LPPNParser.SituationfactContext ctx);
+	void enterSituationfact(LPPNParser.SituationfactContext ctx);
 	/**
 	 * Exit a parse tree produced by {@link LPPNParser#situationfact}.
 	 * @param ctx the parse tree
 	 */
-	void exitSituationfact(@NotNull LPPNParser.SituationfactContext ctx);
+	void exitSituationfact(LPPNParser.SituationfactContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link LPPNParser#eventfact}.
 	 * @param ctx the parse tree
 	 */
-	void enterEventfact(@NotNull LPPNParser.EventfactContext ctx);
+	void enterEventfact(LPPNParser.EventfactContext ctx);
 	/**
 	 * Exit a parse tree produced by {@link LPPNParser#eventfact}.
 	 * @param ctx the parse tree
 	 */
-	void exitEventfact(@NotNull LPPNParser.EventfactContext ctx);
+	void exitEventfact(LPPNParser.EventfactContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link LPPNParser#logicrule}.
 	 * @param ctx the parse tree
 	 */
-	void enterLogicrule(@NotNull LPPNParser.LogicruleContext ctx);
+	void enterLogicrule(LPPNParser.LogicruleContext ctx);
 	/**
 	 * Exit a parse tree produced by {@link LPPNParser#logicrule}.
 	 * @param ctx the parse tree
 	 */
-	void exitLogicrule(@NotNull LPPNParser.LogicruleContext ctx);
+	void exitLogicrule(LPPNParser.LogicruleContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link LPPNParser#normrule}.
 	 * @param ctx the parse tree
 	 */
-	void enterNormrule(@NotNull LPPNParser.NormruleContext ctx);
+	void enterNormrule(LPPNParser.NormruleContext ctx);
 	/**
 	 * Exit a parse tree produced by {@link LPPNParser#normrule}.
 	 * @param ctx the parse tree
 	 */
-	void exitNormrule(@NotNull LPPNParser.NormruleContext ctx);
+	void exitNormrule(LPPNParser.NormruleContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link LPPNParser#constraint}.
 	 * @param ctx the parse tree
 	 */
-	void enterConstraint(@NotNull LPPNParser.ConstraintContext ctx);
+	void enterConstraint(LPPNParser.ConstraintContext ctx);
 	/**
 	 * Exit a parse tree produced by {@link LPPNParser#constraint}.
 	 * @param ctx the parse tree
 	 */
-	void exitConstraint(@NotNull LPPNParser.ConstraintContext ctx);
+	void exitConstraint(LPPNParser.ConstraintContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link LPPNParser#causalrule}.
 	 * @param ctx the parse tree
 	 */
-	void enterCausalrule(@NotNull LPPNParser.CausalruleContext ctx);
+	void enterCausalrule(LPPNParser.CausalruleContext ctx);
 	/**
 	 * Exit a parse tree produced by {@link LPPNParser#causalrule}.
 	 * @param ctx the parse tree
 	 */
-	void exitCausalrule(@NotNull LPPNParser.CausalruleContext ctx);
+	void exitCausalrule(LPPNParser.CausalruleContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link LPPNParser#head}.
 	 * @param ctx the parse tree
 	 */
-	void enterHead(@NotNull LPPNParser.HeadContext ctx);
+	void enterHead(LPPNParser.HeadContext ctx);
 	/**
 	 * Exit a parse tree produced by {@link LPPNParser#head}.
 	 * @param ctx the parse tree
 	 */
-	void exitHead(@NotNull LPPNParser.HeadContext ctx);
+	void exitHead(LPPNParser.HeadContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link LPPNParser#body}.
 	 * @param ctx the parse tree
 	 */
-	void enterBody(@NotNull LPPNParser.BodyContext ctx);
+	void enterBody(LPPNParser.BodyContext ctx);
 	/**
 	 * Exit a parse tree produced by {@link LPPNParser#body}.
 	 * @param ctx the parse tree
 	 */
-	void exitBody(@NotNull LPPNParser.BodyContext ctx);
+	void exitBody(LPPNParser.BodyContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link LPPNParser#list_literals}.
 	 * @param ctx the parse tree
 	 */
-	void enterList_literals(@NotNull LPPNParser.List_literalsContext ctx);
+	void enterList_literals(LPPNParser.List_literalsContext ctx);
 	/**
 	 * Exit a parse tree produced by {@link LPPNParser#list_literals}.
 	 * @param ctx the parse tree
 	 */
-	void exitList_literals(@NotNull LPPNParser.List_literalsContext ctx);
+	void exitList_literals(LPPNParser.List_literalsContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link LPPNParser#situation}.
 	 * @param ctx the parse tree
 	 */
-	void enterSituation(@NotNull LPPNParser.SituationContext ctx);
+	void enterSituation(LPPNParser.SituationContext ctx);
 	/**
 	 * Exit a parse tree produced by {@link LPPNParser#situation}.
 	 * @param ctx the parse tree
 	 */
-	void exitSituation(@NotNull LPPNParser.SituationContext ctx);
+	void exitSituation(LPPNParser.SituationContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link LPPNParser#head_expression}.
 	 * @param ctx the parse tree
 	 */
-	void enterHead_expression(@NotNull LPPNParser.Head_expressionContext ctx);
+	void enterHead_expression(LPPNParser.Head_expressionContext ctx);
 	/**
 	 * Exit a parse tree produced by {@link LPPNParser#head_expression}.
 	 * @param ctx the parse tree
 	 */
-	void exitHead_expression(@NotNull LPPNParser.Head_expressionContext ctx);
+	void exitHead_expression(LPPNParser.Head_expressionContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link LPPNParser#event}.
 	 * @param ctx the parse tree
 	 */
-	void enterEvent(@NotNull LPPNParser.EventContext ctx);
+	void enterEvent(LPPNParser.EventContext ctx);
 	/**
 	 * Exit a parse tree produced by {@link LPPNParser#event}.
 	 * @param ctx the parse tree
 	 */
-	void exitEvent(@NotNull LPPNParser.EventContext ctx);
+	void exitEvent(LPPNParser.EventContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link LPPNParser#operation}.
 	 * @param ctx the parse tree
 	 */
-	void enterOperation(@NotNull LPPNParser.OperationContext ctx);
+	void enterOperation(LPPNParser.OperationContext ctx);
 	/**
 	 * Exit a parse tree produced by {@link LPPNParser#operation}.
 	 * @param ctx the parse tree
 	 */
-	void exitOperation(@NotNull LPPNParser.OperationContext ctx);
+	void exitOperation(LPPNParser.OperationContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link LPPNParser#body_expression}.
 	 * @param ctx the parse tree
 	 */
-	void enterBody_expression(@NotNull LPPNParser.Body_expressionContext ctx);
+	void enterBody_expression(LPPNParser.Body_expressionContext ctx);
 	/**
 	 * Exit a parse tree produced by {@link LPPNParser#body_expression}.
 	 * @param ctx the parse tree
 	 */
-	void exitBody_expression(@NotNull LPPNParser.Body_expressionContext ctx);
+	void exitBody_expression(LPPNParser.Body_expressionContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link LPPNParser#body_constraint}.
 	 * @param ctx the parse tree
 	 */
-	void enterBody_constraint(@NotNull LPPNParser.Body_constraintContext ctx);
+	void enterBody_constraint(LPPNParser.Body_constraintContext ctx);
 	/**
 	 * Exit a parse tree produced by {@link LPPNParser#body_constraint}.
 	 * @param ctx the parse tree
 	 */
-	void exitBody_constraint(@NotNull LPPNParser.Body_constraintContext ctx);
+	void exitBody_constraint(LPPNParser.Body_constraintContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link LPPNParser#num_expression}.
 	 * @param ctx the parse tree
 	 */
-	void enterNum_expression(@NotNull LPPNParser.Num_expressionContext ctx);
+	void enterNum_expression(LPPNParser.Num_expressionContext ctx);
 	/**
 	 * Exit a parse tree produced by {@link LPPNParser#num_expression}.
 	 * @param ctx the parse tree
 	 */
-	void exitNum_expression(@NotNull LPPNParser.Num_expressionContext ctx);
+	void exitNum_expression(LPPNParser.Num_expressionContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link LPPNParser#ext_literal}.
 	 * @param ctx the parse tree
 	 */
-	void enterExt_literal(@NotNull LPPNParser.Ext_literalContext ctx);
+	void enterExt_literal(LPPNParser.Ext_literalContext ctx);
 	/**
 	 * Exit a parse tree produced by {@link LPPNParser#ext_literal}.
 	 * @param ctx the parse tree
 	 */
-	void exitExt_literal(@NotNull LPPNParser.Ext_literalContext ctx);
+	void exitExt_literal(LPPNParser.Ext_literalContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link LPPNParser#literal}.
 	 * @param ctx the parse tree
 	 */
-	void enterLiteral(@NotNull LPPNParser.LiteralContext ctx);
+	void enterLiteral(LPPNParser.LiteralContext ctx);
 	/**
 	 * Exit a parse tree produced by {@link LPPNParser#literal}.
 	 * @param ctx the parse tree
 	 */
-	void exitLiteral(@NotNull LPPNParser.LiteralContext ctx);
+	void exitLiteral(LPPNParser.LiteralContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link LPPNParser#pos_literal}.
 	 * @param ctx the parse tree
 	 */
-	void enterPos_literal(@NotNull LPPNParser.Pos_literalContext ctx);
+	void enterPos_literal(LPPNParser.Pos_literalContext ctx);
 	/**
 	 * Exit a parse tree produced by {@link LPPNParser#pos_literal}.
 	 * @param ctx the parse tree
 	 */
-	void exitPos_literal(@NotNull LPPNParser.Pos_literalContext ctx);
+	void exitPos_literal(LPPNParser.Pos_literalContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link LPPNParser#list_parameters}.
 	 * @param ctx the parse tree
 	 */
-	void enterList_parameters(@NotNull LPPNParser.List_parametersContext ctx);
+	void enterList_parameters(LPPNParser.List_parametersContext ctx);
 	/**
 	 * Exit a parse tree produced by {@link LPPNParser#list_parameters}.
 	 * @param ctx the parse tree
 	 */
-	void exitList_parameters(@NotNull LPPNParser.List_parametersContext ctx);
+	void exitList_parameters(LPPNParser.List_parametersContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link LPPNParser#parameter}.
 	 * @param ctx the parse tree
 	 */
-	void enterParameter(@NotNull LPPNParser.ParameterContext ctx);
+	void enterParameter(LPPNParser.ParameterContext ctx);
 	/**
 	 * Exit a parse tree produced by {@link LPPNParser#parameter}.
 	 * @param ctx the parse tree
 	 */
-	void exitParameter(@NotNull LPPNParser.ParameterContext ctx);
+	void exitParameter(LPPNParser.ParameterContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link LPPNParser#predicate}.
 	 * @param ctx the parse tree
 	 */
-	void enterPredicate(@NotNull LPPNParser.PredicateContext ctx);
+	void enterPredicate(LPPNParser.PredicateContext ctx);
 	/**
 	 * Exit a parse tree produced by {@link LPPNParser#predicate}.
 	 * @param ctx the parse tree
 	 */
-	void exitPredicate(@NotNull LPPNParser.PredicateContext ctx);
+	void exitPredicate(LPPNParser.PredicateContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link LPPNParser#identifier}.
 	 * @param ctx the parse tree
 	 */
-	void enterIdentifier(@NotNull LPPNParser.IdentifierContext ctx);
+	void enterIdentifier(LPPNParser.IdentifierContext ctx);
 	/**
 	 * Exit a parse tree produced by {@link LPPNParser#identifier}.
 	 * @param ctx the parse tree
 	 */
-	void exitIdentifier(@NotNull LPPNParser.IdentifierContext ctx);
+	void exitIdentifier(LPPNParser.IdentifierContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link LPPNParser#constant}.
 	 * @param ctx the parse tree
 	 */
-	void enterConstant(@NotNull LPPNParser.ConstantContext ctx);
+	void enterConstant(LPPNParser.ConstantContext ctx);
 	/**
 	 * Exit a parse tree produced by {@link LPPNParser#constant}.
 	 * @param ctx the parse tree
 	 */
-	void exitConstant(@NotNull LPPNParser.ConstantContext ctx);
+	void exitConstant(LPPNParser.ConstantContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link LPPNParser#variable_structure}.
 	 * @param ctx the parse tree
 	 */
-	void enterVariable_structure(@NotNull LPPNParser.Variable_structureContext ctx);
+	void enterVariable_structure(LPPNParser.Variable_structureContext ctx);
 	/**
 	 * Exit a parse tree produced by {@link LPPNParser#variable_structure}.
 	 * @param ctx the parse tree
 	 */
-	void exitVariable_structure(@NotNull LPPNParser.Variable_structureContext ctx);
+	void exitVariable_structure(LPPNParser.Variable_structureContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link LPPNParser#variable}.
 	 * @param ctx the parse tree
 	 */
-	void enterVariable(@NotNull LPPNParser.VariableContext ctx);
+	void enterVariable(LPPNParser.VariableContext ctx);
 	/**
 	 * Exit a parse tree produced by {@link LPPNParser#variable}.
 	 * @param ctx the parse tree
 	 */
-	void exitVariable(@NotNull LPPNParser.VariableContext ctx);
+	void exitVariable(LPPNParser.VariableContext ctx);
 }

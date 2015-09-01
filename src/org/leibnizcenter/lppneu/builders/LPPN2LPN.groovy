@@ -6,6 +6,7 @@ import org.leibnizcenter.lppneu.components.language.*
 import org.leibnizcenter.lppneu.components.lppetrinets.LPNet
 import org.leibnizcenter.lppneu.components.lppetrinets.LPPlace
 import org.leibnizcenter.lppneu.components.lppetrinets.LPTransition
+import org.leibnizcenter.lppneu.components.lppetrinets.NetInterface
 import org.leibnizcenter.lppneu.components.mapper.Mapper
 import org.leibnizcenter.lppneu.components.position.AbstractPositionRef
 import org.leibnizcenter.lppneu.components.position.AbstractTriple
@@ -74,11 +75,9 @@ class LPPN2LPN {
         net = new LPNet(function: new LPPlace(expression:
                 Expression.build(bodyExpression, Operator.FORBIDS)))
 
-        Net bodyNet = buildExpressionNet(body)
-        net.include(bodyNet)
-        log.trace("attaching body net " + bodyNet)
-
-        LPPlace pIn = (LPPlace) bodyNet.outputs[0]
+        Net bodyNet = buildExpressionNet(bodyExpression)
+        NetInterface bodyNetInterface = net.includeWithInterface(bodyNet)
+        net.inputs += bodyNetInterface.placeInputs
 
         return net
     }
@@ -91,8 +90,8 @@ class LPPN2LPN {
     static Net buildImplicationNet(Formula<Situation> body, Formula<Situation> head, Boolean biconditional) {
         Net net
 
-        Expression headExpression = Expression.build(head)
         Expression bodyExpression = Expression.build(body)
+        Expression headExpression = Expression.build(head)
 
         if (!biconditional) {
             net = new LPNet(function: new LPPlace(expression:
@@ -105,50 +104,38 @@ class LPPN2LPN {
         log.trace("create implication net " + net)
 
         Net bodyNet = buildExpressionNet(body)
-        net.include(bodyNet)
-        log.trace("attaching body net " + bodyNet)
-
-        LPPlace pIn = (LPPlace) bodyNet.outputs[0]
-        log.trace("input place " + pIn)
+        NetInterface bodyNetInterface = net.includeWithInterface(bodyNet)
+        Place pIn = bodyNetInterface.placeOutputs[0]
+        net.inputs += bodyNetInterface.placeInputs
 
         Net headNet = buildExpressionNet(head)
-        net.include(headNet)
-        log.trace("attaching head net " + headNet)
-
-        LPPlace pOut = (LPPlace) headNet.outputs[0]
-        log.trace("contrapositive: output place " + pOut)
+        NetInterface headNetInterface = net.includeWithInterface(headNet)
+        Place pOut = headNetInterface.placeOutputs[0]
+        net.outputs += headNetInterface.placeInputs
 
         if (!biconditional) {
-            LPTransition tImplication = new LPTransition(operator: Operator.IMPLIES)
-            net.transitionList += [tImplication]
-            net.arcList += Arc.buildArcs(pIn, tImplication, pOut)
+            Transition tImplication = net.createTransition(Operator.IMPLIES)
+            net.createBridge(pIn, tImplication, pOut)
 
             // add contrapositive
+            Net cBodyNet = buildExpressionNet(headExpression.negate())
+            NetInterface cBodyNetInterface = net.includeWithInterface(cBodyNet)
+            pIn = cBodyNetInterface.placeOutputs[0]
+            net.inputs += cBodyNetInterface.placeInputs
 
-            bodyNet = buildExpressionNet(headExpression.negate())
-            net.include(bodyNet)
-            log.trace("contrapositive: attaching body net " + bodyNet)
-            pIn = (LPPlace) bodyNet.outputs[0]
-            log.trace("contrapositive: input place " + pIn)
+            Net cHeadNet = buildExpressionNet(bodyExpression.negate())
+            NetInterface cHeadNetInterface = net.includeWithInterface(cHeadNet)
+            pOut = cHeadNetInterface.placeOutputs[0]
+            net.outputs += cHeadNetInterface.placeInputs
 
-            headNet = buildExpressionNet(bodyExpression.negate())
-            net.include(headNet)
-            log.trace("contrapositive: attaching head net " + headNet)
-            pOut = (LPPlace) headNet.outputs[0]
-            log.trace("contrapositive: output place " + pOut)
-
-            tImplication = new LPTransition(operator: Operator.IMPLIES)
-            net.transitionList += [tImplication]
-            net.arcList += Arc.buildArcs(pIn, tImplication, pOut)
+            tImplication = net.createTransition(Operator.IMPLIES)
+            net.createBridge(pIn, tImplication, pOut)
 
         } else { // biconditional
-            LPTransition tNexus = new LPTransition(operator: Operator.IMPLIES, link: true)
-            LPTransition tNexus2 = new LPTransition(operator: Operator.IMPLIES, link: true)
-            net.transitionList += [tNexus, tNexus2]
-            net.arcList << Arc.buildArc((Place) pIn, (Transition) tNexus, ArcType.LINK)
-            net.arcList << Arc.buildArc((Transition) tNexus, (Place) pOut, ArcType.LINK)
-            net.arcList << Arc.buildArc((Place) pOut, (Transition) tNexus2, ArcType.LINK)
-            net.arcList << Arc.buildArc((Transition) tNexus2, (Place) pIn, ArcType.LINK)
+            Transition tDefinition = net.createTransition(Operator.DEFINES)
+            net.createLinkBridge(pIn, tDefinition, pOut)
+            net.inputs += headNetInterface.placeOutputs
+            net.outputs += bodyNetInterface.placeInputs
         }
 
         return net
@@ -161,6 +148,9 @@ class LPPN2LPN {
         List<Expression> seqInputs = []
 
         Net subNet
+        NetInterface subNetInterface
+
+        Place pIn, pOut
 
         for (input in formula.inputFormulas) {
 
@@ -170,14 +160,14 @@ class LPPN2LPN {
 
             if (seqInputs.size() > 0) {
                 subExpression = Expression.buildFromExpressions(seqInputs, Operator.SEQ)
-                compoundExpression = Expression.build(
-                        inputExpression,
-                        subExpression,
-                        Operator.OCCURS_IN
-                )
+                compoundExpression = Expression.build(inputExpression, subExpression, Operator.OCCURS_IN)
 
                 subNet = buildEventConditionNet(compoundExpression.formula)
-                net.include(subNet)
+                subNetInterface = net.includeWithInterface(subNet)
+
+                println subNetInterface
+                pIn = subNetInterface.placeInputs[1]
+                net.createBridge(pOut, pIn)
 
             } else {
                 compoundExpression = Expression.build(
@@ -186,78 +176,25 @@ class LPPN2LPN {
                 )
 
                 subNet = buildEventConditionNet(compoundExpression.formula)
-                net.include(subNet)
+                subNetInterface = net.includeWithInterface(subNet)
+                pOut = subNetInterface.placeOutputs[0]
 
                 // take the inputs from the first subnet
-                net.inputs += subNet.inputs
+                net.inputs += subNetInterface.placeInputs
             }
 
             seqInputs << inputExpression
         }
 
+        if (subNet == null)
+            throw new RuntimeException("You should not be here.")
+
         // take the inputs from the last subnet
-        net.outputs += subNet.outputs
+        net.outputs += subNetInterface.placeOutputs
 
         return net
 
     }
-
-//    static Net buildSeqExpressionNet(Formula<Situation> formula) {
-//
-//        Net net = new LPNet(function: new LPlace(expression: Expression.build(formula)))
-//
-//        LPlace pOut
-//        LTransition tIn
-//        List<Expression> seqInputs = []
-//        Expression seqExpression
-//
-//        for (input in formula.inputFormulas) {
-//            tIn = new LTransition(operation: Expression.build(input).toOperation())
-//
-//            if (pOut) net.arcList += Arc.buildArc((Place) pOut, (Transition) tIn)
-//
-//            net.transitionList << tIn
-//            Net subNetIn = buildExpressionNet(Expression.buildFromExpressions(
-//                    [Expression.build(input, Operator.NEG), Expression.build(input, Operator.NULL)], Operator.OR
-//            ).formula)
-//            net.include(subNetIn)
-//
-//            net.arcList += Arc.buildArc((Place) subNetIn.outputs[0], tIn)
-//            net.inputs += subNetIn.inputs
-//
-//            Expression expression = Expression.build(input)
-//            seqInputs << expression
-//            seqExpression = Expression.buildFromExpressions(seqInputs, Operator.SEQ)
-//
-//            if (seqInputs.size() > 1) {
-//                LPlace pIn = new LPlace(expression: expression)
-//                LPlace pBridge = new LPlace(expression: Expression.build(seqExpression.formula))
-//                pOut = new LPlace(expression: Expression.buildFromExpressions([seqExpression, expression], Operator.AND))
-//                net.placeList += [pIn, pBridge, pOut]
-//
-//                LTransition tBridge = new LTransition(operator: Operator.AND)
-//                net.transitionList += [tBridge]
-//
-//                net.arcList += Arc.buildArc((Transition) tIn, (Place) pBridge)
-//                net.arcList += Arc.buildArc((Place) pBridge, (Transition) tBridge)
-//                net.arcList += Arc.buildArc((Place) pIn, (Transition) tBridge)
-//                net.arcList += Arc.buildArc((Transition) tBridge, (Place) pOut)
-//            } else {
-//                pOut = new LPlace(expression: expression)
-//                net.placeList += [pOut]
-//                net.arcList += Arc.buildArc((Transition) tIn, (Place) pOut)
-//            }
-//
-//        }
-//
-//        if (pOut == null) {
-//            throw new RuntimeException()
-//        }
-//
-//        net.outputs += [pOut]
-//        return net
-//
-//    }
 
     static Net buildProcessExpressionNet(Formula<Situation> formula) {
 
@@ -267,41 +204,34 @@ class LPPN2LPN {
 
         Net net = new LPNet(function: new LPPlace(expression: Expression.build(formula)))
 
-        LPPlace pOut = new LPPlace(expression: Expression.build(formula))
+        Place pOut = net.createPlace(Expression.build(formula))
 
-        LPTransition tOut
+        Transition tOut
         if (formula.operator == Operator.PAR) {
-            tOut = new LPTransition(operator: Operator.AND)
+            tOut = net.createTransition(Operator.AND)
         } else if (formula.operator == Operator.ALT) {
-            tOut = new LPTransition(operator: Operator.XOR)
+            tOut = net.createTransition(Operator.XOR)
         } else if (formula.operator == Operator.OPT) {
-            tOut = new LPTransition(operator: Operator.OR)
+            tOut = net.createTransition(Operator.OR)
         } else {
-            throw new RuntimeException()
+            throw new RuntimeException("Not yet implemented.")
         }
 
-        net.placeList << pOut
-        net.transitionList << tOut
-        net.arcList += Arc.buildArc((Transition) tOut, (Place) pOut)
-
-        net.outputs += [pOut]
+        net.createArc(tOut, pOut)
+        net.outputs << pOut
 
         for (input in formula.inputFormulas) {
 
-            LPPlace pIn = new LPPlace(expression: Expression.build(input))
-            LPTransition tIn = new LPTransition(operation: Expression.build(input).toOperation())
-            net.placeList << pIn
-            net.transitionList << tIn
-            net.arcList += Arc.buildArc((Place) pIn, (Transition) tOut)
-            net.arcList += Arc.buildArc((Transition) tIn, (Place) pIn)
+            Place pIn = net.createPlace(Expression.build(input))
+            Transition tIn = net.createTransition(Expression.build(input).toOperation())
+            net.createArc(pIn, tOut)
+            net.createArc(tIn, pIn)
 
-            Net subNet = buildExpressionNet(Expression.buildFromExpressions(
-                    [Expression.build(input, Operator.NEG), Expression.build(input, Operator.NULL)], Operator.OR
-            ).formula)
-            net.include(subNet)
+            Net subNet = buildExpressionNet(Expression.build(input, Operator.NOT))
+            NetInterface subNetInterface = net.includeWithInterface(subNet)
 
-            net.arcList += Arc.buildArc((Place) subNet.outputs[0], tIn)
-            net.inputs += subNet.inputs
+            net.createArc(subNetInterface.placeOutputs[0], tIn)
+            net.inputs += subNetInterface.placeInputs
         }
 
         return net
@@ -314,33 +244,39 @@ class LPPN2LPN {
     static Net buildExpressionNet(Formula<Situation> formula) {
         Net net = new LPNet(function: new LPPlace(expression: Expression.build(formula)))
 
-        LPPlace pOut = new LPPlace(expression: Expression.build(formula))
-        net.placeList += [pOut]
-        net.outputs += [pOut]
+        Place pOut = net.createPlace(Expression.build(formula))
+        net.outputs << pOut
 
-        if (formula.operator != Operator.POS) {
+        if (formula.operator == Operator.POS) {
+            net.inputs << pOut
+        } else {
             // Logic expressions are only partially transformed into Petri Nets
             if (formula.operator.isLogicOperator()) {
-                LPTransition t = new LPTransition(operator: formula.operator)
-                net.transitionList += [t]
-                net.arcList += Arc.buildArc(t, pOut)
+                Transition t = net.createTransition(formula.operator)
+                net.createArc(t, pOut)
 
-                for (input in formula.inputPorts) {
-                    LPPlace pIn = new LPPlace(expression: Expression.build(input))
-                    net.placeList += [pIn]
-                    net.arcList += Arc.buildArc(pIn, t)
-                    net.inputs += [pIn]
-                }
+//                if (formula.isAtomic()) {
+                    for (input in formula.inputPorts) {
+                        Place pIn = net.createPlace(Expression.build(input))
+                        net.createArc(pIn, t)
+                        net.inputs << pIn
+                    }
+//                } else {
+//                    for (input in formula.inputFormulas) {
+//                        Net subNet = buildExpressionNet(input)
+//                        NetInterface subNetInterface = net.includeWithInterface(subNet)
+//                        net.inputs += subNetInterface.placeInputs
+//                    }
+//                }
+
                 // Process expressions are transformed into actual Petri Nets
             } else if (formula.operator == Operator.OCCURS_IN || formula.operator == Operator.OCCURS) {
                 return buildEventConditionNet(formula)
             } else if (formula.operator.isBinaryProcessOperator()) {
                 return buildProcessExpressionNet(formula)
             } else {
-                throw new RuntimeException()
+                throw new RuntimeException("Error in transforming this formula: "+formula)
             }
-        } else {
-            net.inputs += [pOut]
         }
 
         net
@@ -355,45 +291,38 @@ class LPPN2LPN {
 
         Expression eventExpression = Expression.build(formula.inputPorts[0])
 
-        LPPlace pOut
-        LPTransition tOut
-        pOut = new LPPlace(expression: Expression.build(formula))
-        tOut = new LPTransition(operation: eventExpression.toOperation())
+        Place pOut = net.createPlace(Expression.build(formula))
+        Transition tOut = net.createTransition(eventExpression.toOperation())
+        net.createArc(tOut, pOut)
 
-        net.placeList += [pOut]
-        net.transitionList += [tOut]
-        net.arcList += Arc.buildArc((Transition) tOut, (Place) pOut)
-
-        // if a catalyst context is specified about the occurrence
-        if (formula.inputPorts[1] != null) {
-            Expression conditionExpression = Expression.build(formula.inputPorts[1])
-            LPPlace pCatalyst = new LPPlace(expression: conditionExpression)
-            net.arcList += Arc.buildArc((Place) pCatalyst, (Transition) tOut)
-            net.placeList += [pCatalyst]
+        if (formula.inputPorts.size() > 2) {
+            throw new RuntimeException("Fatal error: OCCURS_IN requires just two parameters.")
         }
 
-        Net subNet = buildExpressionNet(Expression.buildFromExpressions(
-                [Expression.build(eventExpression.formula, Operator.NEG),
-                 Expression.build(eventExpression.formula, Operator.NULL)],
-                Operator.OR
-        ).formula)
+        Net subNet = buildExpressionNet(Expression.build(eventExpression, Operator.NOT))
+        NetInterface subNetInterface = net.includeWithInterface(subNet)
 
-        net.include(subNet)
-        net.arcList += Arc.buildArc((Place) subNet.outputs[0], (Transition) tOut)
+        net.createArc(subNetInterface.placeOutputs[0], tOut)
 
         // I/O
-        net.inputs += subNet.inputs
-        net.outputs += [pOut]
+        net.inputs << subNetInterface.placeInputs[0]
+        net.outputs << pOut
+
+        // if a catalyst context is specified about the occurrence
+        // it is recoded a second output
+        if (formula.inputPorts[1] != null) {
+            Place pCatalyst = net.createPlace( Expression.build(formula.inputPorts[1]))
+            net.createArc(pCatalyst, tOut)
+            net.inputs << pCatalyst
+        }
 
         net
     }
 
     static Net buildEventNet(Event event) {
         Net net = new LPNet(function: new LPTransition(operation: Operation.build(event)))
-        LPTransition t = new LPTransition(operation: Operation.build(event))
-        net.transitionList += [t]
+        Transition t = net.createTransition(Operation.build(event))
 
-        // I/O
         net.inputs << t
         net.outputs << t
 
@@ -402,70 +331,67 @@ class LPPN2LPN {
 
     static Net buildSeqOperationNet(Formula<Event> formula, AbstractPositionRef thisRef = null, AbstractPositionRef instanceRef = null) {
         Net net = new LPNet(function: new LPTransition(operation: Operation.build(formula)))
-        LPTransition t
-        LPPlace p
 
-        // preparatory nodes
-        t = new LPTransition(link: true)
-        p = new LPPlace(link: true)
-
-        net.inputs << t
-        net.transitionList << t
-        net.placeList << p
+        Transition tIn, tOut
 
         int i = 0
         for (input in formula.inputFormulas) {
 
             // create subnet
             Net subNet = buildOperationNet(input, thisRef, instanceRef)
-            net.include(subNet)
+            NetInterface subNetInterface = net.includeWithInterface(subNet)
 
-            // anchoring
-            net.arcList += Arc.buildArcs((Transition) t, (Place) p, (Transition) subNet.inputs[0])
-            t = (LPTransition) subNet.outputs[0]
+            // take the new input
+            tIn = subNetInterface.transitionInputs[0]
+            // anchor the previous output to the new input
+            if (i > 0) { net.createBridge(tOut, tIn) }
+            // take the new output
+            tOut = subNetInterface.transitionOutputs[0]
 
-            // synchronization place
-            p = new LPPlace(link: true)
-            net.placeList << p
+            // the input of the first subnet is a general input
+            if (i == 0) {
+                net.inputs << tIn
+                Transition t = net.createLinkTransition()
+                net.createBridge(t, tIn)
+            }
+
+            i++
         }
 
-        // output transition
-        LPTransition tOut = new LPTransition(link: true)
-        net.transitionList << tOut
+        if (i == 0) throw new RuntimeException("You should not be here")
 
-        // final anchoring
-        net.arcList += Arc.buildArcs((Transition) t, (Place) p, (Transition) tOut)
-
+        // the output of the last subnet is a general output
         net.outputs << tOut
+        Transition t = net.createLinkTransition()
+        net.createBridge(tOut, t)
 
         return net
     }
 
     static Net buildParOperationNet(Formula<Event> formula, AbstractPositionRef thisRef = null, AbstractPositionRef instanceRef = null) {
         Net net = new LPNet(function: new LPTransition(operation: Operation.build(formula)))
-        LPTransition tIn = new LPTransition(link: true)
-        LPTransition tOut = new LPTransition(link: true)
-        net.transitionList += [tIn, tOut]
+
+        List<Place> pStartings = []
+        List<Place> pEndings = []
 
         int i = 0
         for (input in formula.inputFormulas) {
-            // preparatory place
-            LPPlace pIn = new LPPlace(link: true)
-            net.placeList << pIn
-
             // create subnet
             Net subNet = buildOperationNet(input, thisRef, instanceRef)
-            net.include(subNet)
-
-            // synchronization place
-            LPPlace pOut = new LPPlace(link: true)
-            net.placeList << pOut
-
-            // anchoring
-            net.arcList += Arc.buildArcs((Transition) tIn, (Place) pIn, (Transition) subNet.inputs[0])
-            net.arcList += Arc.buildArcs((Transition) subNet.outputs[0], (Place) pOut, (Transition) tOut)
+            NetInterface subNetInterface = net.includeWithInterface(subNet)
+            Place pIn = net.createLinkPlace()
+            Place pOut = net.createLinkPlace()
+            net.createArc(pIn, subNetInterface.transitionInputs[0])
+            net.createArc(subNetInterface.transitionOutputs[0], pOut)
+            pStartings << pIn
+            pEndings << pOut
             i++
         }
+
+        if (i == 0) throw new RuntimeException("You should not be here")
+
+        Transition tIn = net.createTransitionNexus([], pStartings, [], [], [])
+        Transition tOut = net.createTransitionNexus(pEndings, [], [], [], [])
 
         net.inputs << tIn
         net.outputs << tOut
@@ -476,26 +402,24 @@ class LPPN2LPN {
     static Net buildAltOperationNet(Formula<Event> formula, AbstractPositionRef thisRef = null, AbstractPositionRef instanceRef = null) {
         Net net = new LPNet(function: new LPTransition(operation: Operation.build(formula)))
 
-        LPTransition tIn = new LPTransition(link: true)
-        LPTransition tOut = new LPTransition(link: true)
-        LPPlace pIn = new LPPlace(link: true)
-        LPPlace pOut = new LPPlace(link: true)
-
-        net.transitionList += [tIn, tOut]
-        net.placeList += [pIn, pOut]
-        net.arcList << Arc.buildArc(tIn, pIn)
+        List<Transition> tStartings = []
+        List<Transition> tEndings = []
 
         for (input in formula.inputFormulas) {
             // create subnet
             Net subNet = buildOperationNet(input, thisRef, instanceRef)
-            net.include(subNet)
-
-            // anchoring
-            net.arcList << Arc.buildArc((Place) pIn, (Transition) subNet.inputs[0])
-            net.arcList << Arc.buildArc((Transition) subNet.outputs[0], (Place) pOut)
+            NetInterface subNetInterface = net.includeWithInterface(subNet)
+            tStartings << subNetInterface.transitionInputs[0]
+            tEndings << subNetInterface.transitionOutputs[0]
         }
 
-        net.arcList << Arc.buildArc(pOut, tOut)
+        Place pIn = net.createPlaceNexus([], tStartings, [], [], [])
+        Place pOut = net.createPlaceNexus(tEndings, [], [], [], [])
+
+        Transition tIn = net.createLinkTransition()
+        net.createArc(tIn, pIn)
+        Transition tOut = net.createLinkTransition()
+        net.createArc(pOut, tOut)
 
         net.inputs << tIn
         net.outputs << tOut
@@ -537,7 +461,7 @@ class LPPN2LPN {
             }
         } else {
             if (formula.isAtomic()) {
-                // TODO: check properly, it may be wrong I think
+                // TODO: check properly, I think it may be wrong
                 return buildEventNet(formula.inputPorts[0])
             } else {
                 if (formula.operator == Operator.SEQ) {
@@ -576,24 +500,22 @@ class LPPN2LPN {
 
         // create antecedent
         Net triggerNet = buildExpressionNet(antecedent)
-        net.include(triggerNet)
+        NetInterface triggerNetInterface = net.includeWithInterface(triggerNet)
 
-        LPPlace pIn = (LPPlace) triggerNet.outputs[0]
+        Place pIn = triggerNetInterface.placeOutputs[0]
 
         // create consequent
         Expression consequent = action.toExpression()
-        LPPlace pOut = new LPPlace(expression: consequent)
-        net.placeList += [pOut]
+        Place pOut = net.createPlace(consequent)
 
         // define net function as causal dependency between antecedent and consequent
         net.function = new LPPlace(expression: Expression.build(antecedent, consequent, Operator.CAUSES))
 
         Net actionNet = buildOperationNet(action.formula)
-        net.include(actionNet)
+        NetInterface actionNetInterface = net.includeWithInterface(actionNet)
 
-        // anchoring
-        net.arcList += Arc.buildArc((Place) pIn, (Transition) actionNet.inputs[0])
-        net.arcList += Arc.buildArc((Transition) actionNet.outputs[0], (Place) pOut)
+        net.createArc(pIn, actionNetInterface.transitionInputs[0])
+        net.createArc(actionNetInterface.transitionOutputs[0], pOut)
 
         // TODO I/O for causal dependency
         // the input is pluasibly the pIn
