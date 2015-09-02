@@ -23,7 +23,7 @@ class PosLiteral {
     }
 
     // special case: literal with anonymous predicate
-    static PosLiteral buildAnonymous(List<Parameter> parameters = []) {
+    static PosLiteral buildNoFunctorLiteral(List<Parameter> parameters = []) {
         new PosLiteral(parameters: parameters)
     }
 

@@ -85,14 +85,26 @@ class Expression {
     }
 
     // for LPPN, bridge places
-    static Expression buildAnonymousFromVarList(List<Variable> varList) {
+    static Expression buildNoFunctorExpFromVarList(List<Variable> varList) {
         List<Parameter> parameters = []
         for (var in varList) {
             parameters << Parameter.build(var.minimalClone())
         }
 
         new Expression(
-                formula: PROTOTYPE.build(Situation.build(PosLiteral.buildAnonymous(parameters)))
+                formula: PROTOTYPE.build(Situation.build(PosLiteral.buildNoFunctorLiteral(parameters)))
+        )
+    }
+
+    // for LPPN, bridge transition
+    static Expression buildNoFunctorExpFromVarStringList(Set<String> varStringList) {
+        List<Parameter> parameters = []
+        for (varName in varStringList) {
+            parameters << Parameter.build(new Variable(name: varName))
+        }
+
+        new Expression(
+                formula: PROTOTYPE.build(Situation.build(PosLiteral.buildNoFunctorLiteral(parameters)))
         )
     }
 

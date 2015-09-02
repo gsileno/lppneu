@@ -99,7 +99,7 @@ class Operation {
         }
 
         new Operation(
-                formula: PROTOTYPE.build(Event.build(PosLiteral.buildAnonymous(parameters)))
+                formula: PROTOTYPE.build(Event.build(PosLiteral.buildNoFunctorLiteral(parameters)))
         )
     }
 

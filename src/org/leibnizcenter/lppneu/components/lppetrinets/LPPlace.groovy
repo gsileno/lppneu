@@ -79,7 +79,10 @@ class LPPlace extends Place {
                     }
                 }
             }
-            varWithValuesMapList << varWithValuesMap
+
+            // avoid to put duplicate tokens for filter
+            if (!varWithValuesMapList.contains(varWithValuesMap))
+                varWithValuesMapList << varWithValuesMap
         }
         varWithValuesMapList
     }
@@ -156,13 +159,19 @@ class LPPlace extends Place {
             throw new RuntimeException("Given more constants than necessary: ${constants} for ${expression}.")
         }
 
-        LPToken token = new LPToken(expression: tokenExpression)
+        LPToken newToken = new LPToken(expression: tokenExpression)
 
-        if (marking.contains(token))
-            throw new RuntimeException("You cannot produce a token with the same content")
+        // only when the place is labeled with a predicate, check that you are not creating the same content
+        if (tokenExpression.getVariables().size() > 0) {
+            for (token in marking) {
+                if (LPToken.compare(token, newToken)) {
+                    throw new RuntimeException("You cannot produce a predicate token with the same content.")
+                }
+            }
+        }
 
-        marking << token
-        token
+        marking << newToken
+        newToken
     }
 
     Token createToken(String constant) {
@@ -177,11 +186,13 @@ class LPPlace extends Place {
     // the missing items are filled with anonymous identifiers
     Token createToken(Map<String, String> variableLiteralMap) {
 
+        // TODO: refactor with Token.createToken
+
         Expression tokenExpression
         if (!link) { // normal places
             tokenExpression = expression.minimalClone()
         } else {
-            tokenExpression = Expression.buildAnonymousFromVarList(getVarList())
+            tokenExpression = Expression.buildNoFunctorExpFromVarList(getVarList())
         }
 
         for (param in tokenExpression.getParameters()) {

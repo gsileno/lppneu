@@ -1,6 +1,7 @@
 package org.leibnizcenter.lppneu.components.lppetrinets
 
 import groovy.util.logging.Log4j
+import org.leibnizcenter.lppneu.components.language.Expression
 import org.leibnizcenter.lppneu.components.language.Operation
 import org.leibnizcenter.lppneu.components.language.Operator
 import org.leibnizcenter.lppneu.components.language.Variable
@@ -109,7 +110,8 @@ class LPTransition extends Transition {
     // all variables accounted in places
     List<Variable> allVarList
 
-    private static void computePlaceUnificationFilter(List<Node> inputs, List<Variable> commonVarList, List<Variable> allVarList) {
+    private
+    static void computePlaceUnificationFilter(List<Node> inputs, List<Variable> commonVarList, List<Variable> allVarList) {
         // for each input place
         for (elem in inputs) {
             LPPlace pl = ((LPPlace) ((Place) elem))
@@ -209,6 +211,10 @@ class LPTransition extends Transition {
         List<Map<String, String>> filterList = []
 
         // TODO: to add the case of link nodes
+        // initialize filter to unify tokens+
+        if (commonVarList == null) {
+            initializeInputUnificationFilter()
+        }
 
         // filter tokens
         for (arc in inputs) {
@@ -335,12 +341,13 @@ class LPTransition extends Transition {
         return true
     }
 
-    void fire() {
+    Token fire() {
         log.trace("${id} fires.")
         consumeInputTokens()
         produceOutputTokens()
     }
 
+    // TODO: this is wrong for multiple weight arcs
     Map<String, String> coreContent = [:]
 
     void consumeInputTokens() {
@@ -362,6 +369,8 @@ class LPTransition extends Transition {
             List<Token> toBeRemoved = []
 
             if (arc.type == ArcType.NORMAL) {
+
+                // TODO: it is WRONG ------------------------ ERROR!!!!
                 for (int i = 0; i < arc.weight; i++) {
                     toBeRemoved << tokens[i]
                     includes(coreContent, ((LPToken) tokens[i]).toVarWithValuesMap())
@@ -376,8 +385,9 @@ class LPTransition extends Transition {
         }
     }
 
-    void produceOutputTokens() {
+    Token produceOutputTokens() {
         log.trace("${id} produces.")
+        if (link) log.trace("It is a link transition")
 
         log.trace("Transmitted content in consumption (without anonymous variables): ${coreContent}")
 
@@ -409,10 +419,92 @@ class LPTransition extends Transition {
         }
 
         coreContent = [:]
+
+        if (!link)
+            LPToken.createToken(operation.toExpression(), coreContent)
+        else
+            LPToken.createToken(Expression.buildNoFunctorExpFromVarStringList(coreContent.keySet()), coreContent)
+    }
+
+    // return the list of token fireable
+    List<Token> enabledFiring() {
+        List<Token> tokenList = []
+        List<Map<String, String>> listContent = []
+
+        List<Map<String, String>> filterList = getFilterList()
+
+        for (filter in filterList) {
+
+            log.trace("filter: " + filter)
+
+            List<Map<String, String>> listContentPerFilter = []
+
+            for (arc in inputs) {
+                LPPlace p = (LPPlace) arc.source
+
+                log.trace("input place: " + p)
+
+                List<Token> filteredMarking = p.getFilteredMarking(filter)
+
+                log.trace("filtered marking: " + filteredMarking)
+
+                if (arc.type == ArcType.INHIBITOR) {
+                    if (filteredMarking.size() >= arc.weight) {
+                        return []
+                    }
+                } else if (arc.type == ArcType.NORMAL) {
+                    if (filteredMarking.size() < arc.weight) {
+                        return []
+                    }
+                }
+
+                if (arc.type == ArcType.NORMAL) {
+                    if (listContentPerFilter == []) {
+                        log.trace("first execution on this filter")
+                        for (token in filteredMarking) {
+                            log.trace("creating content with token " + token)
+                            listContentPerFilter << ((LPToken) token).toVarWithValuesMap()
+                        }
+                    } else {
+                        log.trace("not first execution on this filter")
+                        List<Map<String, String>> newListContentPerFilter = []
+                        for (contentPerFilter in listContentPerFilter) {
+                            log.trace("considering content " + contentPerFilter)
+                            for (token in filteredMarking) {
+                                Map<String, String> newContent = [:]
+                                for (item in contentPerFilter) {
+                                    newContent[item.key] = item.value
+                                }
+                                log.trace("cloning it, and including content from token " + token)
+                                includes(newContent, ((LPToken) token).toVarWithValuesMap())
+                                newListContentPerFilter << newContent
+                            }
+                        }
+                        listContentPerFilter = newListContentPerFilter
+                        log.trace("list of content so far: " + listContentPerFilter)
+                    }
+                }
+            }
+
+            listContent += listContentPerFilter
+        }
+
+        if (!link) {
+            for (content in listContent) {
+                tokenList << LPToken.createToken(operation.toExpression(), content)
+            }
+        } else {
+            for (content in listContent) {
+                tokenList << LPToken.createToken(Expression.buildNoFunctorExpFromVarStringList(content.keySet()), content)
+            }
+        }
+
+        tokenList
     }
 
     // count the anonymous content generated, in order to generate unique names
     private Map<String, Integer> variableAnonymousGeneratedIdCountMap = [:]
+
     private String generateAnonymousIdentifier(String variable) {
 
         if (variableAnonymousGeneratedIdCountMap[variable] == null)
@@ -422,9 +514,9 @@ class LPTransition extends Transition {
         variableAnonymousGeneratedIdCountMap[variable] = n
 
         if (id == null) {
-            "_"+variable.toLowerCase()+n
+            "_" + variable.toLowerCase() + n
         } else {
-            "_"+id+variable.toLowerCase()+n
+            "_" + id + variable.toLowerCase() + n
         }
     }
 
@@ -443,8 +535,12 @@ class LPTransition extends Transition {
 
         List<Variable> varList = []
         List<LPPlace> connectedPlaces = []
-        for (arc in inputs) { connectedPlaces << (LPPlace) arc.source }
-        for (arc in outputs) { connectedPlaces << (LPPlace) arc.target }
+        for (arc in inputs) {
+            connectedPlaces << (LPPlace) arc.source
+        }
+        for (arc in outputs) {
+            connectedPlaces << (LPPlace) arc.target
+        }
 
         for (transition in connectedPlaces) {
             varList = combineVarList(varList, transition.getVarList())

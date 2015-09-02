@@ -5,6 +5,7 @@ import org.leibnizcenter.lppneu.components.lppetrinets.LPNet
 import org.leibnizcenter.lppneu.components.lppetrinets.LPTransition
 import org.leibnizcenter.pneu.components.petrinet.Net
 import org.leibnizcenter.pneu.components.petrinet.Place
+import org.leibnizcenter.pneu.components.petrinet.Token
 import org.leibnizcenter.pneu.components.petrinet.Transition
 
 class SimulationComponentsTest extends GroovyTestCase {
@@ -301,5 +302,54 @@ class SimulationComponentsTest extends GroovyTestCase {
 
     }
 
+    void testTransition7() {
+        Net net = new LPNet()
+
+        Place p1 = net.createPlace("a(A, C, E)")
+        Place p2 = net.createPlace("b(B, A, D)")
+        Transition t = net.createLinkTransition()
+        Place p3 = net.createPlace("c(A, B, C, F)")
+
+        net.createArc(p1, t)
+        net.createArc(p2, t)
+        net.createArc(t, p3)
+        net.resetIds()
+
+        List<Token> firableContentList
+        LPTransition lpt = (LPTransition) t
+
+        p1.createToken(["a1", "c1", "e1"])
+        assert lpt.enabledFiring().size() == 0
+        // no firing possible
+
+        p2.createToken(["b1", "a1", "d1"])
+        assert lpt.enabledFiring().size() == 1
+        // a1, b1, c1, d1, e1
+
+        p1.createToken(["a2", "c1", "e2"])
+        assert lpt.enabledFiring().size() == 1
+        // a1, b1, c1, d1, e1
+
+        p2.createToken(["b1", "a2", "d1"])
+        assert lpt.enabledFiring().size() == 2
+        // a1, b1, c1, d1, e1 + a2, b1, c1, d1, e2
+
+        p1.createToken(["a2", "c2", "e2"])
+        assert lpt.enabledFiring().size() == 3
+        // a1, b1, c1, d1, e1 + a2, b1, c1, d1, e2 + a2, b1, d1, c2, e2
+
+        p1.createToken(["a2", "c3", "e3"])
+        assert lpt.enabledFiring().size() == 4
+
+        p2.createToken(["b1", "a1", "d2"])
+        assert lpt.enabledFiring().size() == 5
+
+        p2.createToken(["b2", "a1", "d2"])
+        assert lpt.enabledFiring().size() == 6
+
+        p2.createToken(["b2", "a1", "d3"])
+        assert lpt.enabledFiring().size() == 7
+
+    }
 }
 
