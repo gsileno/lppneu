@@ -11,7 +11,7 @@ class MarketModel {
     static Net basicSaleInstance1() {
         Net sale = new LPNet()
 
-        sale.function = LPTransition.build("sells(Seller, Good, Money, Buyer)")
+        sale.function = LPTransition.build("sells(Seller, Buyer, Good, Money)")
 
         Transition tIn = sale.createEmitterTransition()
         Transition t1 = sale.createTransition("offers(Seller, Buyer, Good, Money)")
@@ -33,7 +33,7 @@ class MarketModel {
     static Net basicSaleInstance2() {
         Net sale = new LPNet()
 
-        sale.function = LPTransition.build("sells(Seller, Good, Money, Buyer)")
+        sale.function = LPTransition.build("sells(Seller, Buyer, Good, Money)")
 
         Transition tIn = sale.createEmitterTransition()
         Transition t1 = sale.createTransition("offers(Seller, Buyer, Good, Money)")
@@ -55,7 +55,7 @@ class MarketModel {
     static Net basicSaleModel() {
         Net sale = new LPNet()
 
-        sale.function = LPTransition.build("sells(Seller, Good, Money, Buyer)")
+        sale.function = LPTransition.build("sells(Seller, Buyer, Good, Money)")
 
         Transition tIn = sale.createEmitterTransition()
         Transition t1 = sale.createTransition("offers(Seller, Buyer, Good, Money)")
@@ -75,10 +75,47 @@ class MarketModel {
         sale
     }
 
+    static Net basicSale() {
+        Net sale = new LPNet()
+
+        sale.function = LPTransition.build("sells(Seller, Buyer, Good, Money)")
+
+        Transition tIn = sale.createEmitterTransition()
+        Transition t1 = sale.createTransition("sells(Seller, Buyer, Good, Money)")
+        Transition tOut = sale.createCollectorTransition()
+
+        sale.createBridge(tIn, t1)
+        sale.createBridge(t1, tOut)
+
+        sale.resetIds()
+        sale
+    }
+
+    static Net basicSaleWithTaxes() {
+        Net sale = new LPNet()
+
+        sale.function = LPTransition.build("sellsAndPaysTaxes(Seller, Buyer, Good, Money)")
+
+        Transition tIn = sale.createEmitterTransition()
+        Transition t1 = sale.createTransition("sells(Seller, Buyer, Good, Money)")
+        Transition t2 = sale.createTransition("paysTax(Seller, administration, Money)")
+        Transition t3 = sale.createTransition("paysTax(Buyer, administration, Money)")
+        Transition tOut = sale.createCollectorTransition()
+
+        sale.createBridge(tIn, t1)
+        sale.createBridge(t1, t2)
+        sale.createBridge(t1, t3)
+        sale.createBridge(t2, tOut)
+        sale.createBridge(t3, tOut)
+
+        sale.resetIds()
+        sale
+    }
+
     static Net basicSaleWith2Parties() {
         Net sale = new LPNet()
 
-        sale.function = LPTransition.build("sells(Seller, Good, Money, Buyer)")
+        sale.function = LPTransition.build("sells(Seller, Buyer, Good, Money)")
 
         Transition tIn = sale.createEmitterTransition()
         Transition t1s = sale.createTransition("offers(Seller, Buyer, Good, Money)")
@@ -104,7 +141,7 @@ class MarketModel {
     static Net basicSaleWithWorld() {
         Net sale = new LPNet()
 
-        sale.function = LPTransition.build("sells(Seller, Good, Money, Buyer)")
+        sale.function = LPTransition.build("sells(Seller, Buyer, Good, Money)")
 
         Transition tIn = sale.createEmitterTransition()
         Transition t1s = sale.createTransition("offers(Seller, Buyer, Good, Money)")
@@ -134,7 +171,7 @@ class MarketModel {
     static Net basicSaleWithWorldAndTimeline() {
         Net sale = new LPNet()
 
-        sale.function = LPTransition.build("sells(Seller, Good, Money, Buyer)")
+        sale.function = LPTransition.build("sells(Seller, Buyer, Good, Money)")
 
         Transition tIn = sale.createEmitterTransition()
         Transition t1s = sale.createTransition("offers(Seller, Buyer, Good, Money)")

@@ -1,6 +1,6 @@
 package org.leibnizcenter.lppneu.components
 
-import org.leibnizcenter.lppneu.builders.LPPN2LPN
+import org.leibnizcenter.lppneu.builders.LPNHandler
 import org.leibnizcenter.lppneu.components.language.*
 import org.leibnizcenter.lppneu.parsers.LPPNLoader
 import org.leibnizcenter.pneu.components.petrinet.Net
@@ -9,7 +9,7 @@ class NetEqualityTest extends GroovyTestCase {
 
     static Net batchConvert(String code) {
         LPPNProgram program = LPPNLoader.parseString(code)
-        LPPN2LPN conversion = new LPPN2LPN()
+        LPNHandler conversion = new LPNHandler()
         conversion.convert(program)
         return conversion.net
     }
@@ -47,14 +47,6 @@ class NetEqualityTest extends GroovyTestCase {
     }
 
     void testNetUnEquality5() {
-        Net net1 = batchConvert("a :- b.")
-        Net net2 = batchConvert("b :- a.")
-
-        net1.exportToDot("test1")
-        net1.exportToLog("test1")
-        net2.exportToDot("test2")
-        net2.exportToLog("test2")
-
         assert !Net.compare(batchConvert("a :- b."), batchConvert("b :- a."))
     }
 

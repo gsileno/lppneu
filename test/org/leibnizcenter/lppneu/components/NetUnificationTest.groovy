@@ -1,12 +1,12 @@
 package org.leibnizcenter.lppneu.components
 
-import org.leibnizcenter.lppneu.builders.LPPN2LPN
+import org.leibnizcenter.lppneu.builders.LPNHandler
 import org.leibnizcenter.lppneu.components.language.*
 import org.leibnizcenter.lppneu.parsers.LPPNLoader
 
 class NetUnificationTest extends GroovyTestCase {
 
-    void printResult(LPPN2LPN conversion) {
+    static void printResult(LPNHandler conversion) {
 
         println conversion.net.getAllPlaces().size()
         println conversion.net.getAllTransitions().size()
@@ -19,15 +19,15 @@ class NetUnificationTest extends GroovyTestCase {
 
     }
 
-    static LPPN2LPN batchConvert(String code) {
+    static LPNHandler batchConvert(String code) {
         LPPNProgram program = LPPNLoader.parseString(code)
-        LPPN2LPN conversion = new LPPN2LPN()
+        LPNHandler conversion = new LPNHandler()
         conversion.convert(program)
         return conversion
     }
 
     void testUnifyFact() {
-        LPPN2LPN convert = batchConvert("a. a.")
+        LPNHandler convert = batchConvert("a. a.")
         printResult(convert)
 
         assert convert.net.getAllPlaces().size() == 2
@@ -42,7 +42,7 @@ class NetUnificationTest extends GroovyTestCase {
     }
 
     void testUnifyFact2() {
-        LPPN2LPN convert = batchConvert("a. a. a. a. a.")
+        LPNHandler convert = batchConvert("a. a. a. a. a.")
         printResult(convert)
 
         assert convert.net.getAllPlaces().size() == 5
@@ -58,7 +58,7 @@ class NetUnificationTest extends GroovyTestCase {
     }
 
     void testUnifyFact3() {
-        LPPN2LPN convert = batchConvert("a and b. a and b. a and b.")
+        LPNHandler convert = batchConvert("a and b. a and b. a and b.")
         printResult(convert)
 
         assert convert.net.getAllPlaces().size() == 9
@@ -74,7 +74,7 @@ class NetUnificationTest extends GroovyTestCase {
     }
 
     void testUnifyLogicRule() {
-        LPPN2LPN convert = batchConvert("p :- q.")
+        LPNHandler convert = batchConvert("p :- q.")
         printResult(convert)
 
         assert convert.net.getAllPlaces().size() == 4
@@ -90,7 +90,7 @@ class NetUnificationTest extends GroovyTestCase {
 
 
     void testUnifyLogicRules() {
-        LPPN2LPN convert = batchConvert("b :- a. c :- b.")
+        LPNHandler convert = batchConvert("b :- a. c :- b.")
         printResult(convert)
 
         assert convert.net.getAllPlaces().size() == 8
@@ -105,7 +105,7 @@ class NetUnificationTest extends GroovyTestCase {
     }
 
     void testUnifyLogicRules2() {
-        LPPN2LPN convert = batchConvert("p :- a. q :- a.")
+        LPNHandler convert = batchConvert("p :- a. q :- a.")
         printResult(convert)
 
         assert convert.net.getAllPlaces().size() == 8
@@ -120,7 +120,7 @@ class NetUnificationTest extends GroovyTestCase {
     }
 
     void testUnifyLogicRules3() {
-        LPPN2LPN convert = batchConvert("p :- a and b. q :- a and b. a.")
+        LPNHandler convert = batchConvert("p :- a and b. q :- a and b. a.")
         printResult(convert)
 
         assert convert.net.getAllPlaces().size() == 17
@@ -135,7 +135,7 @@ class NetUnificationTest extends GroovyTestCase {
     }
 
     void testUnifyCausalRule() {
-        LPPN2LPN convert = batchConvert("a -> b.")
+        LPNHandler convert = batchConvert("a -> b.")
         printResult(convert)
 
         assert convert.net.getAllPlaces().size() == 5
@@ -150,7 +150,7 @@ class NetUnificationTest extends GroovyTestCase {
     }
 
     void testUnifyCausalRules() {
-        LPPN2LPN convert = batchConvert("a -> b. b -> a.")
+        LPNHandler convert = batchConvert("a -> b. b -> a.")
         printResult(convert)
 
         assert convert.net.getAllPlaces().size() == 10
@@ -165,7 +165,7 @@ class NetUnificationTest extends GroovyTestCase {
     }
 
     void testUnifyEventFact() {
-        LPPN2LPN convert = batchConvert("-> a.")
+        LPNHandler convert = batchConvert("-> a.")
         printResult(convert)
 
         assert convert.net.getAllPlaces().size() == 0
@@ -180,7 +180,7 @@ class NetUnificationTest extends GroovyTestCase {
     }
 
     void testUnifyEventFact2() {
-        LPPN2LPN convert = batchConvert("-> a seq b.")
+        LPNHandler convert = batchConvert("-> a seq b.")
         printResult(convert)
 
         assert convert.net.getAllPlaces().size() == 3
@@ -195,7 +195,7 @@ class NetUnificationTest extends GroovyTestCase {
     }
 
     void testUnifyProcessFact() {
-        LPPN2LPN convert = batchConvert("a seq b.")
+        LPNHandler convert = batchConvert("a seq b.")
         printResult(convert)
 
         assert convert.net.getAllPlaces().size() == 8
@@ -210,7 +210,7 @@ class NetUnificationTest extends GroovyTestCase {
     }
 
     void testUnifyECARule() {
-        LPPN2LPN convert = batchConvert("a in b -> p.")
+        LPNHandler convert = batchConvert("a in b -> p.")
         printResult(convert)
 
         assert convert.net.getAllPlaces().size() == 6
@@ -225,7 +225,7 @@ class NetUnificationTest extends GroovyTestCase {
     }
 
     void testUnifyDefinition() {
-        LPPN2LPN convert = batchConvert("a := b.")
+        LPNHandler convert = batchConvert("a := b.")
         printResult(convert)
 
         assert convert.net.getAllPlaces().size() == 2
@@ -240,7 +240,7 @@ class NetUnificationTest extends GroovyTestCase {
     }
 
     void testUnifyCompoundDefinition() {
-        LPPN2LPN conversion = batchConvert("p := a and b.")
+        LPNHandler conversion = batchConvert("p := a and b.")
         // printResult(conversion)
 
         assert conversion.net.getAllPlaces().size() == 10
@@ -256,7 +256,7 @@ class NetUnificationTest extends GroovyTestCase {
 
 
     void testUnifyCausalCompoundRule() {
-        LPPN2LPN convert = batchConvert("a seq b seq c -> p.")
+        LPNHandler convert = batchConvert("a seq b seq c -> p.")
         printResult(convert)
 
         assert convert.net.getAllPlaces().size() == 10
@@ -271,7 +271,7 @@ class NetUnificationTest extends GroovyTestCase {
     }
 
     void testUnifyCausalLogicCompoundRule() {
-        LPPN2LPN convert = batchConvert("a seq b -> p. q and r :- p.")
+        LPNHandler convert = batchConvert("a seq b -> p. q and r :- p.")
         printResult(convert)
 
         assert convert.net.getAllPlaces().size() == 10
