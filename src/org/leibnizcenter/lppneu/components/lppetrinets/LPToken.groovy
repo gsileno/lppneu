@@ -15,6 +15,10 @@ class LPToken extends Token {
         expression.toString()
     }
 
+    String label() {
+        expression.toString()
+    }
+
     // LP net tokens are equal if they are of the same type and transports the same content
     Boolean compare(Token t) {
         if (t.class != LPToken) return false

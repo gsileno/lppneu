@@ -32,8 +32,8 @@ class SimulationComponentsTest extends GroovyTestCase {
         assert p2.expression.getParameters().size() == 1
 
         LPTransition lpt = (LPTransition) t
-        lpt.initializeInputUnificationFilter()
-        assert lpt.commonVarList.size() == 0
+        lpt.initializeUnificationFilter()
+        assert lpt.inputCommonVarList.size() == 0
 
         assert !t.isEnabled()
         p1.createToken()
@@ -69,8 +69,8 @@ class SimulationComponentsTest extends GroovyTestCase {
         net.resetIds()
 
         LPTransition lpt = (LPTransition) t
-        lpt.initializeInputUnificationFilter()
-        assert lpt.commonVarList.size() == 0
+        lpt.initializeUnificationFilter()
+        assert lpt.inputCommonVarList.size() == 0
 
         assert !t.isEnabled()
         p1.createToken()
@@ -107,9 +107,9 @@ class SimulationComponentsTest extends GroovyTestCase {
         assert p3.expression.getParameters().size() == 2
 
         LPTransition lpt = (LPTransition) t
-        lpt.initializeInputUnificationFilter()
-        assert lpt.commonVarList.size() == 1
-        assert lpt.commonVarList[0] == Variable.build("A")
+        lpt.initializeUnificationFilter()
+        assert lpt.inputCommonVarList.size() == 1
+        assert lpt.inputCommonVarList[0] == Variable.build("A")
 
         assert !t.isEnabled()
         p1.createToken("a")
@@ -125,7 +125,7 @@ class SimulationComponentsTest extends GroovyTestCase {
         List<Variable> localVarList = p2.expression.getVariables()
         assert localVarList.size() == 1
 
-        List<Variable> localCommonVarList = localVarList - (localVarList - lpt.commonVarList)
+        List<Variable> localCommonVarList = localVarList - (localVarList - lpt.inputCommonVarList)
         assert localCommonVarList.size() == 1
 
         // for the variables contained take the local values
@@ -163,9 +163,9 @@ class SimulationComponentsTest extends GroovyTestCase {
         assert p3.expression.getParameters().size() == 2
 
         LPTransition lpt = (LPTransition) t
-        lpt.initializeInputUnificationFilter()
-        assert lpt.commonVarList.size() == 1
-        assert lpt.commonVarList[0] == Variable.build("A")
+        lpt.initializeUnificationFilter()
+        assert lpt.inputCommonVarList.size() == 1
+        assert lpt.inputCommonVarList[0] == Variable.build("A")
 
         assert !t.isEnabled()
         p1.createToken("a")
@@ -182,7 +182,7 @@ class SimulationComponentsTest extends GroovyTestCase {
         List<Variable> localVarList = p2.expression.getVariables()
         assert localVarList.size() == 1
 
-        List<Variable> localCommonVarList = localVarList - (localVarList - lpt.commonVarList)
+        List<Variable> localCommonVarList = localVarList - (localVarList - lpt.inputCommonVarList)
         assert localCommonVarList.size() == 1
 
         // for the variables contained take the local values
@@ -209,8 +209,8 @@ class SimulationComponentsTest extends GroovyTestCase {
         net.resetIds()
 
         LPTransition lpt = (LPTransition) t
-        lpt.initializeInputUnificationFilter()
-        assert lpt.commonVarList.size() == 1 // A is a common variable
+        lpt.initializeUnificationFilter()
+        assert lpt.inputCommonVarList.size() == 1 // A is a common variable
 
         assert !t.isEnabled()
 
@@ -319,36 +319,36 @@ class SimulationComponentsTest extends GroovyTestCase {
         LPTransition lpt = (LPTransition) t
 
         p1.createToken(["a1", "c1", "e1"])
-        assert lpt.enabledFiring().size() == 0
+        assert lpt.fireableEvents().size() == 0
         // no firing possible
 
         p2.createToken(["b1", "a1", "d1"])
-        assert lpt.enabledFiring().size() == 1
+        assert lpt.fireableEvents().size() == 1
         // a1, b1, c1, d1, e1
 
         p1.createToken(["a2", "c1", "e2"])
-        assert lpt.enabledFiring().size() == 1
+        assert lpt.fireableEvents().size() == 1
         // a1, b1, c1, d1, e1
 
         p2.createToken(["b1", "a2", "d1"])
-        assert lpt.enabledFiring().size() == 2
+        assert lpt.fireableEvents().size() == 2
         // a1, b1, c1, d1, e1 + a2, b1, c1, d1, e2
 
         p1.createToken(["a2", "c2", "e2"])
-        assert lpt.enabledFiring().size() == 3
+        assert lpt.fireableEvents().size() == 3
         // a1, b1, c1, d1, e1 + a2, b1, c1, d1, e2 + a2, b1, d1, c2, e2
 
         p1.createToken(["a2", "c3", "e3"])
-        assert lpt.enabledFiring().size() == 4
+        assert lpt.fireableEvents().size() == 4
 
         p2.createToken(["b1", "a1", "d2"])
-        assert lpt.enabledFiring().size() == 5
+        assert lpt.fireableEvents().size() == 5
 
         p2.createToken(["b2", "a1", "d2"])
-        assert lpt.enabledFiring().size() == 6
+        assert lpt.fireableEvents().size() == 6
 
         p2.createToken(["b2", "a1", "d3"])
-        assert lpt.enabledFiring().size() == 7
+        assert lpt.fireableEvents().size() == 7
 
     }
 }
