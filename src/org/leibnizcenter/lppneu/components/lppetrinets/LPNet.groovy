@@ -177,12 +177,7 @@ class LPNet extends Net {
     Net minimalClone(Map<Net, Net> sourceCloneMap = [:]) {
 
         if (!sourceCloneMap[this]) {
-            sourceCloneMap[this] = new LPNet(transitionList: transitionList.collect(),
-                    placeList: placeList.collect(),
-                    arcList: arcList.collect(),
-                    inputs: inputs.collect(),
-                    outputs: outputs.collect(),
-                    function: function)
+            sourceCloneMap[this] = minimalCloneNoRecursive()
         }
 
         Net clone = sourceCloneMap[this]
@@ -202,6 +197,15 @@ class LPNet extends Net {
         }
 
         clone
+    }
+
+    Net minimalCloneNoRecursive() {
+        new LPNet(transitionList: transitionList.collect(),
+                placeList: placeList.collect(),
+                arcList: arcList.collect(),
+                inputs: inputs.collect(),
+                outputs: outputs.collect(),
+                function: function)
     }
 
     NetInterface includeWithInterface(Net subNet) {

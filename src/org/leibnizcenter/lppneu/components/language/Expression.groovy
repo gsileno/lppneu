@@ -85,7 +85,7 @@ class Expression {
     }
 
     // for LPPN, bridge places
-    static Expression buildNoFunctorExpFromVarList(List<Variable> varList) {
+    static Expression buildNoFunctorExpFromVarList(List<Variable> varList = []) {
         List<Parameter> parameters = []
         for (var in varList) {
             parameters << Parameter.build(var.minimalClone())

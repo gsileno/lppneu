@@ -4,6 +4,7 @@ import groovy.transform.Immutable
 import groovy.util.logging.Log4j
 import org.leibnizcenter.lppneu.components.language.Atom
 import org.leibnizcenter.lppneu.components.language.Expression
+import org.leibnizcenter.lppneu.components.language.Operator
 import org.leibnizcenter.lppneu.components.language.PosLiteral
 import org.leibnizcenter.pneu.components.petrinet.Token
 
@@ -65,30 +66,63 @@ class LPToken extends Token {
 
     // creates a token with a map that associates identifiers to variables
     // the missing items are filled with anonymous identifiers
-    static Token createToken(Expression expression, Map<String, String> varStringMap) {
+    static Token createToken(Expression expression, Map<String, String> content) {
 
-        Expression tokenExpression = expression.minimalClone()
+        log.trace("complete content to be forged: " + content)
 
-        log.trace("token expression used as a forge: "+tokenExpression)
-        log.trace("content to be forged: "+varStringMap)
+        Expression tokenExpression, contextExpression
+        if (expression != null) {
+            tokenExpression = expression.minimalClone()
 
-        List<String> foundVarString = []
+            log.trace("token expression used as a forge: " + tokenExpression)
 
-        for (param in tokenExpression.getParameters()) {
-            if (param.isVariable()) {
-                if (varStringMap[param.variable.name]) {
-                    param.variable.identifier = PosLiteral.build(Atom.build(varStringMap[param.variable.name]))
-                    foundVarString << param.variable.name
+            for (param in tokenExpression.getParameters()) {
+                if (param.isVariable()) {
+                    if (content.containsKey(param.variable.name)) {
+                        log.trace("filling " + param.variable.name + " with " + content[param.variable.name])
+                        param.variable.identifier = PosLiteral.build(Atom.build(content[param.variable.name]))
+                        content.remove(param.variable.name)
+                    }
                 }
             }
+
+            log.trace("forged explicit expression: " + tokenExpression)
         }
 
-        if (foundVarString.size() != varStringMap.keySet().size()) {
-            throw new RuntimeException("some variables were not forged!")
+        if (content.size() > 0) {
+
+            contextExpression = Expression.buildNoFunctorExpFromVarStringList(content.keySet())
+            log.trace("context expression used as a forge: " + contextExpression)
+
+            for (param in contextExpression.getParameters()) {
+                if (param.isVariable()) {
+                    if (content.containsKey(param.variable.name)) {
+                        log.trace("filling " + param.variable.name + " with " + content[param.variable.name])
+                        param.variable.identifier = PosLiteral.build(Atom.build(content[param.variable.name]))
+                        content.remove(param.variable.name)
+                    }
+                }
+            }
+
+            log.trace("forged context expression: " + contextExpression)
         }
 
-        LPToken newToken = new LPToken(expression: tokenExpression)
-        newToken
+        if (tokenExpression && contextExpression) {
+            new LPToken(expression: Expression.build(tokenExpression, contextExpression, Operator.AND))
+        } else if (tokenExpression) {
+            new LPToken(expression: tokenExpression)
+        } else if (contextExpression) {
+            new LPToken(expression: contextExpression)
+        } else {
+            new LPToken()
+        }
+
+    }
+
+    // creates a token with a map that associates identifiers to variables
+    // all the items are put into a context anonymous predicate
+    static Token createToken(Map<String, String> varStringMap) {
+        createToken(null, varStringMap)
     }
 }
 

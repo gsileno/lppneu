@@ -1,5 +1,6 @@
 package org.leibnizcenter.lppneu.components.lppetrinets
 
+import groovy.util.logging.Log4j
 import org.leibnizcenter.lppneu.components.language.Atom
 import org.leibnizcenter.lppneu.components.language.Expression
 import org.leibnizcenter.lppneu.components.language.Operation
@@ -9,6 +10,7 @@ import org.leibnizcenter.lppneu.components.language.Variable
 import org.leibnizcenter.pneu.components.petrinet.Place
 import org.leibnizcenter.pneu.components.petrinet.Token
 
+@Log4j
 class LPPlace extends Place {
 
     List<LPToken> marking = []
@@ -46,16 +48,9 @@ class LPPlace extends Place {
 
     // how to compute the actual variables, using the label or reifying the connected nodes
     List<Variable> getVarList() {
-        if (varList == null) {
-            if (!link)
-                varList = expression.getVariables()
-            else {
-                varList = reifyTransitions()
-            }
-            varList
-        } else {
-            varList
-        }
+        if (varList == null)
+            varList = reifyTransitions()
+        varList
     }
 
     // get the elements recorded in the tokens
@@ -261,26 +256,74 @@ class LPPlace extends Place {
         return varList1 - varList2 + varList2
     }
 
+    // TODO: I'm not sure it works for multiple links places
     // semaphor to avoid recursion
     private Boolean inReification = false
 
     // combine all the variables of the connected transitions (for link places)
-    List<Variable> reifyTransitions() {
-        if (inReification) return []
-        else inReification = true
+    // it searches for the first node reified/specified in the given direction
+    // the direction is by default forward (specification tells what information we require from the current content)
+    // in case of collectors/sink places it is backward
+    List<Variable> reifyTransitions(Boolean forwardDirection = true) {
+
+        if (!link) {
+            log.trace("${id} is specified.. "+toString())
+            return expression.getVariables()
+        }
+
+        if (inReification) {
+            log.trace("${id} in reification.. return to avoid recursion")
+        }
+        inReification = true
+
+        log.trace("reifying ${id}, going forward? "+forwardDirection+"...")
 
         List<Variable> varList = []
         List<LPTransition> connectedTransitions = []
-        for (arc in inputs) {
-            connectedTransitions << (LPTransition) arc.source
-        }
-        for (arc in outputs) {
-            connectedTransitions << (LPTransition) arc.target
+
+        if (forwardDirection) {
+            if (outputs.size() == 0) {
+                log.trace("${id}: dead end.")
+                varList = []
+            } else {
+                for (arc in outputs) {
+                    connectedTransitions << (LPTransition) arc.target
+                }
+
+                log.trace("${id}: considering ${connectedTransitions} in forward direction")
+
+                for (transition in connectedTransitions) {
+                    varList = combineVarList(varList, transition.reifyPlaces())
+                }
+
+                if (varList.size() == 0) {
+                    log.trace("${id}: no variable collected, going backward")
+                    forwardDirection = false
+                    connectedTransitions = []
+                }
+            }
         }
 
-        for (transition in connectedTransitions) {
-            varList = combineVarList(varList, transition.getVarList())
+        // backward direction
+        if (!forwardDirection) {
+            if (inputs.size() == 0) {
+                log.trace("${id}: (backward) dead end.")
+                varList = []
+            } else {
+                for (arc in inputs) {
+                    connectedTransitions << (LPTransition) arc.source
+                }
+
+                log.trace("${id}: considering ${connectedTransitions} in backward direction")
+
+                for (transition in connectedTransitions) {
+                    varList = combineVarList(varList, transition.reifyPlaces(false))
+                }
+
+            }
         }
+
+        log.trace("${id}: variables found: "+varList)
         varList
     }
 

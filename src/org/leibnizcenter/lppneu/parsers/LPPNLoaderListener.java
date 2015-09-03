@@ -19,7 +19,7 @@ public class LPPNLoaderListener extends LPPNBaseListener {
         return program;
     }
 
-    private final static Logger log = Logger.getLogger("LoaderListener");
+    private final static Logger log = Logger.getLogger("LPPNLoaderListener");
 
     // to enrich the parsing tree with ids to already computed values (atoms, formulas, ...)
 

@@ -51,18 +51,11 @@ class LPTransition extends Transition {
 
     List<Variable> varList
 
-    // Name of the variables given by this place
+    // how to compute the actual variables, using the label or reifying the connected nodes
     List<Variable> getVarList() {
-        if (varList == null) {
-            if (!link)
-                varList = operation.getVariables()
-            else {
-                varList = reifyPlaces()
-            }
-            varList
-        } else {
-            varList
-        }
+        if (varList == null)
+            varList = reifyPlaces()
+        varList
     }
 
     Transition minimalClone() {
@@ -103,6 +96,10 @@ class LPTransition extends Transition {
         return true
     }
 
+    Boolean compare(Transition other) {
+        return compare(this, other)
+    }
+
     //////////////////////////////
     // Operational Semantics
     //////////////////////////////
@@ -121,6 +118,9 @@ class LPTransition extends Transition {
 
     private
     static void computePlaceUnificationFilter(List<Node> nodes, List<Variable> commonVarList, List<Variable> allVarList) {
+
+        log.trace("nodes to be unified: " + nodes)
+
         // for each input place
         for (node in nodes) {
             LPPlace pl = ((LPPlace) ((Place) node))
@@ -145,6 +145,11 @@ class LPTransition extends Transition {
 
     // set the filter for the input to the transition
     void initializeUnificationFilter() {
+
+        if (allVarList != null) {
+            log.trace("unification filter already computed")
+        }
+
         inputCommonVarList = []
         outputCommonVarList = []
         allInputVarList = []
@@ -156,29 +161,70 @@ class LPTransition extends Transition {
             nodeInputs << arc.source
         }
 
+        log.trace(id + ": compute inputs")
+
         computePlaceUnificationFilter(nodeInputs, inputCommonVarList, allInputVarList)
+        log.trace("computed: input common vars: " + inputCommonVarList)
+        log.trace("computed: all input vars: " + allInputVarList)
 
         List<Node> nodeOutputs = []
         for (arc in outputs) {
             nodeOutputs << arc.target
         }
 
+        log.trace(id + ": compute outputs")
         computePlaceUnificationFilter(nodeOutputs, outputCommonVarList, allOutputVarList)
+        log.trace("computed: output common vars: " + outputCommonVarList)
+        log.trace("computed: all output vars: " + allOutputVarList)
 
-        allVarList = allInputVarList + allOutputVarList
+        allVarList = (allInputVarList - allOutputVarList) + allOutputVarList
+        allVarList = (allVarList - getVarList()) + getVarList()
+
+        log.trace("computed: all vars: " + allVarList)
+    }
+
+    // consider all variables: internal and external
+    List<Variable> getAllVarList() {
+        if (allVarList == null) {
+            initializeUnificationFilter()
+        }
+        log.trace("All var list: " + allVarList)
+        allVarList
+    }
+
+    // set the filter for the output to the transition
+    List<Variable> getAllInputVarList() {
+        if (allVarList == null) {
+            initializeUnificationFilter()
+        }
+        log.trace("All input var list: " + allInputVarList)
+        allInputVarList
+    }
+
+    // set the filter for the output to the transition
+    List<Variable> getAllOutputVarList() {
+        if (allVarList == null) {
+            initializeUnificationFilter()
+        }
+        log.trace("All output var list: " + allOutputVarList)
+        allOutputVarList
     }
 
     // set the filter for the output to the transition
     List<Variable> getOutputCommonVarList() {
-        if (allVarList == null)
+        if (allVarList == null) {
             initializeUnificationFilter()
+        }
+        log.trace("Output common var list: " + outputCommonVarList)
         outputCommonVarList
     }
 
     // set the filter for the input to the transition
     List<Variable> getInputCommonVarList() {
-        if (allVarList == null)
+        if (allVarList == null) {
             initializeUnificationFilter()
+        }
+        log.trace("Input common var list: " + inputCommonVarList)
         inputCommonVarList
     }
 
@@ -209,81 +255,96 @@ class LPTransition extends Transition {
     }
 
     // to filter all the content of input tokens which satisfy the filter
-    // this is the *fireable* data
+    // this is used to constrain the *fireable* data
 
     List<Map<String, String>> getFilterList() {
         List<Map<String, String>> filterList = []
 
         // TODO: to add the case of label on the transition
 
-        // filter tokens
-        for (arc in inputs) {
-            LPPlace pl = (LPPlace) arc.source
+        if (inputs.size() == 0) {
+            filterList << [:]
+        } else {
 
-            // these are the variables given by this place
-            List<Variable> localVarList = pl.getVarList()
+            // filter tokens
+            for (arc in inputs) {
+                LPPlace pl = (LPPlace) arc.source
 
-            // these are the variables constrained by the other inputs
-            List<Variable> localCommonVarList = localVarList - (localVarList - getInputCommonVarList())
+                log.debug("filtering tokens from place " + pl.id + ", labeled with " + pl.label() + "")
 
-            if (localCommonVarList.size() > 0) {
+                // these are the variables given by this place
+                List<Variable> localVarList = pl.getVarList()
+                log.debug("variables given by ${pl.id}: ${localVarList}")
 
-                // for the variables contained take the local values (avoiding duplicates)
-                List<Map<String, String>> localFilterList = pl.getFilterList(localCommonVarList)
+                // these are the variables constrained by the other inputs
+                List<Variable> localCommonVarList = localVarList - (localVarList - getInputCommonVarList())
+                log.debug("local common variables: ${localCommonVarList}")
 
-                log.trace("relevant item from this place (${pl.id}): " + localFilterList)
+                if (localCommonVarList.size() > 0) {
 
-                // for the first elem you take that as starting filter
-                if (filterList.size() == 0) {
-                    log.trace("this is the first element, so I start setting the filter")
-                    filterList = localFilterList
-                } else {
-                    log.trace("this is not the first element, so it is used for pruning")
+                    // for the variables contained take the local values (avoiding duplicates)
+                    List<Map<String, String>> localFilterList = pl.getFilterList(localCommonVarList)
 
-                    // this map is used to check which global item has been found or not
-                    Map<Map<String, String>, Boolean> foundMap = [:]
+                    log.debug("relevant filters from this place (${pl.id}): " + localFilterList)
 
-                    // for each local data item
-                    for (localItem in localFilterList) {
-                        log.trace("local item: " + localItem)
+                    // for the first elem you take that as starting filter
+                    if (filterList.size() == 0) {
+                        log.debug("this is the first element, so I start setting the filter")
+                        filterList = localFilterList
+                    } else {
+                        log.debug("this is not the first element, so it is used for pruning")
 
-                        // for each cached data item
-                        for (globalItem in filterList) {
-                            log.trace("global item: " + globalItem)
+                        // this map is used to check which global item has been found or not
+                        Map<Map<String, String>, Boolean> foundMap = [:]
 
-                            // initialize as not found
-                            if (!foundMap[globalItem])
-                                foundMap[globalItem] = false
+                        // for each local data item
+                        for (localItem in localFilterList) {
+                            log.debug("local item: " + localItem)
 
-                            // if they are compatible, include the new filter and record as found
-                            if (contains(globalItem, localItem)) {
-                                log.trace("the global item can be included to the filter")
-                                foundMap[globalItem] = true
-                                includes(globalItem, localItem)
+                            // for each cached data item
+                            for (globalItem in filterList) {
+                                log.debug("global item: " + globalItem)
+
+                                // initialize as not found
+                                if (!foundMap.containsKey(globalItem)) {
+                                    foundMap[globalItem] = false
+                                }
+
+                                // if they are compatible, include the new filter and record as found
+                                if (contains(globalItem, localItem)) {
+                                    log.debug("the global item can be included to the filter")
+                                    foundMap[globalItem] = true
+                                    includes(globalItem, localItem)
+                                }
                             }
                         }
-                    }
 
-                    // remove global items that were not compatible with any token
-                    List<Map<String, String>> toBeRemoved = []
-                    for (globalItem in foundMap.keySet()) {
-                        if (!foundMap.get(globalItem)) {
-                            toBeRemoved << globalItem
+                        // Strange BUG with Maps.
+                        // repairing by using natural iteration (item.key and item.value)
+                        // rather then keys and getKeys method
+
+                        // remove global items that were not compatible with any token
+                        List<Map<String, String>> toBeRemoved = []
+                        for (item in foundMap) {
+                            if (!item.value) {
+                                toBeRemoved << item.key
+                            }
                         }
+                        log.debug("elements to be removed: "+toBeRemoved)
+
+                        filterList -= toBeRemoved
+
+                        log.debug("remaining global values satisfying the filter: " + filterList)
+
+                        // the filter does not have any compatible value
+                        if (filterList.size() == 0)
+                            return null
                     }
-
-                    filterList -= toBeRemoved
-
-                    log.trace("remaining global values satisfying the filter: " + filterList)
-
-                    // the filter does not have any compatible value
-                    if (filterList.size() == 0)
-                        return null
                 }
             }
         }
 
-        log.trace("Filter list: " + filterList)
+        log.debug("filter list: " + filterList)
         filterList
     }
 
@@ -300,7 +361,7 @@ class LPTransition extends Transition {
 
     Boolean isEnabled() {
 
-        log.trace("Checking enabled condition for transition ${id}")
+        log.trace("checking enabled condition for transition ${id}..")
 
         // cut out not emitters
         if (inputs.size() == 0) return false
@@ -313,7 +374,7 @@ class LPTransition extends Transition {
         // for optimization - there are no tokens here
         for (arc in inputs) {
             if (arc.type == ArcType.NORMAL && ((Place) arc.source).marking.size() == 0) {
-                log.trace("empty place with normal arc: {$id} not enabled transition.")
+                log.trace("input empty place ${arc.source.id} connected with normal arc ==> {$id} not enabled transition.")
                 return false
             }
         }
@@ -387,16 +448,11 @@ class LPTransition extends Transition {
         LPToken eventToken = (LPToken) event.token
         Map<String, String> content = [:]
 
-        for (var in getInputCommonVarList()) {
+        if (eventToken.expression != null) {
             for (param in eventToken.expression.getParameters()) {
                 if (param.isVariable()) {
-                    if (param.variable.name == var.name) {
-                        content[var.name] = param.variable.identifier
-                    }
+                    content[param.variable.name] = param.variable.identifier
                 }
-            }
-            if (!content.keySet().contains(var.name)) {
-                throw new RuntimeException("You should not be here.")
             }
         }
 
@@ -404,7 +460,7 @@ class LPTransition extends Transition {
     }
 
     private void consumeContent(Map<String, String> content) {
-        log.trace("transmitted content/filter for consumption: ${content}")
+        log.trace("${id}: transmitted content/filter for consumption: ${content}")
 
         coreContent = [:]
         for (arc in inputs) {
@@ -436,12 +492,14 @@ class LPTransition extends Transition {
         log.trace("${id} produces.")
         if (link) log.trace("it is a link transition")
 
-        log.trace("transmitted content from consumption (without anonymous variables): ${coreContent}")
+        log.trace("${id}: transmitted content for production (without anonymous variables): ${coreContent}")
         List<String> outCommonVarStringList = []
 
         for (var in getOutputCommonVarList()) {
             outCommonVarStringList << var.name
         }
+
+        log.trace("${id}: output common variables: ${outCommonVarStringList}")
 
         for (var in outCommonVarStringList) {
             if (!coreContent.keySet().contains(var))
@@ -459,30 +517,33 @@ class LPTransition extends Transition {
         LPToken eventToken = (LPToken) event.token
         Map<String, String> content = [:]
 
-        for (var in getOutputCommonVarList()) {
+        if (eventToken.expression != null) {
             for (param in eventToken.expression.getParameters()) {
                 if (param.isVariable()) {
-                    if (param.variable.name == var.name) {
-                        content[var.name] = param.variable.identifier
-                    }
+                    content[param.variable.name] = param.variable.identifier
                 }
             }
-            if (!content.keySet().contains(var.name))
-                content[var.name] = generateAnonymousIdentifier(var.name)
         }
 
         createContent(content)
     }
 
     private TransitionEvent createContent(Map<String, String> content) {
-        log.trace("transmitted content (with anonymous variables): ${content}")
+        log.trace("${id}: transmitted content for production (including anonymous variables): ${content}")
 
         for (arc in outputs) {
             LPPlace p = (LPPlace) arc.target
             if (arc.type == ArcType.NORMAL) {
                 if (arc.weight > 1) throw new RuntimeException("Not yet implemented")
                 Token token = p.createToken(content)
-                log.trace("Producing in ${p.id} the token " + token)
+                log.trace("producing in ${p.id} the token " + token)
+
+                for (var in ((LPToken) token).expression.getVariables()) {
+                    if (!content.containsKey(var.name)) {
+                        log.trace("adding value ${var.identifier} to var ${var.name}")
+                        content[var.name] = var.identifier
+                    }
+                }
             } else if (arc.type == ArcType.RESET) {
                 p.flush()
             } else {
@@ -491,9 +552,8 @@ class LPTransition extends Transition {
         }
 
         Token token
-
-        if (!link) token = LPToken.createToken(operation.toExpression(), coreContent)
-        else token = LPToken.createToken(Expression.buildNoFunctorExpFromVarStringList(coreContent.keySet()), coreContent)
+        if (!link) token = LPToken.createToken(operation.toExpression(), content)
+        else token = LPToken.createToken(content)
 
         new TransitionEvent(transition: this, token: token)
     }
@@ -501,25 +561,113 @@ class LPTransition extends Transition {
     // return the list of fireable events (transition, token coupling)
     // a fireable event is defined by the content of the input place
     List<TransitionEvent> fireableEvents() {
+
+        log.trace("computing fireable events from " + id + ": " + toString())
+
+        // propositional transition, with propositional places, basic petri nets case
+        if (getAllVarList().size() == 0) {
+            if (isEnabledIncludingEmission()) {
+                if (!link) {
+                    return [new TransitionEvent(transition: this, token: new LPToken(expression: operation.toExpression()))]
+                } else {
+                    return [new TransitionEvent(transition: this, token: new LPToken())]
+                }
+            } else return []
+        }
+
+        // there are variables involved
         List<Token> tokenList = []
         List<Map<String, String>> listContent = []
         List<Map<String, String>> filterList = getFilterList()
 
-        // for each filter available
-        for (filter in filterList) {
-            log.trace("filter: " + filter)
-            listContent += getListContentPerFilter(filter)
+        // all filters were discarded, nothing can be fired
+        if (filterList == null) {
+            log.trace("all filters are discarded, nothing can be fired")
+            return []
         }
 
-        if (!link) {
-            for (content in listContent) {
-                tokenList << LPToken.createToken(operation.toExpression(), content)
-            }
+        // if there are no filter available, then take all the elements:
+        if (filterList.isEmpty()) {
+            listContent = getListContentViaFilter([:])
         } else {
-            for (content in listContent) {
-                tokenList << LPToken.createToken(Expression.buildNoFunctorExpFromVarStringList(content.keySet()), content)
+            // for each filter available
+            for (filter in filterList) {
+                log.trace("filter: " + filter)
+                // take the available elements
+                listContent += getListContentViaFilter(filter)
             }
         }
+
+        // free variables to be generated at transition level
+        // TODO: add transition binding
+        // List<Variable> freeVariables = getOutputCommonVarList() - getAllInputVarList()
+        List<Variable> freeVariables = getAllOutputVarList() - getAllInputVarList()
+        log.trace("all var list: " + getAllVarList())
+        log.trace("output common var list: " + getOutputCommonVarList())
+        log.trace("all input var list: " + getAllInputVarList())
+        log.trace("free variables: " + freeVariables)
+
+        // create an anonymous identifier for each free variable
+        Map<String, String> anonymousContent = [:]
+        for (variable in freeVariables) {
+            anonymousContent[variable.name] = generateAnonymousIdentifier(variable.name)
+        }
+
+        log.trace("anonymous content: " + anonymousContent)
+
+        if (!link) {
+            log.trace("${id} is not a link")
+            if (listContent.isEmpty()) {
+                log.trace("there is no content.")
+                tokenList = []
+            } else {
+
+                List<Variable> contextVariables = allVarList - operation.getVariables()
+                log.trace("context variables: " + contextVariables)
+
+                if (anonymousContent.size() == 0) {
+                    log.trace("there is content but no anonymous content, so it simply forges from input content (if any).")
+                    for (content in listContent) {
+                        // create an anonymous identifier for each context variable
+                        Map<String, String> contextContent = [:]
+                        for (variable in contextVariables) {
+                            contextContent[variable.name] = content[variable.name]
+                        }
+                        log.trace("context content: " + contextContent)
+
+                        tokenList << LPToken.createToken(operation.toExpression(), content + contextContent)
+                    }
+                } else { // add anonymous content
+                    log.trace("there is content and anonymous content, so it generates a compound input + anonymous content.")
+                    for (content in listContent) {
+                        Map<String, String> contextContent = [:]
+                        for (variable in contextVariables) {
+                            contextContent[variable.name] = content[variable.name]
+                        }
+                        log.trace("context content: " + contextContent)
+
+                        tokenList << LPToken.createToken(operation.toExpression(), content + anonymousContent + contextContent)
+                    }
+                }
+            }
+        } else {
+            log.trace("${id} is a link")
+            if (listContent.isEmpty()) {
+                if (inputs.size() == 0 && isEmitter()) {
+                    log.trace("there is no content, but it is an emitter enabled to fire, so it generates anonymous content.")
+                    tokenList << LPToken.createToken(Expression.buildNoFunctorExpFromVarStringList(anonymousContent.keySet()), anonymousContent)
+                }
+            } else {
+                log.trace("there is content, so it generates a compound input + anonymous content.")
+                // in the case of link you have also to consider the output
+                for (content in listContent) {
+                    Map<String, String> allContent = content + anonymousContent
+                    tokenList << LPToken.createToken(Expression.buildNoFunctorExpFromVarStringList(allContent.keySet()), allContent)
+                }
+            }
+        }
+
+        log.trace("fireable event token list: " + tokenList)
 
         List<TransitionEvent> firableEvents = []
         for (token in tokenList) {
@@ -532,7 +680,8 @@ class LPTransition extends Transition {
     /////////////////////////////// return event tokens given a certain filter
 
     // return all the event tokens from inputs which satisfy the filter
-    private List<Map<String, String>> getListContentPerFilter(Map<String, String> filter) {
+    private List<Map<String, String>> getListContentViaFilter(Map<String, String> filter) {
+
         List<Map<String, String>> listContentPerFilter = []
         // for each input place
         for (arc in inputs) {
@@ -610,27 +759,71 @@ class LPTransition extends Transition {
         return varList1 - varList2 + varList2
     }
 
-// TODO: I'm not sure it works for multiple links places
-// semaphor to avoid recursion
+    // TODO: I'm not sure it works for multiple links places
+    // semaphor to avoid recursion
     private Boolean inReification = false
 
-// combine all the variables of the connected places (for link transitions)
-    List<Variable> reifyPlaces() {
-        if (inReification) return []
-        else inReification = true
+    // combine all the variables of the connected places (for link transitions)
+    List<Variable> reifyPlaces(Boolean forwardDirection = true) {
+
+        if (!link) {
+            log.trace("${id} is specified.. " + toString())
+            return operation.getVariables()
+        }
+
+        if (inReification) {
+            log.trace("${id} in reification.. return to avoid recursion")
+        }
+        inReification = true
+
+        log.trace("reifying ${id}, going forward? " + forwardDirection + "...")
 
         List<Variable> varList = []
         List<LPPlace> connectedPlaces = []
-        for (arc in inputs) {
-            connectedPlaces << (LPPlace) arc.source
-        }
-        for (arc in outputs) {
-            connectedPlaces << (LPPlace) arc.target
+
+        if (forwardDirection) {
+            if (outputs.size() == 0) {
+                log.trace("${id}: dead end.")
+                varList = []
+            } else {
+                for (arc in outputs) {
+                    connectedPlaces << (LPPlace) arc.target
+                }
+
+                log.trace("${id}: considering ${connectedPlaces} in forward direction")
+
+                for (place in connectedPlaces) {
+                    varList = combineVarList(varList, place.reifyTransitions())
+                }
+
+                if (varList.size() == 0) {
+                    log.trace("${id}: no variable collected, going backward")
+                    forwardDirection = false
+                    connectedPlaces = []
+                }
+            }
         }
 
-        for (transition in connectedPlaces) {
-            varList = combineVarList(varList, transition.getVarList())
+        // backward direction
+        if (!forwardDirection) {
+            if (inputs.size() == 0) {
+                log.trace("${id}: (backward) dead end.")
+                varList = []
+            } else {
+                for (arc in inputs) {
+                    connectedPlaces << (LPPlace) arc.source
+                }
+
+                log.trace("${id}: considering ${connectedPlaces} in backward direction")
+
+                for (place in connectedPlaces) {
+                    varList = combineVarList(varList, place.reifyTransitions(false))
+                }
+
+            }
         }
+
+        log.trace("${id}: variables found: " + varList)
         varList
     }
 
