@@ -197,6 +197,72 @@ class AnalysisTest extends GroovyTestCase {
         assert runner.analysis.storyBase.base.size() == 23
     }
 
+    void testBasicInputWithDifferentEmitters() {
+        Net net = new LPNet()
+
+        Transition tInput = net.createEmitterTransition()
+        Place pInput = net.createPlace("input")
+        net.createArc(tInput, pInput)
+
+        Transition tInput2 = net.createEmitterTransition()
+        Place pInput2 = net.createPlace("input")
+        net.createArc(tInput2, pInput2)
+
+        Transition tOutput = net.createCollectorTransition()
+        Place pOutput = net.createPlace("output")
+        net.createArc(pOutput, tOutput)
+
+        net.createTransitionNexus([pInput, pInput2], [pOutput], [], [], [])
+
+        net.resetIds()
+
+        NetRunner runner = new NetRunner()
+        runner.load(net)
+
+        runner.analyse()
+
+        assert runner.analysis.storyBase.base.size() == 2
+        assert runner.analysis.storyBase.base[0].steps.size() == 5
+        assert runner.analysis.storyBase.base[1].steps.size() == 3
+        assert runner.analysis.stateBase.base.size() == 5
+
+        runner.status()
+
+    }
+
+    void testLPInputWithDifferentVariables() {
+        Net net = new LPNet()
+
+        Transition tInput = net.createEmitterTransition()
+        Place pInput = net.createPlace("input(A)")
+        net.createArc(tInput, pInput)
+
+        Transition tInput2 = net.createEmitterTransition()
+        Place pInput2 = net.createPlace("input(B)")
+        net.createArc(tInput2, pInput2)
+
+        Transition tOutput = net.createCollectorTransition()
+        Place pOutput = net.createPlace("output(C)")
+        net.createArc(pOutput, tOutput)
+
+        net.createTransitionNexus([pInput, pInput2], [pOutput], [], [], [])
+
+        net.resetIds()
+
+        NetRunner runner = new NetRunner()
+        runner.load(net)
+
+        runner.analyse()
+
+        runner.status()
+
+        assert runner.analysis.storyBase.base.size() == 2
+        assert runner.analysis.storyBase.base[0].steps.size() == 5
+        assert runner.analysis.storyBase.base[1].steps.size() == 5
+        assert runner.analysis.stateBase.base.size() == 7
+
+    }
+
     void testNexusStructureWithDifferentVariables() {
         Net net = new LPNet()
 
@@ -223,6 +289,8 @@ class AnalysisTest extends GroovyTestCase {
         net.createTransitionNexus([pInput], [pOutput], [pBiflow], [pDiode], [pInhibitor])
 
         net.resetIds()
+
+        net.exportToDot("NexusWithDifferentVariables")
 
         NetRunner runner = new NetRunner()
         runner.load(net)
