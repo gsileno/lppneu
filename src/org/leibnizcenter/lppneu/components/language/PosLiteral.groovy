@@ -8,7 +8,7 @@ class PosLiteral {
 
     // classic literal
     Atom functor
-    List<Parameter> parameters
+    List<Parameter> parameters = [] // TODO: there is a BUG between tokens and expression with identifiers
 
     PosLiteral minimalClone() {
         List<Parameter> cloneParameters = []
@@ -35,9 +35,10 @@ class PosLiteral {
         List<Parameter> reifiedParameters = []
         for (param in parameters) {
             if (param.isVariable()) {
-                if (!param.variable.identifier) {
-                    throw new RuntimeException("Variable ${param} cannot be reified, there is no value.")
-                }
+                // TODO: check, maybe bug
+//                if (!param.variable.identifier) {
+//                    throw new RuntimeException("Variable ${param} cannot be reified, there is no value.")
+//                }
                 reifiedParameters << Parameter.build(Atom.build(param.variable.identifier))
             } else {
                 reifiedParameters << param

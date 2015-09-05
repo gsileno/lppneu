@@ -4,6 +4,7 @@ import groovy.util.logging.Log4j
 import org.leibnizcenter.lppneu.components.language.Atom
 import org.leibnizcenter.lppneu.components.language.Expression
 import org.leibnizcenter.lppneu.components.language.Operation
+import org.leibnizcenter.lppneu.components.language.Parameter
 import org.leibnizcenter.lppneu.components.language.PosLiteral
 import org.leibnizcenter.lppneu.components.language.Operator
 import org.leibnizcenter.lppneu.components.language.Variable
@@ -177,9 +178,23 @@ class LPPlace extends Place {
         createToken([])
     }
 
+    private void fillParametersWithContent(List<Parameter> parameters, Map<String, String> content) {
+        for (param in parameters) {
+            if (param.isVariable()) {
+                if (content[param.variable.name] == null)
+                    param.variable.identifier = generateAnonymousIdentifier(param.variable.name)
+                param.variable.identifier = PosLiteral.build(Atom.build(content[param.variable.name]))
+            } else if (param.isLiteral()) {
+                if (param.literal.parameters.size() > 0) {
+                    fillParametersWithContent(param.literal.parameters, content)
+                }
+            }
+        }
+    }
+
     // creates a token with a map that associates identifiers to variables
     // the missing items are filled with anonymous identifiers
-    Token createToken(Map<String, String> variableLiteralMap) {
+    Token createToken(Map<String, String> content) {
 
         // TODO: refactor with Token.createToken
 
@@ -190,14 +205,7 @@ class LPPlace extends Place {
             tokenExpression = Expression.buildNoFunctorExpFromVarList(getVarList())
         }
 
-        for (param in tokenExpression.getParameters()) {
-            if (param.isVariable()) {
-                if (variableLiteralMap[param.variable.name])
-                    param.variable.identifier = PosLiteral.build(Atom.build(variableLiteralMap[param.variable.name]))
-                else
-                    param.variable.identifier = generateAnonymousIdentifier(param.variable.name)
-            }
-        }
+        fillParametersWithContent(tokenExpression.getParameters(), content)
 
         LPToken newToken = new LPToken(expression: tokenExpression)
 

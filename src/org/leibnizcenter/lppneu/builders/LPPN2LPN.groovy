@@ -6,15 +6,12 @@ import org.leibnizcenter.lppneu.components.language.*
 import org.leibnizcenter.lppneu.components.lppetrinets.LPNet
 import org.leibnizcenter.lppneu.components.lppetrinets.LPPlace
 import org.leibnizcenter.lppneu.components.lppetrinets.LPTransition
-import org.leibnizcenter.lppneu.components.lppetrinets.NetInterface
-import org.leibnizcenter.lppneu.components.mapper.Mapper
+import org.leibnizcenter.pneu.components.petrinet.NetInterface
 import org.leibnizcenter.lppneu.components.position.AbstractPositionRef
 import org.leibnizcenter.lppneu.components.position.AbstractTriple
 import org.leibnizcenter.lppneu.components.position.FactualTriple
 import org.leibnizcenter.pneu.components.petrinet.Arc
-import org.leibnizcenter.pneu.components.petrinet.ArcType
 import org.leibnizcenter.pneu.components.petrinet.Net
-import org.leibnizcenter.pneu.components.petrinet.Node
 import org.leibnizcenter.pneu.components.petrinet.Place
 import org.leibnizcenter.pneu.components.petrinet.Transition
 
@@ -574,4 +571,13 @@ class LPPN2LPN {
 
         net
     }
+
+//    static Net buildFirstSquare(Expression initiationReference,
+//                                Expression expirationReference,
+//                                Expression successReference,
+//                                Expression failureReference,
+//                                Operation successAction,
+//                                Operation failureReference)
+
+
 }

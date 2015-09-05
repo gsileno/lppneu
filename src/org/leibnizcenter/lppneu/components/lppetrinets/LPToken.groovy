@@ -5,6 +5,7 @@ import groovy.util.logging.Log4j
 import org.leibnizcenter.lppneu.components.language.Atom
 import org.leibnizcenter.lppneu.components.language.Expression
 import org.leibnizcenter.lppneu.components.language.Operator
+import org.leibnizcenter.lppneu.components.language.Parameter
 import org.leibnizcenter.lppneu.components.language.PosLiteral
 import org.leibnizcenter.pneu.components.petrinet.Token
 
@@ -23,7 +24,22 @@ class LPToken extends Token {
     // LP net tokens are equal if they are of the same type and transports the same content
     Boolean compare(Token t) {
         if (t.class != LPToken) return false
-        expression == ((LPToken) t).expression
+
+        LPToken lpt = (LPToken) t
+
+        if (expression == null && lpt.expression == null) return true
+
+//        log.trace "formula: "+ expression.reify().formula == lpt.expression.reify().formula
+//        log.trace "situation: "+ expression.reify().formula.inputPorts[0] == lpt.expression.reify().formula.inputPorts[0]
+//        log.trace "parameter: "+ expression.reify().formula.inputPorts[0].factLiteral.parameters[0] == lpt.expression.reify().formula.inputPorts[0].factLiteral.parameters[0]
+//        log.trace "literal: "+ expression.reify().formula.inputPorts[0].factLiteral.parameters[0].literal == lpt.expression.reify().formula.inputPorts[0].factLiteral.parameters[0].literal
+
+//        log.trace "experssion: "+expression.reify().formula.inputPorts[0].factLiteral.parameters[0].literal.dump()
+//        log.trace "token experssion: "+lpt.expression.reify().formula.inputPorts[0].factLiteral.parameters[0].literal.dump()
+
+        expression.reify() == lpt.expression.reify()
+
+
     }
 
     static Boolean compare(Token t1, Token t2) {
@@ -64,6 +80,29 @@ class LPToken extends Token {
         varWithValuesMap
     }
 
+    // return the list of variables grounded
+    static List<String> fillParametersWithContent(List<Parameter> parameters, Map<String, String> content) {
+        List<String> groundedVarStringList = []
+        for (param in parameters) {
+            if (param.isVariable()) {
+                if (content.containsKey(param.variable.name)) {
+                    log.trace("filling " + param.variable.name + " with " + content[param.variable.name])
+                    param.variable.identifier = PosLiteral.build(Atom.build(content[param.variable.name]))
+                    groundedVarStringList = groundedVarStringList - [param.variable.name] + [param.variable.name]
+                } else {
+                    throw new RuntimeException("I don't know how to ground this variable: "+param.variable.name)
+                }
+            } else if (param.isLiteral()) {
+                if (param.literal.parameters.size() > 0) {
+                    List<String> newGroundedVars = []
+                    newGroundedVars = fillParametersWithContent(param.literal.parameters, content)
+                    groundedVarStringList = (groundedVarStringList - newGroundedVars) + newGroundedVars
+                }
+            }
+        }
+        groundedVarStringList
+    }
+
     // creates a token with a map that associates identifiers to variables
     // the missing items are filled with anonymous identifiers
     static Token createToken(Expression expression, Map<String, String> content) {
@@ -76,34 +115,19 @@ class LPToken extends Token {
 
             log.trace("token expression used as a forge: " + tokenExpression)
 
-            for (param in tokenExpression.getParameters()) {
-                if (param.isVariable()) {
-                    if (content.containsKey(param.variable.name)) {
-                        log.trace("filling " + param.variable.name + " with " + content[param.variable.name])
-                        param.variable.identifier = PosLiteral.build(Atom.build(content[param.variable.name]))
-                        content.remove(param.variable.name)
-                    }
-                }
-            }
+            List<String> groundedVarStringList = fillParametersWithContent(tokenExpression.getParameters(), content)
+
+            for (groundedVarString in groundedVarStringList)
+                content.remove(groundedVarString)
 
             log.trace("forged explicit expression: " + tokenExpression)
         }
 
         if (content.size() > 0) {
-
             contextExpression = Expression.buildNoFunctorExpFromVarStringList(content.keySet())
             log.trace("context expression used as a forge: " + contextExpression)
 
-            for (param in contextExpression.getParameters()) {
-                if (param.isVariable()) {
-                    if (content.containsKey(param.variable.name)) {
-                        log.trace("filling " + param.variable.name + " with " + content[param.variable.name])
-                        param.variable.identifier = PosLiteral.build(Atom.build(content[param.variable.name]))
-                        content.remove(param.variable.name)
-                    }
-                }
-            }
-
+            fillParametersWithContent(contextExpression.getParameters(), content)
             log.trace("forged context expression: " + contextExpression)
         }
 

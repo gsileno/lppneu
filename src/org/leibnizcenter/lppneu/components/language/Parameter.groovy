@@ -33,7 +33,7 @@ class Parameter {
         }
     }
 
-    Boolean isConstant() {
+    Boolean isLiteral() {
         (literal != null)
     }
 
