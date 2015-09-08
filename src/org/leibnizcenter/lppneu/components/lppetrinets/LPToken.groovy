@@ -23,27 +23,32 @@ class LPToken extends Token {
 
     // LP net tokens are equal if they are of the same type and transports the same content
     Boolean compare(Token t) {
-        if (t.class != LPToken) return false
+        if (t.class != LPToken)
+            throw new RuntimeException("You should not be here")
 
         LPToken lpt = (LPToken) t
 
+        // for propositional content
         if (expression == null && lpt.expression == null) return true
 
 //        log.trace "formula: "+ expression.reify().formula == lpt.expression.reify().formula
 //        log.trace "situation: "+ expression.reify().formula.inputPorts[0] == lpt.expression.reify().formula.inputPorts[0]
 //        log.trace "parameter: "+ expression.reify().formula.inputPorts[0].factLiteral.parameters[0] == lpt.expression.reify().formula.inputPorts[0].factLiteral.parameters[0]
 //        log.trace "literal: "+ expression.reify().formula.inputPorts[0].factLiteral.parameters[0].literal == lpt.expression.reify().formula.inputPorts[0].factLiteral.parameters[0].literal
-
-//        log.trace "experssion: "+expression.reify().formula.inputPorts[0].factLiteral.parameters[0].literal.dump()
+//        log.trace "expression: "+expression.reify().formula.inputPorts[0].factLiteral.parameters[0].literal.dump()
 //        log.trace "token experssion: "+lpt.expression.reify().formula.inputPorts[0].factLiteral.parameters[0].literal.dump()
 
         expression.reify() == lpt.expression.reify()
-
 
     }
 
     static Boolean compare(Token t1, Token t2) {
         t1.compare(t2)
+    }
+
+    // TODO
+    Boolean subsumes(Token t) {
+        compare(t)
     }
 
     Token minimalClone() {

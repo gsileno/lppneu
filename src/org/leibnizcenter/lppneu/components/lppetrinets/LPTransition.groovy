@@ -100,6 +100,11 @@ class LPTransition extends Transition {
         return compare(this, other)
     }
 
+    // TODO
+    Boolean subsumes(Transition that) {
+        compare(that)
+    }
+
     //////////////////////////////
     // Operational Semantics
     //////////////////////////////

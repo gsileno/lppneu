@@ -1,6 +1,7 @@
 package org.leibnizcenter.lppneu.components.lppetrinets
 
 import groovy.util.logging.Log4j
+import org.leibnizcenter.lppneu.builders.LPPN2LPN
 import org.leibnizcenter.lppneu.components.language.Atom
 import org.leibnizcenter.lppneu.components.language.Expression
 import org.leibnizcenter.lppneu.components.language.Operation
@@ -248,6 +249,10 @@ class LPPlace extends Place {
         return new LPPlace(expression: Expression.parse(label))
     }
 
+    Boolean compare(Place that) {
+        return compare((LPPlace) this, (LPPlace) that)
+    }
+
     static Boolean compare(Place p1, Place p2) {
         return compare((LPPlace) p1, (LPPlace) p2)
     }
@@ -257,6 +262,11 @@ class LPPlace extends Place {
         if (p1.expression != p2.expression) return false
         if (p1.link != p2.link) return false
         return true
+    }
+
+    // TODO
+    Boolean subsumes(Place that) {
+        compare(that)
     }
 
     // remove redundant elements
