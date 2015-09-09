@@ -47,8 +47,16 @@ class LPToken extends Token {
     }
 
     // TODO
-    Boolean subsumes(Token t) {
-        compare(t)
+    Boolean subsumes(Token t, Map<String, Map<String, String>> mapAnonymousIdentifiers = null) {
+        if (t.class != LPToken)
+            throw new RuntimeException("Wrong type of token")
+
+        List<Parameter> generalParameterList = expression.getParameters()
+        List<Parameter> specificParameterList = (LPToken)
+
+        if (mapAnonymousIdentifiers == null) {
+            mapAnonymousIdentifiers = [:]
+        }
     }
 
     Token minimalClone() {

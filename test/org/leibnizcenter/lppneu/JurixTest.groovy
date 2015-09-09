@@ -13,41 +13,53 @@ import org.leibnizcenter.pneu.parsers.PNML2PN
 
 class JurixTest extends GroovyTestCase {
 
-    static Analysis batchAnalysis(Net net) {
-        Net model = MarketModel.groundSaleInstance()
-        NetRunner runner = new NetRunner()
-        runner.load(model)
-        runner.analyse()
-        runner.status()
-        runner.analysis
-    }
+    static Analysis batchAnalysis(String filename, Net net) {
 
+        Analysis analysis = null
+
+//        Analysis analysis = Analysis.loadFromFile(filename)
+
+        if (!analysis) {
+            NetRunner runner = new NetRunner()
+            runner.load(net)
+            runner.analyse()
+            runner.status()
+            analysis = runner.analysis
+//            analysis.saveToFile(filename)
+        }
+
+        analysis
+    }
 
     void testGroundNetsExports() {
         MarketModel.groundSaleInstance().exportToDot("groundSaleInstance")
         MarketModel.groundSaleModel().exportToDot("groundSaleModel")
         MarketModel.groundSaleNormativeModel().exportToDot("groundSaleNormativeModel")
-        MarketModel.groundSaleNormativeModel().exportToDot("groundSaleScriptModel")
+        MarketModel.groundSaleScriptModel().exportToDot("groundSaleScriptModel")
     }
 
     void testGroundNetsAnalysis1() {
-        Analysis analysis = batchAnalysis(MarketModel.groundSaleInstance())
-        analysis.exportToLog("groundSaleInstance")
+        String filename = "groundSaleInstance"
+        Analysis analysis = batchAnalysis(filename, MarketModel.groundSaleInstance())
+        analysis.exportToLog(filename)
     }
 
     void testGroundNetsAnalysis2() {
-        Analysis analysis = batchAnalysis(MarketModel.groundSaleModel())
-        analysis.exportToLog("groundSaleModel")
+        String filename = "groundSaleModel"
+        Analysis analysis = batchAnalysis(filename, MarketModel.groundSaleModel())
+        analysis.exportToLog(filename)
     }
 
     void testGroundNetsAnalysis3() {
-        Analysis analysis = batchAnalysis(MarketModel.groundSaleNormativeModel())
-        analysis.exportToLog("groundSaleNormativeModel")
+        String filename = "groundSaleNormativeModel"
+        Analysis analysis = batchAnalysis(filename, MarketModel.groundSaleNormativeModel())
+        analysis.exportToLog(filename)
     }
 
     void testGroundNetsAnalysis4() {
-        Analysis analysis = batchAnalysis(MarketModel.groundSaleScriptModel())
-        analysis.exportToLog("groundSaleScriptModel")
+        String filename = "groundSaleScriptModel"
+        Analysis analysis = batchAnalysis(filename, MarketModel.groundSaleScriptModel())
+        analysis.exportToLog(filename)
     }
 
     void testSubsumptionIdentity() {
@@ -58,9 +70,15 @@ class JurixTest extends GroovyTestCase {
     }
 
     void testSubsumption1() {
+      assert Subsumption.subsumes(MarketModel.groundSaleModel(), MarketModel.groundSaleInstance())
+//        assert Subsumption.subsumes(MarketModel.groundSaleNormativeModel(), MarketModel.groundSaleModel())
+        //assert Subsumption.subsumes(MarketModel.groundSaleModel(), MarketModel.groundSaleNormativeModel())
+        // Subsumption.subsumes(MarketModel.groundSaleScriptModel(), MarketModel.groundSaleScriptModel())
+    }
+    void testSubsumption2() {
 //        Subsumption.subsumes(MarketModel.groundSaleModel(), MarketModel.groundSaleInstance())
-        assert !Subsumption.subsumes(MarketModel.groundSaleNormativeModel(), MarketModel.groundSaleModel())
-        assert Subsumption.subsumes(MarketModel.groundSaleModel(), MarketModel.groundSaleNormativeModel())
+//        assert Subsumption.subsumes(MarketModel.groundSaleNormativeModel(), MarketModel.groundSaleModel())
+        //assert Subsumption.subsumes(MarketModel.groundSaleModel(), MarketModel.groundSaleNormativeModel())
         // Subsumption.subsumes(MarketModel.groundSaleScriptModel(), MarketModel.groundSaleScriptModel())
     }
 
