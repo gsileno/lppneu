@@ -1,15 +1,10 @@
 package org.leibnizcenter.lppneu
 
-import org.leibnizcenter.lppneu.components.lppetrinets.LPNet
 import org.leibnizcenter.lppneu.examples.MarketModel
 import org.leibnizcenter.pneu.animation.monolithic.NetRunner
 import org.leibnizcenter.pneu.animation.monolithic.analysis.Analysis
-import org.leibnizcenter.pneu.builders.PN2LaTeX
 import org.leibnizcenter.pneu.components.petrinet.Net
-import org.leibnizcenter.pneu.components.petrinet.Place
-import org.leibnizcenter.pneu.components.petrinet.Transition
 import org.leibnizcenter.pneu.decomposition.Subsumption
-import org.leibnizcenter.pneu.parsers.PNML2PN
 
 class JurixTest extends GroovyTestCase {
 
@@ -71,18 +66,22 @@ class JurixTest extends GroovyTestCase {
 
     void testSubsumption1() {
       assert Subsumption.subsumes(MarketModel.groundSaleModel(), MarketModel.groundSaleInstance())
-//        assert Subsumption.subsumes(MarketModel.groundSaleNormativeModel(), MarketModel.groundSaleModel())
-        //assert Subsumption.subsumes(MarketModel.groundSaleModel(), MarketModel.groundSaleNormativeModel())
-        // Subsumption.subsumes(MarketModel.groundSaleScriptModel(), MarketModel.groundSaleScriptModel())
     }
+
+    void testSubsumption1bis() {
+        assert !Subsumption.subsumes(MarketModel.groundSaleInstance(), MarketModel.groundSaleModel())
+    }
+
     void testSubsumption2() {
-//        Subsumption.subsumes(MarketModel.groundSaleModel(), MarketModel.groundSaleInstance())
+     assert Subsumption.subsumes(MarketModel.groundSaleNormativeModel(), MarketModel.groundSaleModel())
+//        assert Subsumption.subsumes(MarketModel.groundSaleModel(), MarketModel.groundSaleInstance())
 //        assert Subsumption.subsumes(MarketModel.groundSaleNormativeModel(), MarketModel.groundSaleModel())
         //assert Subsumption.subsumes(MarketModel.groundSaleModel(), MarketModel.groundSaleNormativeModel())
         // Subsumption.subsumes(MarketModel.groundSaleScriptModel(), MarketModel.groundSaleScriptModel())
     }
 
-
-
-
+    void testSubsumption3() {
+        assert !Subsumption.subsumes(MarketModel.groundSaleModel(), MarketModel.groundSaleNormativeModel())
+        // Subsumption.subsumes(MarketModel.groundSaleScriptModel(), MarketModel.groundSaleScriptModel())
+    }
 }

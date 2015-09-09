@@ -46,17 +46,15 @@ class LPToken extends Token {
         t1.compare(t2)
     }
 
-    // TODO
-    Boolean subsumes(Token t, Map<String, Map<String, String>> mapAnonymousIdentifiers = null) {
+
+    Boolean subsumes(Token t, Map<String, Map<String, String>> mapIdentifiers = [:]) {
+
         if (t.class != LPToken)
             throw new RuntimeException("Wrong type of token")
 
-        List<Parameter> generalParameterList = expression.getParameters()
-        List<Parameter> specificParameterList = (LPToken)
+        Token lpt = (LPToken) t
 
-        if (mapAnonymousIdentifiers == null) {
-            mapAnonymousIdentifiers = [:]
-        }
+        expression.subsumes(lpt.expression, mapIdentifiers)
     }
 
     Token minimalClone() {
@@ -103,7 +101,7 @@ class LPToken extends Token {
                     param.variable.identifier = PosLiteral.build(Atom.build(content[param.variable.name]))
                     groundedVarStringList = groundedVarStringList - [param.variable.name] + [param.variable.name]
                 } else {
-                    throw new RuntimeException("I don't know how to ground this variable: "+param.variable.name)
+                    throw new RuntimeException("I don't know how to ground this variable: " + param.variable.name)
                 }
             } else if (param.isLiteral()) {
                 if (param.literal.parameters.size() > 0) {

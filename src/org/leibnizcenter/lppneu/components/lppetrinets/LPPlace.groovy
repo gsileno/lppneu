@@ -25,7 +25,11 @@ class LPPlace extends Place {
     Boolean link = false
 
     String toString() {
-        if (link) "*" + " ${id} (" + marking.size() + ")"
+        if (link) {
+            if (id == null)
+                throw new RuntimeException("place should have an id")
+            "* (" + marking.size() + ")"
+        }
         else if (expression != null) expression.toString() + " (" + marking.size() + ")" // + " LPlace@"+hashCode()
         else throw new RuntimeException("Empty place?")
     }
@@ -224,6 +228,7 @@ class LPPlace extends Place {
         newToken
     }
 
+    // TODO: refactor with Analysis
     LPPlace minimalClone() {
         Map<String, Integer> newVariableAnonymousGeneratedIdCountMap = [:]
         for (item in variableAnonymousGeneratedIdCountMap) {
@@ -237,7 +242,8 @@ class LPPlace extends Place {
                 marking: marking.collect(),
                 expression: clonedExpression,
                 link: link,
-                variableAnonymousGeneratedIdCountMap: newVariableAnonymousGeneratedIdCountMap
+                variableAnonymousGeneratedIdCountMap: newVariableAnonymousGeneratedIdCountMap,
+                id: id
         )
     }
 
@@ -262,11 +268,6 @@ class LPPlace extends Place {
         if (p1.expression != p2.expression) return false
         if (p1.link != p2.link) return false
         return true
-    }
-
-    // TODO
-    Boolean subsumes(Place that) {
-        compare(that)
     }
 
     // remove redundant elements

@@ -138,10 +138,12 @@ class Formula<T> {
         formula
     }
 
+    // a simple formula has only atomic inputs
     Boolean isAtomic() {
         (inputFormulas.size() == 0)
     }
 
+    // a simple formula has all input formulas atomic formulas
     Boolean isSimple() {
         for (input in inputFormulas) {
             if (!input.isAtomic()) {
@@ -230,6 +232,47 @@ class Formula<T> {
         )
     }
 
+    Boolean subsumes(Formula<T> specific, Map<String, Map<String, String>> mapIdentifiers = [:]) {
 
+        log.trace("checking $this against $specific - "+mapIdentifiers)
+
+        // TODO: refactor
+        // jump the context elements, in the general
+        if (operator == Operator.AND && inputFormulas[1].inputPorts[0].factLiteral.functor == null) {
+            log.trace("jumping to the explicit internal part of general: "+inputFormulas[0])
+            return inputFormulas[0].subsumes(specific)
+        }
+        // jump the context elements, and in the specific
+        if (specific.operator == Operator.AND && specific.inputFormulas.size() == 2 && specific.inputFormulas[1].inputPorts[0].factLiteral.functor == null) {
+            log.trace("jumping to the explicit internal part of specific: "+specific.inputFormulas[0])
+            return subsumes(specific.inputFormulas[0])
+        }
+
+
+        if (operator != specific.operator) {
+            log.trace("${this} and ${specific} have different operators. there cannot be subsumption.")
+            return false
+        } else if (inputPorts.size() != specific.inputPorts.size()) {
+            log.trace("${this} and ${specific} have different inputs. there cannot be subsumption.")
+            return false
+        } else if (inputFormulas.size() != specific.inputFormulas.size()) {
+            log.trace("${this} and ${specific} have different inputs. there cannot be subsumption.")
+            return false
+        }
+
+        if (isAtomic()) {
+            for (int i = 0; i < inputPorts.size(); i++) {
+                if (!this.inputPorts[i].subsumes(specific.inputPorts[i], mapIdentifiers)) {
+                    return false
+                }
+            }
+        } else {
+            for (int i = 0; i < inputFormulas.size(); i++) {
+                if (!this.inputFormulas[i].subsumes(specific.inputFormulas[i], mapIdentifiers))
+                    return false
+            }
+        }
+        return true
+    }
 
 }

@@ -3,7 +3,8 @@ package org.leibnizcenter.lppneu.components.language
 import groovy.transform.EqualsAndHashCode
 import groovy.util.logging.Log4j
 
-@Log4j @EqualsAndHashCode
+@Log4j
+@EqualsAndHashCode
 class PosLiteral {
 
     // classic literal
@@ -45,6 +46,99 @@ class PosLiteral {
             }
         }
         new PosLiteral(functor: functor, parameters: reifiedParameters)
+    }
+
+    Boolean subsumes(PosLiteral specific, Map<String, Map<String, String>> mapIdentifiers = [:]) {
+        log.trace("checking $this against $specific")
+
+        if (functor.name != specific.functor.name) return false
+
+        if (parameters.size() != specific.parameters.size()) {
+            log.trace("the two literals have a different number of parameters")
+            return false
+        }
+
+        for (int i = 0; i < parameters.size(); i++) {
+            if (parameters[i].isLiteral()) {
+                String generalId = parameters[i].literal.functor.name
+                if (specific.parameters[i].isLiteral()) {
+                    if (!parameters[i].literal.subsumes(specific.parameters[i].literal))
+                        return false
+                } else if (specific.parameters[i].isVariable()) {
+                    String specificVarString = specific.parameters[i].variable.name
+                    String specificId = specific.parameters[i].variable.identifier
+
+                    log.trace("specific id: ${specificId}")
+
+                    // TODO: check for overlap between specific and general model variables
+                    if (mapIdentifiers[specificVarString] == null) {
+                        mapIdentifiers[specificVarString] = [:]
+                    }
+                    if (mapIdentifiers[specificVarString][specificId] == null) {
+                        log.trace("not yet inserted in the the mapping")
+                        mapIdentifiers[specificVarString][specificId] = generalId
+                    } else if (mapIdentifiers[specificVarString][specificId] != generalId) {
+                        log.trace("the mapped identifier does not correspond: " + mapIdentifiers[specificVarString][specificId] + " vs " + generalId)
+                        return false
+                    }
+                }
+            } else if (parameters[i].isVariable()) {
+                String generalVarString = parameters[i].variable.name
+                String generalId = parameters[i].variable.identifier
+
+                log.trace("general id: ${generalId}")
+
+                if (generalId == null)
+                    throw new RuntimeException("the literal should be reified to check concrete subsumption")
+
+                if (specific.parameters[i].isLiteral()) {
+                    if (specific.parameters[i].literal.parameters.size() > 0) {
+                        throw new RuntimeException("I was expecting only an identifier, not a predicate!")
+                    }
+
+                    String specificId = specific.parameters[i].literal.functor.name
+
+                    log.trace("specific id: ${specificId}")
+
+                    if (mapIdentifiers[generalVarString] == null) {
+                        mapIdentifiers[generalVarString] = [:]
+                    }
+                    if (mapIdentifiers[generalVarString][generalId] == null) {
+                        log.trace("not yet inserted in the the mapping")
+                        mapIdentifiers[generalVarString][generalId] = specificId
+                    } else if (mapIdentifiers[generalVarString][generalId] != specificId) {
+                        log.trace("the mapped identifier does not correspond: " + mapIdentifiers[generalVarString][generalId] + " vs " + specificId)
+                        return false
+                    }
+                } else if (specific.parameters[i].isVariable()) {
+                    String specificVarString = specific.parameters[i].variable.name
+                    String specificId = specific.parameters[i].variable.identifier
+
+                    if (generalVarString != specificVarString) {
+                        log.trace("variables are differents")
+                    }
+
+                    log.trace("specific id: ${specificId}")
+
+                    if (mapIdentifiers[generalVarString] == null) {
+                        mapIdentifiers[generalVarString] = [:]
+                    }
+                    if (mapIdentifiers[generalVarString][generalId] == null) {
+                        log.trace("not yet inserted in the the mapping")
+                        mapIdentifiers[generalVarString][generalId] = specificId
+                    } else if (mapIdentifiers[generalVarString][generalId] != specificId) {
+                        log.trace("the mapped identifier does not correspond: " + mapIdentifiers[generalVarString][generalId] + " vs " + specificId)
+                        return false
+                    }
+                } else {
+                    throw new RuntimeException("Yet to be implemented")
+                }
+            } else {
+                throw new RuntimeException("Yet to be implemented")
+            }
+        }
+
+        return true
     }
 
     List<Variable> getVariables() {

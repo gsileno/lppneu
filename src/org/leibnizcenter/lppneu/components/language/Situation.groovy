@@ -168,6 +168,23 @@ class Situation {
 
     }
 
+    Boolean subsumes(Situation specific, Map<String, Map<String, String>> mapIdentifiers = [:]) {
+        Boolean result
+
+        if (polarity != specific.polarity)
+            result = false
+        if (positionRef)
+            throw new RuntimeException("Yet to be implemented")
+        else if (rootLiteral) {
+            result = rootLiteral.subsumes(specific.rootLiteral, mapIdentifiers)
+        } else if (factLiteral) {
+            result = factLiteral.subsumes(specific.factLiteral, mapIdentifiers)
+        } else
+            throw new RuntimeException("You shouldn't be here")
+
+        result
+    }
+
     Event toEvent() {
         return new Event(
                 operator: polarity.toOperator(),

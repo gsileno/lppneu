@@ -2,10 +2,11 @@ package org.leibnizcenter.lppneu.components.language
 
 import commons.base.Formula
 import groovy.transform.EqualsAndHashCode
+import groovy.util.logging.Log4j
 import org.leibnizcenter.lppneu.components.position.AbstractPositionRef
 import org.leibnizcenter.lppneu.parsers.LPPNLoader
 
-@EqualsAndHashCode
+@Log4j @EqualsAndHashCode
 class Expression {
 
     Formula<Situation> formula
@@ -227,5 +228,9 @@ class Expression {
         new Expression(
                 formula: formula.reify()
         )
+    }
+
+    Boolean subsumes(Expression specific, Map<String, Map<String, String>> mapIdentifiers = null) {
+        formula.subsumes(specific.formula, mapIdentifiers)
     }
 }
