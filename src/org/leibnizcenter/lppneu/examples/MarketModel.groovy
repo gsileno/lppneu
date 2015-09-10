@@ -385,7 +385,134 @@ class MarketModel {
     static Net groundSaleScriptModel() {
         Net sale = new LPNet()
 
+        Expression commitmentBuyGood = Expression.parse("commits(Buyer, buys(Buyer, Good, Money))")
+        Expression failureCommitmentBuyGood = Expression.build(commitmentBuyGood, Operator.FAILURE)
+        Expression successCommitmentBuyGood = Expression.build(commitmentBuyGood, Operator.SUCCESS)
+
+        Expression affordanceBuyGood = Expression.parse("affords(Buyer, buys(Buyer, Good, Money))")
+        Expression initAffordanceBuyGood = Expression.build(affordanceBuyGood, Operator.ISTANTIATION)
+
+        Expression commitmentWaitForOffer = Expression.parse("waitsFor(offers(Seller, Buyer, Good, Money))")
+        Expression failureCommitmentWaitForOffer = Expression.build(commitmentWaitForOffer, Operator.FAILURE)
+        Expression successCommitmentWaitForOffer = Expression.build(commitmentWaitForOffer, Operator.SUCCESS)
+
+        Expression commitmentWaitForDelivery = Expression.parse("waitsFor(delivers(Seller, Buyer, Good))")
+        Expression failureCommitmentWaitForDelivery = Expression.build(commitmentWaitForDelivery, Operator.FAILURE)
+        Expression successCommitmentWaitForDelivery = Expression.build(commitmentWaitForDelivery, Operator.SUCCESS)
+
+        Expression ownsMoney = Expression.parse("owns(Buyer, Money)")
+
+        Operation buyEvent = Operation.parse("buys(Buyer, Good, Money)")
+        Operation negBuyEvent = Operation.build(buyEvent, Operator.NEG)
+
+        Operation offerEvent = Operation.parse("offers(Seller, Buyer, Good, Money)")
+        Operation acceptEvent = Operation.parse("accepts(Buyer, Seller, Good, Money)")
+        Operation payEvent = Operation.parse("pays(Buyer, Seller, Money)")
+        Operation deliverEvent = Operation.parse("delivers(Seller, Buyer, Good)")
+        Operation enforceEvent = Operation.parse("enforces(Buyer, delivers(Seller, Buyer, Good))")
+
+        Operation timeOutOffer = Operation.parse("timeout(offers(Seller, Buyer, Good, Money))")
+        Operation timeOutDelivery = Operation.parse("timeout(delivers(Seller, Buyer, Good))")
+
+        Place pCommitmentBuyGood = sale.createPlace(commitmentBuyGood)
+        Place pFailureCommitmentBuyGood = sale.createPlace(failureCommitmentBuyGood)
+        Place pSuccessCommitmentBuyGood = sale.createPlace(successCommitmentBuyGood)
+
+        Place pAffordanceBuyGood = sale.createPlace(affordanceBuyGood)
+        Place pInitAffordanceBuyGood = sale.createPlace(initAffordanceBuyGood)
+
+        Place pCommitmentWaitForOffer = sale.createPlace(commitmentWaitForOffer)
+        Place pFailureCommitmentWaitForOffer = sale.createPlace(failureCommitmentWaitForOffer)
+        Place pSuccessCommitmentWaitForOffer = sale.createPlace(successCommitmentWaitForOffer)
+
+        Place pCommitmentWaitForDelivery = sale.createPlace(commitmentWaitForDelivery)
+        Place pFailureCommitmentWaitForDelivery = sale.createPlace(failureCommitmentWaitForDelivery)
+        Place pSuccessCommitmentWaitForDelivery = sale.createPlace(successCommitmentWaitForDelivery)
+
+        Place pOwnsMoney = sale.createPlace(ownsMoney)
+
+        Place pConstraintTimeoutOffer = sale.createLinkPlace()
+        Place pConstraintTimeoutDelivery = sale.createLinkPlace()
+
+        Transition tSuccessCommitmentBuyGood = sale.createLinkTransition()
+        Transition tFailureCommitmentBuyGood = sale.createLinkTransition()
+        Transition tInitCommitmentWaitForOffer = sale.createLinkTransition()
+        Transition tSuccessCommitmentWaitForOffer = sale.createLinkTransition()
+        Transition tFailureCommitmentWaitForOffer = sale.createLinkTransition()
+        Transition tInitCommitmentWaitForDelivery = sale.createLinkTransition()
+        Transition tSuccessCommitmentWaitForDelivery = sale.createLinkTransition()
+        Transition tFailureCommitmentWaitForDelivery = sale.createLinkTransition()
+        Transition tInitAffordanceBuyGood = sale.createLinkTransition()
+
+        Transition tBuyEvent = sale.createTransition(buyEvent)
+        Transition tNegBuyEvent = sale.createTransition(negBuyEvent)
+
+        Transition tOfferEvent = sale.createTransition(offerEvent)
+        Transition tAcceptEvent = sale.createTransition(acceptEvent)
+        Transition tPayEvent = sale.createTransition(payEvent)
+        Transition tDeliverEvent = sale.createTransition(deliverEvent)
+        Transition tEnforceEvent = sale.createTransition(enforceEvent)
+
+        Transition tTimeOutOffer = sale.createTransition(timeOutOffer)
+        Transition tTimeOutDelivery = sale.createTransition(timeOutDelivery)
+
+        Transition tMainIn = sale.createEmitterTransition()
+        Transition tCatalystIn = sale.createEmitterTransition()
+
+        sale.createPlaceNexus(pCommitmentBuyGood, [tMainIn], [tFailureCommitmentBuyGood, tSuccessCommitmentBuyGood], [tBuyEvent, tNegBuyEvent], [], [])
+        sale.createBridge(tNegBuyEvent, pFailureCommitmentBuyGood, tFailureCommitmentBuyGood)
+        sale.createBridge(tBuyEvent, pSuccessCommitmentBuyGood, tSuccessCommitmentBuyGood)
+
+        sale.createPlaceNexus(pCommitmentWaitForOffer, [tInitCommitmentWaitForOffer], [tFailureCommitmentWaitForOffer, tSuccessCommitmentWaitForOffer], [tBuyEvent, tNegBuyEvent], [], [])
+        sale.createBridge(tTimeOutOffer, pFailureCommitmentWaitForOffer, tFailureCommitmentWaitForOffer)
+        sale.createBridge(tOfferEvent, pSuccessCommitmentWaitForOffer, tSuccessCommitmentWaitForOffer)
+        sale.createArc(pConstraintTimeoutOffer, tTimeOutOffer)
+        sale.createArc(pConstraintTimeoutOffer, tOfferEvent)
+
+        sale.createPlaceNexus(pCommitmentWaitForDelivery, [tInitCommitmentWaitForDelivery], [tFailureCommitmentWaitForDelivery, tSuccessCommitmentWaitForDelivery], [tBuyEvent, tNegBuyEvent], [], [])
+        sale.createBridge(tNegBuyEvent, pFailureCommitmentWaitForDelivery, tFailureCommitmentWaitForDelivery)
+        sale.createBridge(tBuyEvent, pSuccessCommitmentWaitForDelivery, tSuccessCommitmentWaitForDelivery)
+        sale.createArc(pConstraintTimeoutDelivery, tTimeOutDelivery)
+        sale.createArc(pConstraintTimeoutDelivery, tDeliverEvent)
+
+        sale.createArc(tCatalystIn, pOwnsMoney)
+        Transition tCatalyst = sale.createLinkTransition()
+        sale.createBiflowArc(pOwnsMoney, tCatalyst)
+        sale.createPersistentBridge(tCatalyst, pInitAffordanceBuyGood, tInitAffordanceBuyGood)
+        sale.createDiodeArc(tInitAffordanceBuyGood, pAffordanceBuyGood)
+
+        Transition tStartAction = sale.createLinkTransition()
+        Place pStartAction = sale.createLinkPlace()
+
+        sale.createDiodeArc(tStartAction, pStartAction)
+        sale.createBiflowArc(pStartAction, tInitCommitmentWaitForOffer)
+
+        sale.createBiflowArc(tStartAction, pCommitmentBuyGood)
+        sale.createBiflowArc(tStartAction, pAffordanceBuyGood)
+        sale.createBridge(tStartAction, tInitCommitmentWaitForOffer)
+        sale.createBridge(tSuccessCommitmentWaitForOffer, tAcceptEvent)
+        sale.createBridge(tFailureCommitmentWaitForDelivery, tEnforceEvent)
+
+        Place pFailureSink = sale.createLinkPlace()
+        sale.createArc(tFailureCommitmentWaitForOffer, pFailureSink)
+        sale.createArc(tFailureCommitmentWaitForDelivery, pFailureSink)
+        sale.createArc(pFailureSink, tNegBuyEvent)
+
+        Place pBridge1 = sale.createBridge(tAcceptEvent, tPayEvent)
+        Place pBridge2 = sale.createBridge(tPayEvent, tBuyEvent)
+
+        sale.createResetArc(pStartAction, tFailureCommitmentBuyGood)
+        sale.createResetArc(pBridge1, tFailureCommitmentBuyGood)
+        sale.createResetArc(pBridge2, tFailureCommitmentBuyGood)
+
+        sale.createBridge(tAcceptEvent, tInitCommitmentWaitForDelivery)
+        sale.createBridge(tSuccessCommitmentWaitForDelivery, tBuyEvent)
+
+        sale.createArc(tInitCommitmentWaitForOffer, pConstraintTimeoutOffer)
+        sale.createArc(tInitCommitmentWaitForDelivery, pConstraintTimeoutDelivery)
+
         sale.resetIds()
         sale
     }
+
 }

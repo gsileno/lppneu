@@ -61,7 +61,7 @@ class JurixTest extends GroovyTestCase {
         assert Subsumption.subsumes(MarketModel.groundSaleInstance(), MarketModel.groundSaleInstance())
         assert Subsumption.subsumes(MarketModel.groundSaleModel(), MarketModel.groundSaleModel())
         assert Subsumption.subsumes(MarketModel.groundSaleNormativeModel(), MarketModel.groundSaleNormativeModel())
-        // Subsumption.subsumes(MarketModel.groundSaleScriptModel(), MarketModel.groundSaleScriptModel())
+        assert Subsumption.subsumes(MarketModel.groundSaleScriptModel(), MarketModel.groundSaleScriptModel())
     }
 
     void testSubsumption1() {
@@ -73,15 +73,19 @@ class JurixTest extends GroovyTestCase {
     }
 
     void testSubsumption2() {
-     assert Subsumption.subsumes(MarketModel.groundSaleNormativeModel(), MarketModel.groundSaleModel())
-//        assert Subsumption.subsumes(MarketModel.groundSaleModel(), MarketModel.groundSaleInstance())
-//        assert Subsumption.subsumes(MarketModel.groundSaleNormativeModel(), MarketModel.groundSaleModel())
-        //assert Subsumption.subsumes(MarketModel.groundSaleModel(), MarketModel.groundSaleNormativeModel())
-        // Subsumption.subsumes(MarketModel.groundSaleScriptModel(), MarketModel.groundSaleScriptModel())
+        assert Subsumption.subsumes(MarketModel.groundSaleNormativeModel(), MarketModel.groundSaleModel())
+    }
+
+    void testSubsumption2bis() {
+        assert !Subsumption.subsumes(MarketModel.groundSaleModel(), MarketModel.groundSaleNormativeModel())
     }
 
     void testSubsumption3() {
-        assert !Subsumption.subsumes(MarketModel.groundSaleModel(), MarketModel.groundSaleNormativeModel())
-        // Subsumption.subsumes(MarketModel.groundSaleScriptModel(), MarketModel.groundSaleScriptModel())
+        assert Subsumption.subsumes(MarketModel.groundSaleScriptModel(), MarketModel.groundSaleNormativeModel())
     }
+
+    void testSubsumption3bis() {
+        assert !Subsumption.subsumes(MarketModel.groundSaleNormativeModel(), MarketModel.groundSaleScriptModel())
+    }
+
 }
