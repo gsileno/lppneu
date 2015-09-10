@@ -374,7 +374,7 @@ class LPTransition extends Transition {
         // cut out not emitters
         if (inputs.size() == 0) return false
 
-        // initialize filter to unify tokens+
+        // initialize filter to unify tokens
         if (inputCommonVarList == null) {
             initializeUnificationFilter()
         }
