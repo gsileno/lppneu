@@ -31,26 +31,26 @@ class ReadmeTest extends GroovyTestCase {
 
         net.resetIds()
 
-//        NetRunner runner = new NetRunner()
-//        runner.load(net)
-//
-//        net.exportToJson("readmeNet.step0")
-//
-//        runner.run(1)
-//
-//        net.exportToJson("readmeNet.step1")
-//
-//        runner.run(1)
-//        net.exportToJson("readmeNet.step2")
-//        runner.run(1)
-//        net.exportToJson("readmeNet.step3")
-//        net.exportToDot("readmeNet")
-//
-
         NetRunner runner = new NetRunner()
         runner.load(net)
-        runner.analyse()
-        runner.analysis.exportToLog("readmeNet")
+
+        net.exportToJson("readmeNet.step0")
+
+        runner.run(1)
+
+        net.exportToJson("readmeNet.step1")
+
+        runner.run(1)
+        net.exportToJson("readmeNet.step2")
+        runner.run(1)
+        net.exportToJson("readmeNet.step3")
+        net.exportToDot("readmeNet")
+
+
+//        NetRunner runner = new NetRunner()
+//        runner.load(net)
+//        runner.analyse()
+//        runner.analysis.exportToLog("readmeNet")
 
     }
 
