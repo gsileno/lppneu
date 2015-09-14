@@ -1,24 +1,20 @@
 # lppneu
 
-Logic Programming Petri Net pnEUmatics: *groovy libraries/scripts to tinker with Logic Programming Petri Nets*
+*exdending pneu for LPPNs (Logic Programming Petri Nets)*
 
-always valid guidelines:
+(still quite a prototype)
 
-* keep the source code simple, readable with few comments
-* hopefully no documentation required
-* make tests for each component
+##Dependencies
 
-## Dependencies
-
-pneu
-grasp
+* https://github.com/s1l3n0/pneu
 
 ## Components
 
-* parser of LPPN files
-* simulator 
-* analyzer 
-* exporter to PNML (to be executed, at least partially, e.g. on Yasper) 
+* LPPN model (labels on places, transitions, tokens with grounded predicates)
+* parser of LPPN files (.lppn)
+* LPPN simulator (via pneu) 
+* LPPN analyzer (via pneu)
+* LPPN exporter (via pneu)
 
 ## Usage
 
