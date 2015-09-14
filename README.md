@@ -2,6 +2,8 @@
 
 *exdending pneu for LPPNs (Logic Programming Petri Nets)*
 
+LPPN integrates Logic Programming constructs with Petri Nets. In short, the verb/noun categories are mapped as declarative labelings of transitions/places. Tokens are grounded statements, consumed/produced by events.
+
 (still quite a prototype)
 
 ##Dependencies
