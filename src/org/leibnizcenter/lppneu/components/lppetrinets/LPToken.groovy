@@ -14,11 +14,14 @@ class LPToken extends Token {
     Expression expression
 
     String toString() {
-        expression.toString()
+        if (expression)
+            expression.toString()
+        else
+            ""
     }
 
     String label() {
-        expression.toString()
+        toString()
     }
 
     // LP net tokens are equal if they are of the same type and transports the same content

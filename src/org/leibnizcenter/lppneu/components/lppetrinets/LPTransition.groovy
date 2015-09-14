@@ -501,23 +501,33 @@ class LPTransition extends Transition {
         if (link) log.trace("it is a link transition")
 
         log.trace("${id}: transmitted content for production (without anonymous variables): ${coreContent}")
-        List<String> outCommonVarStringList = []
 
+        List<String> outCommonVarStringList = []
         for (var in getOutputCommonVarList()) {
             outCommonVarStringList << var.name
         }
-
         log.trace("${id}: output common variables: ${outCommonVarStringList}")
 
-        for (var in outCommonVarStringList) {
-            if (!coreContent.keySet().contains(var))
+        List<String> transitionVarStringList = []
+
+        if (!link) {
+            for (var in operation.getVariables()) {
+                transitionVarStringList << var.name
+            }
+            log.trace("${id}: transition variables: ${transitionVarStringList}")
+        }
+
+        for (var in outCommonVarStringList + transitionVarStringList) {
+            if (!coreContent.keySet().contains(var)) {
                 coreContent[var] = generateAnonymousIdentifier(var)
+                log.trace("${id}: generate anonymous identifier for ${var}: "+coreContent[var])
+            }
         }
 
         createContent(coreContent)
     }
 
-    // when we already know which event we have to choose
+    // when we already know which event we have to fire
     TransitionEvent produceOutputTokens(TransitionEvent event) {
         log.trace("${id} produces via ${event}.")
         if (link) log.trace("it is a link transition")
@@ -608,8 +618,10 @@ class LPTransition extends Transition {
 
         // free variables to be generated at transition level
         // TODO: add transition binding
-        // List<Variable> freeVariables = getOutputCommonVarList() - getAllInputVarList()
-        List<Variable> freeVariables = getAllOutputVarList() - getAllInputVarList()
+
+        List<Variable> freeVariables = (getAllOutputVarList() - getVarList()) + getVarList() - getAllInputVarList()
+
+        log.trace("transition var list: " + getVarList())
         log.trace("all var list: " + getAllVarList())
         log.trace("output common var list: " + getOutputCommonVarList())
         log.trace("all input var list: " + getAllInputVarList())
@@ -775,7 +787,7 @@ class LPTransition extends Transition {
     List<Variable> reifyPlaces(Boolean forwardDirection = true) {
 
         if (!link) {
-            log.trace("${id} is specified.. " + toString())
+            log.trace("${id} is not a link, therefore there is a label: I get variables from here " + toString())
             return operation.getVariables()
         }
 

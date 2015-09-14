@@ -184,11 +184,16 @@ class LPPlace extends Place {
     }
 
     private void fillParametersWithContent(List<Parameter> parameters, Map<String, String> content) {
+        log.trace("filling place ${id}, which has parameters $parameters, with content $content")
         for (param in parameters) {
             if (param.isVariable()) {
-                if (content[param.variable.name] == null)
+                log.trace("parameter $param is a variable")
+                if (content[param.variable.name] == null) {
                     param.variable.identifier = generateAnonymousIdentifier(param.variable.name)
-                param.variable.identifier = PosLiteral.build(Atom.build(content[param.variable.name]))
+                    log.trace("I do not have it in the content, I generate an anonymous variable: "+param.variable.identifier)
+                } else {
+                    param.variable.identifier = PosLiteral.build(Atom.build(content[param.variable.name]))
+                }
             } else if (param.isLiteral()) {
                 if (param.literal.parameters.size() > 0) {
                     fillParametersWithContent(param.literal.parameters, content)
