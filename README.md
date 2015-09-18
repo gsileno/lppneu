@@ -42,7 +42,6 @@ net.createArc(pOut2, tOut)
 net.resetIds() 
 ```
 
-
 **monolithic simulation**
 ```
 NetRunner runner = new NetRunner()
@@ -55,7 +54,7 @@ runner.run(2) // to make 2 discrete steps
 net.exportToJson("readmeNet")
 ```
 
-output: /out/json/readmeNet.json
+output: out/json/readmeNet.json
 ```
 {
   "places": [
@@ -87,7 +86,7 @@ runner.analyse()
 runner.analysis.exportToLog("readmeNet")
 ```
 
-output: /out/log/analysis/readmeNet.analysis.log
+output: out/log/analysis/readmeNet.analysis.log
 ```
 Summary: 
 0: t0.*(Object:_t0object0), t1.cutsInTwoPieces(Person:_t1person1, Object:_t0object0), t2.* (t2).
