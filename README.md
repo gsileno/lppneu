@@ -2,7 +2,7 @@
 
 *pneu extension for LPPNs (Logic Programming Petri Nets)*
 
-LPPN is a notation which integrates Logic Programming constructs with Petri Nets, under ongoing research and development. In short, the verb/noun categories are mapped as labelings of transitions/places. Tokens are grounded statements, consumed/produced by events.
+LPPNs integrate Logic Programming constructs with Petri Nets. This library reflects preliminary results of ongoing research. In short, the verb/noun categories are mapped as labelings of transitions/places. Tokens are grounded statements, consumed/produced by events.
 
 (still quite a prototype)
 
