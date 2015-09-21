@@ -50,14 +50,18 @@ class LPToken extends Token {
     }
 
 
-    Boolean subsumes(Token t, Map<String, Map<String, String>> mapIdentifiers = [:]) {
+    Boolean subsumes(Token t, Map<String, Map<String, String>> mapIdentifiers = [:], Boolean negateHead = false) {
 
         if (t.class != LPToken)
             throw new RuntimeException("Wrong type of token")
 
         Token lpt = (LPToken) t
 
-        expression.subsumes(lpt.expression, mapIdentifiers)
+        if (!negateHead)
+            expression.subsumes(lpt.expression, mapIdentifiers)
+        else {
+            expression.negate().subsumes(lpt.expression, mapIdentifiers) || expression.nullify().subsumes(lpt.expression, mapIdentifiers)
+        }
     }
 
     Token minimalClone() {

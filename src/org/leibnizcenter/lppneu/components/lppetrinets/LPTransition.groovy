@@ -100,9 +100,14 @@ class LPTransition extends Transition {
         return compare(this, other)
     }
 
-    // TODO
-    Boolean subsumes(Transition that) {
-        compare(that)
+    Boolean subsumes(Transition t) {
+        LPTransition lpt = (LPTransition) t
+
+        if (isLink() && t.isLink())
+            return true
+
+        // TODO: avoid the double change
+        operation.toExpression().subsumes(lpt.operation.toExpression())
     }
 
     //////////////////////////////
@@ -846,5 +851,7 @@ class LPTransition extends Transition {
         log.trace("${id}: variables found: " + varList)
         varList
     }
+
+
 
 }

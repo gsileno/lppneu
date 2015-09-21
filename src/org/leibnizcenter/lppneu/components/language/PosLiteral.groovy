@@ -51,26 +51,45 @@ class PosLiteral {
     Boolean subsumes(PosLiteral specific, Map<String, Map<String, String>> mapIdentifiers = [:]) {
         log.trace("checking $this against $specific")
 
+        // check if the functor is the same
         if (functor.name != specific.functor.name) return false
 
+        // TO CHANGE: I shouldn't need the requirement of same number of parameters
         if (parameters.size() != specific.parameters.size()) {
             log.trace("the two literals have a different number of parameters")
             return false
         }
 
+        // ASSUMPTION: same parameter order! TODO: not necessarily true
+
+        // CHECK: now general variables evaluated with specific variables or constants
+        //        does general constants make sense to be compared to specific variable?
+
+        // check if each parameter subsume the other
         for (int i = 0; i < parameters.size(); i++) {
+
+            // if the parameter is a literal
             if (parameters[i].isLiteral()) {
                 String generalId = parameters[i].literal.functor.name
+                log.trace("general id: ${generalId}")
+
+                // if the specific parameter is a literal as well, check each other
                 if (specific.parameters[i].isLiteral()) {
-                    if (!parameters[i].literal.subsumes(specific.parameters[i].literal))
+                    if (!parameters[i].literal.subsumes(specific.parameters[i].literal, mapIdentifiers))
                         return false
+                // if it is a variable, check if the identifier mapping corresponds
                 } else if (specific.parameters[i].isVariable()) {
+
+                    // WRONG: here I considerate only functors, but variables value can be a predicate as well!
+
                     String specificVarString = specific.parameters[i].variable.name
                     String specificId = specific.parameters[i].variable.identifier
 
                     log.trace("specific id: ${specificId}")
 
-                    // TODO: check for overlap between specific and general model variables
+                    // TODO: check for overlap between specific and general model variables!!! URGENT
+
+                    // if this is the first time you meet this specific variable
                     if (mapIdentifiers[specificVarString] == null) {
                         mapIdentifiers[specificVarString] = [:]
                     }

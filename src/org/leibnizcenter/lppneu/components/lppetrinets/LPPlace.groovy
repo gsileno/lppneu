@@ -1,10 +1,8 @@
 package org.leibnizcenter.lppneu.components.lppetrinets
 
 import groovy.util.logging.Log4j
-import org.leibnizcenter.lppneu.builders.LPPN2LPN
 import org.leibnizcenter.lppneu.components.language.Atom
 import org.leibnizcenter.lppneu.components.language.Expression
-import org.leibnizcenter.lppneu.components.language.Operation
 import org.leibnizcenter.lppneu.components.language.Parameter
 import org.leibnizcenter.lppneu.components.language.PosLiteral
 import org.leibnizcenter.lppneu.components.language.Operator
@@ -233,6 +231,10 @@ class LPPlace extends Place {
         newToken
     }
 
+//    Token createToken(Map<String, Map<String, String>> mapIdentifiers) {
+//        throw new RuntimeException("Yet to be implemented")
+//    }
+
     // TODO: refactor with Analysis
     LPPlace minimalClone() {
         Map<String, Integer> newVariableAnonymousGeneratedIdCountMap = [:]
@@ -351,6 +353,17 @@ class LPPlace extends Place {
         varList
     }
 
+    Boolean subsumes(Place p, Boolean negateHead = false) {
+        LPPlace lp = (LPPlace) p
+
+        if (isLink() && p.isLink())
+            return true
+
+        if (!negateHead)
+            expression.subsumes(lp.expression)
+        else
+            expression.negate().subsumes(lp.expression) || expression.nullify().subsumes(lp.expression)
+    }
 
 }
 
