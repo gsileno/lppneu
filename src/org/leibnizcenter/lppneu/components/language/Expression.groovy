@@ -149,6 +149,10 @@ class Expression {
         return this.positive().negate()
     }
 
+    Expression dual() {
+        return build(this, Operator.DUAL)
+    }
+
     Expression minimalClone() {
         new Expression(formula: formula.minimalClone())
     }

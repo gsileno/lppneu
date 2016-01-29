@@ -28,7 +28,7 @@ import groovy.util.logging.Log4j
 
 @Log4j
 enum Operator {
-    POS, NEG, NULL, NOT,             // unary operators  (situations and events)
+    POS, NEG, NULL, DUAL,             // unary operators  (situations and events)
     AND, OR, XOR,                    // binary operators (situations)
     SEQ, PAR, OPT, ALT,              // binary operators (events and situations)
     IMPLIES, FORBIDS, DEFINES,      // logical dependencies on situations
@@ -55,7 +55,7 @@ enum Operator {
     }
 
     Boolean isUnary() {
-        this == POS || this == NEG || this == NULL || this == NOT ||
+        this == POS || this == NEG || this == NULL || this == DUAL ||
                 this == POS_INSTANCE || this == NEG_INSTANCE || this ==  NULL_INSTANCE ||
                 this == POS_THIS || this == NEG_THIS || this == NULL_THIS
     }

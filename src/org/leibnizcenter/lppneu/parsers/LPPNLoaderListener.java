@@ -163,7 +163,7 @@ public class LPPNLoaderListener extends LPPNBaseListener {
         Literal literal = literalNodes.get(ctx.literal());
 
         if (ctx.NOT() != null)
-            expression = Expression.build(literal, Operator.NOT);
+            expression = Expression.build(literal, Operator.DUAL);
         else {
             expression = Expression.build(literal);
         }
@@ -196,7 +196,7 @@ public class LPPNLoaderListener extends LPPNBaseListener {
             );
         } else if (ctx.NOT() != null) {
             expression = Expression.build(
-                    expressionNodes.get(ctx.body_expression(0)), Operator.NOT
+                    expressionNodes.get(ctx.body_expression(0)), Operator.DUAL
             );
         } else {
             Operator op;

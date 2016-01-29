@@ -49,7 +49,7 @@ class Formula<T> {
         Formula<T> formula = new Formula<T>()
 
         if (terms.size() > 1) {
-            if (op == Operator.POS || op == Operator.NEG || op == Operator.NULL || op == Operator.NOT)
+            if (op == Operator.POS || op == Operator.NEG || op == Operator.NULL || op == Operator.DUAL)
                 throw new RuntimeException("Unary operator cannot have more than one term")
 
             formula.operator = op
@@ -73,7 +73,7 @@ class Formula<T> {
                 formula = build(terms[0])
 
             // for these operators, you have to maintain the information about the operator
-            else if (op == Operator.NOT ||
+            else if (op == Operator.DUAL ||
                      op == Operator.OCCURS || op == Operator.TRIPLE || op == Operator.ASSOCIATION ||
                      op == Operator.IS_IMPLIED_BY || op == Operator.IS_CAUSED_BY ||
                      op == Operator.SUCCESS || op == Operator.FAILURE || op == Operator.INHIBITION ||

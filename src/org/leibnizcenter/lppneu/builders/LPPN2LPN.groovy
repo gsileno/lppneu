@@ -224,7 +224,7 @@ class LPPN2LPN {
             net.createArc(pIn, tOut)
             net.createArc(tIn, pIn)
 
-            Net subNet = buildExpressionNet(Expression.build(input, Operator.NOT))
+            Net subNet = buildExpressionNet(Expression.build(input, Operator.DUAL))
             NetInterface subNetInterface = net.includeWithInterface(subNet)
 
             net.createArc(subNetInterface.placeOutputs[0], tIn)
@@ -296,7 +296,7 @@ class LPPN2LPN {
             throw new RuntimeException("Fatal error: OCCURS_IN requires just two parameters.")
         }
 
-        Net subNet = buildExpressionNet(Expression.build(eventExpression, Operator.NOT))
+        Net subNet = buildExpressionNet(Expression.build(eventExpression, Operator.DUAL))
         NetInterface subNetInterface = net.includeWithInterface(subNet)
 
         net.createArc(subNetInterface.placeOutputs[0], tOut)
