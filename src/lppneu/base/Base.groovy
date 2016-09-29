@@ -22,7 +22,7 @@ class Base<T> {
     }
 
     T build(T elem) {
-        Integer pos = add(T)
+        Integer pos = add(elem)
         if (pos == null) return null
         base[pos]
     }
