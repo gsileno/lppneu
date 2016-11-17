@@ -4,8 +4,8 @@ import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.ParseTreeProperty;
 import org.apache.log4j.Logger;
 import lppneu.components.language.*;
-import org.leibnizcenter.lppneu.parser.LPPNBaseListener;
-import org.leibnizcenter.lppneu.parser.LPPNParser;
+import lppneu.parser.LPPNBaseListener;
+import lppneu.parser.LPPNParser;
 
 import java.util.ArrayList;
 import java.util.List;

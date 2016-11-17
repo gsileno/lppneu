@@ -1,5 +1,5 @@
 // Generated from /home/giovanni/dev/lppneu/antlr4/LPPN.g4 by ANTLR 4.5.1
-package org.leibnizcenter.lppneu.parser;
+package lppneu.parser;
 import org.antlr.v4.runtime.tree.ParseTreeListener;
 
 /**

@@ -5,8 +5,8 @@ import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
 import lppneu.components.language.LPPNProgram;
-import org.leibnizcenter.lppneu.parser.LPPNLexer;
-import org.leibnizcenter.lppneu.parser.LPPNParser;
+import lppneu.parser.LPPNLexer;
+import lppneu.parser.LPPNParser;
 
 import java.io.*;
 
